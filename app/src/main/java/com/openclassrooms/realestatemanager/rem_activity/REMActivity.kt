@@ -1,7 +1,8 @@
-package com.openclassrooms.realestatemanager
+package com.openclassrooms.realestatemanager.rem_activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.openclassrooms.realestatemanager.R
 
 class REMActivity : AppCompatActivity() {
 
