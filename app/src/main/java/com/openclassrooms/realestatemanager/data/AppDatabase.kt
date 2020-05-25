@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.openclassrooms.realestatemanager.utilities.DATABASE_NAME
 
 
-@Database(entities = [Property::class], version = 1, exportSchema = false)
+@Database(entities = [Property::class,PropertyPhoto::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun propertyDao(): PropertyDao
     abstract fun propertyPhotoDao(): PropertyPhotoDao

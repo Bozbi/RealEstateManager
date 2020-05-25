@@ -23,5 +23,6 @@ data class PropertyPhoto(
     @ColumnInfo(name = "main_photo") val mainPhoto : Boolean
 ) {
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0
+    @ColumnInfo(name = "photo_id")
+    var photoId: Long = 0
 }

@@ -15,12 +15,12 @@ data class Property (
     @ColumnInfo(name ="rooms_count") val roomsCount : Int,
     @ColumnInfo(name = "description") val description : String,
     @ColumnInfo(name = "address") val address : String,
-    @ColumnInfo(name = "insert_date") val insertDate :LocalDateTime,
-    @ColumnInfo(name = "sell_date") val sellDate :LocalDateTime?,
+    @ColumnInfo(name = "insert_date") val insertDate :String,
+    @ColumnInfo(name = "sell_date") val sellDate :String,
     @ColumnInfo(name="agent_name") val agentName : String
 
 ){
-    @ColumnInfo(name ="property_id")
     @PrimaryKey(autoGenerate = true)
-    val propertyId : Long = 0
+    @ColumnInfo(name ="property_id")
+    var propertyId : Long = 0
 }
