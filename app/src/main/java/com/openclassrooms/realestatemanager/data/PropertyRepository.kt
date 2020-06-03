@@ -1,14 +1,14 @@
 package com.openclassrooms.realestatemanager.data
 
-class PropertyRepository private constructor(
-    private val propertyDao: PropertyDao
-) {
-    companion object {
+import com.openclassrooms.realestatemanager.App
 
-        private var instance: PropertyRepository? = null
+object PropertyRepository{
 
-        fun getInstance(propertyDao: PropertyDao) =
-            instance ?:PropertyRepository(propertyDao).also { instance = it }
+    private val propertyDao = AppDatabase.getInstance(App.getInstance()).propertyDao()
 
-    }
+    suspend fun insertProperty(property: Property)= propertyDao.insertProperty(property)
+
+    suspend fun getAllProperties() = propertyDao.getAllProperties()
+
 }
+

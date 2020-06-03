@@ -1,17 +1,18 @@
 package com.openclassrooms.realestatemanager.data
 
-import androidx.lifecycle.LiveData
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
+
 
 @Dao
 interface PropertyDao {
 
     @Query("SELECT * FROM properties")
-    fun getAllProperties(): LiveData<List<Property>>
+    suspend fun getAllProperties(): List<Property>
 
     @Insert
-    fun insertProperty(property: Property)
-
-    @Update
-    fun updateProperty(property: Property)
+    suspend fun insertProperty(property: Property)
 }
