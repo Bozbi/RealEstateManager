@@ -6,8 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.rem_activity.REMActivity">
 
-
-
     <FrameLayout
         android:id="@+id/container1"
         android:layout_width="match_parent"
