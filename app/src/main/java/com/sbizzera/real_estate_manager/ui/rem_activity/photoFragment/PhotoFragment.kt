@@ -1,31 +1,28 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.photoFragment
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toUri
+import android.widget.Toast
+import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
+import com.bumptech.glide.Glide
 import com.sbizzera.real_estate_manager.R
-import com.sbizzera.real_estate_manager.events.EventListener
+import com.sbizzera.real_estate_manager.events.OnPhotoSelectedListener
+import com.sbizzera.real_estate_manager.events.SelectPhotoSourceListener
 import com.sbizzera.real_estate_manager.utils.ViewModelFactory
 import kotlinx.android.synthetic.main.fragment_photo.*
 import kotlinx.android.synthetic.main.fragment_photo.view.*
-import java.io.File
-import java.io.IOException
-import java.util.*
 
-class PhotoFragment() : Fragment() {
+class PhotoFragment() : Fragment(), OnPhotoSelectedListener {
 
-    private val REQUEST_IMAGE_CAPTURE = 1
-    private val REQUEST_IMAGE_FROM_GALLERY = 2
-    private lateinit var currentPhotoPath: String
-    private lateinit var currentPhotoId :String
-    lateinit var listener : EventListener
+
+    private lateinit var viewModel: PhotoFragmentViewModel
+    lateinit var listener: SelectPhotoSourceListener
 
     companion object {
         fun newInstance(): PhotoFragment {
@@ -38,83 +35,47 @@ class PhotoFragment() : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         val view = inflater.inflate(R.layout.fragment_photo, container, false)
 
-        val viewModel = ViewModelProvider(this,ViewModelFactory).get(PhotoFragmentViewModel::class.java)
-
-        viewModel.viewAction.observe(this){viewAction ->
-            when(viewAction){
-                is ViewAction.SavePhoto -> println("debug : save clicked")
-                is ViewAction.LaunchGallery -> listener.onLaunchGalleryClick()
-                is ViewAction.LaunchCamera -> listener.onLaunchCameraClick()
+        viewModel = ViewModelProvider(this, ViewModelFactory).get(PhotoFragmentViewModel::class.java)
+        viewModel.viewAction.observe(this) { viewAction ->
+            when (viewAction) {
+                is ViewAction.OnLaunchGalleryClick -> listener.onLaunchGalleryClick()
+                is ViewAction.OnLaunchCameraClick -> listener.onLaunchCameraClick()
             }
         }
 
+        viewModel.uiModelLiveData.observe(this) { model ->
+            updateUi(model)
+        }
+
         view.takePhotoBtn.setOnClickListener {
-            viewModel.takePhotoBtnClicked()
+            viewModel.onLaunchCameraClick()
         }
         view.addPhotoFromGalleryBtn.setOnClickListener {
-            viewModel.addPhotoFromGalleryBtnClicked()
+            viewModel.onLaunchGalleryClick()
         }
         view.savePhotoBtn.setOnClickListener {
-            viewModel.savePhotoBtnClicked()
+            viewModel.onSavePhotoBtnClicked()
         }
 
-        //TODO se faire expliquer ça par Nino et comment le mettre en MVVM
-//        view.takePhotoBtn.setOnClickListener {
-//            Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-//                takePictureIntent.resolveActivity(activity!!.packageManager)?.also {
-//                    val photoFile: File? = try {
-//                        createImageFile()
-//                    } catch (ex: IOException) {
-//                        null
-//                    }
-//
-//                    photoFile?.also {
-//                        val photoURI: Uri = FileProvider.getUriForFile(
-//                            requireActivity(),
-//                            "com.sbizzera.real_estate_manager",
-//                            it
-//                        )
-//                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-//                        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
-//                    }
-//                }
-//            }
-//        }
+        view.photoTitle.doOnTextChanged { text, _, _, _ ->
+            viewModel.onTitleTextChanged(text)
+        }
 
-
-//        view.addPhotoFromGalleryBtn.setOnClickListener {
-//            val intent = Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-//            startActivityForResult(intent,REQUEST_IMAGE_FROM_GALLERY)
-//        }
         return view
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == AppCompatActivity.RESULT_OK) {
-            photoContainer.setImageURI(currentPhotoPath.toUri())
-            val testPhotoId = "032da1bd-3150-4009-a4fa-330ae2e70f3a3018680426709714817"
-            photoContainer.setImageURI("/data/user/0/com.sbizzera.real_estate_manager/files/${testPhotoId}.jpg".toUri())
 
-        }
-
-        if (requestCode == REQUEST_IMAGE_FROM_GALLERY && resultCode == AppCompatActivity.RESULT_OK) {
-            photoContainer.setImageURI(data?.data)
-        }
+    private fun updateUi(model: UiModel) {
+        savePhotoBtn.isClickable = model.saveBtnClickable
+        savePhotoBtn.isVisible = model.saveBtnClickable
+        Glide.with(this).load(model.imageUri).into(photoContainer)
     }
 
-    @Throws(IOException::class)
-    private fun createImageFile(): File {
-        val storageDir: File? = activity!!.filesDir
-        currentPhotoId = UUID.randomUUID().toString()
-        return File.createTempFile(
-            currentPhotoId,
-            ".jpg",
-            storageDir
-        )
-            .apply {
-            currentPhotoPath = absolutePath
-        }
+
+    override fun onPhotoSelected(uri: String) {
+        viewModel.onPhotoSelected(uri)
     }
 }

@@ -1,9 +1,9 @@
 package com.sbizzera.real_estate_manager
 
-import android.app.Application
+import androidx.multidex.MultiDexApplication
 import com.jakewharton.threetenabp.AndroidThreeTen
 
-class App : Application() {
+class App : MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()
@@ -11,8 +11,8 @@ class App : Application() {
         AndroidThreeTen.init(this)
     }
 
-    companion object{
-        private lateinit var instance : App
-        fun getInstance():App = instance
+    companion object {
+        private lateinit var instance: App
+        fun getInstance(): App = instance
     }
 }

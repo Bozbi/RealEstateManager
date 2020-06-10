@@ -1,6 +1,6 @@
 package com.sbizzera.real_estate_manager.events
 
-interface EventListener {
+interface SelectPhotoSourceListener {
     fun onLaunchCameraClick()
     fun onLaunchGalleryClick()
 }

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Real Estate Manager</string>
+    <string name="app_package_name">com.sbizzera.real_estate_manager</string>
 </resources>
