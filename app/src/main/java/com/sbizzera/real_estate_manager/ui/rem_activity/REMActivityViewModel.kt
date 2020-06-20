@@ -9,18 +9,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sbizzera.real_estate_manager.App
+import com.sbizzera.real_estate_manager.data.photo.Photo
 import com.sbizzera.real_estate_manager.data.property.Property
 import com.sbizzera.real_estate_manager.data.property.PropertyRepository
-import com.sbizzera.real_estate_manager.data.property_register.PropertyRegisterRepository
-import com.sbizzera.real_estate_manager.data.utils.toPropertyRegisterRow
-import com.sbizzera.real_estate_manager.utils.FileHelper
 import com.sbizzera.real_estate_manager.utils.FAKE_PROPERTIES
+import com.sbizzera.real_estate_manager.utils.FileHelper
 import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
 import kotlinx.coroutines.launch
 
 class REMActivityViewModel(
     private val propertyRepository: PropertyRepository,
-    private val propertyRegisterRepository: PropertyRegisterRepository,
     private val fileHelper: FileHelper,
     private val appContext: App
 ) : ViewModel() {
@@ -38,14 +36,28 @@ class REMActivityViewModel(
     init {
 //        populateDbForTesting()
 //        compareRegistersAndReact()
+        populateFirestoreForTesting()
+
+
     }
 
+    private fun populateFirestoreForTesting() {
+        val propertyList = FAKE_PROPERTIES
+        propertyList.forEach {
+            insertRemoteProperty(it)
+        }
+    }
+
+    private fun insertRemoteProperty(propertyToInsert: Property) {
+        viewModelScope.launch {
+            propertyRepository.insertRemoteProperty(propertyToInsert)
+        }
+    }
 
 
     private fun insertProperty(propertyToInsert: Property) {
         viewModelScope.launch {
             propertyRepository.insertLocalProperty(propertyToInsert)
-            propertyRegisterRepository.insertPropertyInLocalRegister(propertyToInsert.toPropertyRegisterRow())
         }
     }
 
@@ -56,6 +68,7 @@ class REMActivityViewModel(
             insertProperty(it)
         }
     }
+
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_FROM_GALLERY && resultCode == AppCompatActivity.RESULT_OK) {
@@ -87,10 +100,17 @@ class REMActivityViewModel(
         viewAction.value = ViewAction.OnLaunchCameraClick(takePictureIntent2, REQUEST_IMAGE_CAPTURE)
     }
 
+    fun onLaunchEditor() {
+        viewAction.value = ViewAction.OnPhotoEditorLaunch()
+    }
+
+
+
     sealed class ViewAction {
         data class OnLaunchCameraClick(val intent: Intent, val requestCode: Int) : ViewAction()
         data class OnLaunchGalleryClick(val intent: Intent, val requestCode: Int) : ViewAction()
         data class OnPhotoSelected(val photoUri: String) : ViewAction()
+        class OnPhotoEditorLaunch ():ViewAction()
     }
 
 }

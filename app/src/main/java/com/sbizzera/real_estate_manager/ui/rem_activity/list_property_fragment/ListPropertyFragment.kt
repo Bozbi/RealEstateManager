@@ -12,7 +12,8 @@ import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.utils.ViewModelFactory
 import kotlinx.android.synthetic.main.fragment_list_property.view.*
 
-class ListPropertyFragment : Fragment() {
+class
+ListPropertyFragment : Fragment() {
 
     companion object {
         fun newInstance(): ListPropertyFragment {

@@ -5,16 +5,15 @@ import androidx.lifecycle.ViewModelProvider
 import com.sbizzera.real_estate_manager.App
 import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyFragmentViewModel
 import com.sbizzera.real_estate_manager.data.property.PropertyRepository
-import com.sbizzera.real_estate_manager.data.property_register.PropertyRegisterRepository
 import com.sbizzera.real_estate_manager.ui.rem_activity.REMActivityViewModel
-import com.sbizzera.real_estate_manager.ui.rem_activity.photoFragment.PhotoFragmentViewModel
+import com.sbizzera.real_estate_manager.ui.rem_activity.newPropertyFragment.NewPropertyFragmentViewModel
 import java.lang.IllegalArgumentException
 
 object ViewModelFactory : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(REMActivityViewModel::class.java)){
-            return REMActivityViewModel(PropertyRepository,PropertyRegisterRepository,
+            return REMActivityViewModel(PropertyRepository,
                 FileHelper,App.getInstance()) as T
         }
         if (modelClass.isAssignableFrom(ListPropertyFragmentViewModel::class.java)){
@@ -22,8 +21,8 @@ object ViewModelFactory : ViewModelProvider.Factory {
                 PropertyRepository
             ) as T
         }
-        if (modelClass.isAssignableFrom(PhotoFragmentViewModel::class.java)){
-            return PhotoFragmentViewModel(FileHelper) as T
+        if(modelClass.isAssignableFrom(NewPropertyFragmentViewModel::class.java)){
+            return NewPropertyFragmentViewModel() as T
         }
 
 

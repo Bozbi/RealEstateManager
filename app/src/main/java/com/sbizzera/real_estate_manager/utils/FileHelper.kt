@@ -6,6 +6,7 @@ import android.provider.OpenableColumns
 import androidx.core.content.FileProvider
 import com.sbizzera.real_estate_manager.App
 import com.sbizzera.real_estate_manager.R
+import com.sbizzera.real_estate_manager.data.FirebaseStorageRepository
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -66,7 +67,7 @@ object FileHelper {
         val newFileName = "${UUID.randomUUID().toString()}.jpg"
         val newFile = File(fileDir,newFileName)
         fileToCopy.copyTo(newFile, true)
-        return newFile.path
+        return Uri.fromFile(newFile).toString()
     }
 }
 

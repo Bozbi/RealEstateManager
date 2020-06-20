@@ -4,21 +4,17 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.sbizzera.real_estate_manager.data.photo.Photo
-import com.sbizzera.real_estate_manager.data.photo.PhotoDao
+import androidx.room.TypeConverters
 import com.sbizzera.real_estate_manager.data.property.Property
 import com.sbizzera.real_estate_manager.data.property.PropertyDao
-import com.sbizzera.real_estate_manager.data.property_register.PropertyRegister
-import com.sbizzera.real_estate_manager.data.property_register.PropertyRegisterDao
-import com.sbizzera.real_estate_manager.data.property_register.PropertyRegisterRow
+import com.sbizzera.real_estate_manager.data.utils.Converters
 import com.sbizzera.real_estate_manager.utils.DATABASE_NAME
 
 
-@Database(entities = [Property::class,PropertyRegisterRow::class,Photo::class], version = 1, exportSchema = false)
+@Database(entities = [Property::class], version = 1, exportSchema = false)
+@TypeConverters(Converters::class)
 abstract class AppLocalDatabase : RoomDatabase() {
     abstract fun propertyDao(): PropertyDao
-    abstract fun propertyRegisterDao(): PropertyRegisterDao
-    abstract fun photoDao():PhotoDao
 
     companion object {
 
