@@ -7,8 +7,6 @@
     android:background="@android:color/darker_gray"
     >
 
-
-
     <ImageView
         android:id="@+id/photo_img"
         android:layout_width="match_parent"
@@ -22,5 +20,34 @@
         />
 
 
+
+    <TextView
+        android:id="@+id/photo_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#000000"
+        android:gravity="center"
+        android:alpha="0.6"
+        android:paddingVertical="10dp"
+        tools:text="Salon"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <ImageView
+        android:id="@+id/edit_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_edit"
+        app:layout_constraintBottom_toBottomOf="@id/photo_title"
+        app:layout_constraintEnd_toEndOf="@id/photo_title"
+        app:layout_constraintTop_toTopOf="@id/photo_title"
+        android:layout_margin="16dp"
+        android:tint="@android:color/white"
+        android:clickable="true"
+        android:focusable="true"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

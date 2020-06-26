@@ -4,16 +4,18 @@ import android.content.ContentResolver
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import com.sbizzera.real_estate_manager.App
 import com.sbizzera.real_estate_manager.R
-import com.sbizzera.real_estate_manager.data.FirebaseStorageRepository
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.*
 
 object FileHelper {
+
     private val appContext = App.getInstance()
+    private val tempStorage = File("${ appContext.filesDir}/temp")
 
     fun createEmptyTempPhotoFileAndGetUriBack(): String {
         val file =
@@ -25,11 +27,11 @@ object FileHelper {
     }
 
     private fun createImageFile(): File {
-        val storageDir: File? = appContext.filesDir
+        tempStorage.mkdir()
         return File.createTempFile(
-            "temp",
+            "temp_",
             ".jpg",
-            storageDir
+            tempStorage
         )
     }
 
@@ -38,8 +40,9 @@ object FileHelper {
             appContext.contentResolver.openFileDescriptor(uri!!, "r", null)
         if (parcelFileDescriptor != null) {
             val inputStream = FileInputStream(parcelFileDescriptor.fileDescriptor)
+            tempStorage.mkdir()
             val file = File(
-                appContext.filesDir,
+                tempStorage,
                 appContext.contentResolver.getFileName(uri)
             )
             val outputStream = FileOutputStream(file)
@@ -49,25 +52,29 @@ object FileHelper {
         return ""
     }
 
-    fun saveImageToPropertyFolder(path: String?, propertyId: String): String {
+    fun saveImageToPropertyFolder(path: String?, propertyId: String,photoId:String): String {
         var fileToCopy = File(path!!)
         if (!fileToCopy.exists()) {
             fileToCopy = File(
-                appContext.filesDir,
+                tempStorage,
                 appContext.contentResolver.getFileName(Uri.parse(path))
             )
         }
         val fileDir = File("${appContext.filesDir}/$propertyId")
         fileDir.mkdir()
-//        val newFile = File.createTempFile(
-//            "photo_",
-//            ".jpg",
-//            fileDir
-//        )
-        val newFileName = "${UUID.randomUUID().toString()}.jpg"
-        val newFile = File(fileDir,newFileName)
+        val newFileName = "${photoId}.jpg"
+        val newFile = File(fileDir, newFileName)
         fileToCopy.copyTo(newFile, true)
         return Uri.fromFile(newFile).toString()
+    }
+
+    fun fileExists(uri: String): Boolean {
+        val file = File(appContext.contentResolver.getFileName(Uri.parse(uri)))
+        return file.exists()
+    }
+
+    fun deleteCache() {
+        tempStorage.deleteRecursively()
     }
 }
 

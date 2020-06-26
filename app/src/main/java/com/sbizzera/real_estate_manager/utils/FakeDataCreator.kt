@@ -13,54 +13,54 @@ val FAKE_PHOTO_LIST = mutableListOf(
     Photo("photoID3","LivingRoom","https://images.unsplash.com/photo-1554995207-c18c203602cb?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80")
 )
 
-val FAKE_PROPERTIES = listOf(
-    Property(
-        UUID.randomUUID().toString(),
-        "Belle maison à BelAir",
-        "Maison",
-        350000,
-        listOf(FAKE_PHOTO_LIST[0], FAKE_PHOTO_LIST[1]),
-        DateTimeUtils.toSqlTimestamp(LocalDateTime.now()).toString()
-    ),
-    Property(
-        UUID.randomUUID().toString(),
-        "Appartement avec cachet",
-        "Appartement",
-        250000,
-        listOf(FAKE_PHOTO_LIST[2], FAKE_PHOTO_LIST[3]),
-        DateTimeUtils.toSqlTimestamp(LocalDateTime.now()).toString()
-    ),
-    Property(
-        UUID.randomUUID().toString(),
-        "Terrain à batir vue imprenable",
-        "Terrain",
-        100000,
-        listOf(FAKE_PHOTO_LIST[2], FAKE_PHOTO_LIST[3]),
-        DateTimeUtils.toSqlTimestamp(LocalDateTime.now()).toString()
-    ),
-    Property(
-        UUID.randomUUID().toString(),
-        "Loft à rénover",
-        "Appartement",
-        450000,
-        listOf(FAKE_PHOTO_LIST[0], FAKE_PHOTO_LIST[1]),
-        DateTimeUtils.toSqlTimestamp(LocalDateTime.now()).toString()
-    ),
-    Property(
-        UUID.randomUUID().toString(),
-        "Maison de ville à Fétilly",
-        "Maison",
-        550000,
-        listOf(FAKE_PHOTO_LIST[0], FAKE_PHOTO_LIST[1]),
-        DateTimeUtils.toSqlTimestamp(LocalDateTime.now()).toString()
-    ),
-    Property(
-        UUID.randomUUID().toString(),
-        "Appartement à saisir urgemment",
-        "Appartement",
-        225000,
-        listOf(FAKE_PHOTO_LIST[2], FAKE_PHOTO_LIST[3]),
-        DateTimeUtils.toSqlTimestamp(LocalDateTime.now()).toString()
-    )
-)
+//val FAKE_PROPERTIES = listOf(
+//    Property(
+//        UUID.randomUUID().toString(),
+//        "Belle maison à BelAir",
+//        "Maison",
+//        350000,
+//        listOf(FAKE_PHOTO_LIST[0], FAKE_PHOTO_LIST[1]),
+//        DateTimeUtils.toSqlTimestamp(LocalDateTime.now()).toString()
+//    ),
+//    Property(
+//        UUID.randomUUID().toString(),
+//        "Appartement avec cachet",
+//        "Appartement",
+//        250000,
+//        listOf(FAKE_PHOTO_LIST[2], FAKE_PHOTO_LIST[3]),
+//        DateTimeUtils.toSqlTimestamp(LocalDateTime.now()).toString()
+//    ),
+//    Property(
+//        UUID.randomUUID().toString(),
+//        "Terrain à batir vue imprenable",
+//        "Terrain",
+//        100000,
+//        listOf(FAKE_PHOTO_LIST[2], FAKE_PHOTO_LIST[3]),
+//        DateTimeUtils.toSqlTimestamp(LocalDateTime.now()).toString()
+//    ),
+//    Property(
+//        UUID.randomUUID().toString(),
+//        "Loft à rénover",
+//        "Appartement",
+//        450000,
+//        listOf(FAKE_PHOTO_LIST[0], FAKE_PHOTO_LIST[1]),
+//        DateTimeUtils.toSqlTimestamp(LocalDateTime.now()).toString()
+//    ),
+//    Property(
+//        UUID.randomUUID().toString(),
+//        "Maison de ville à Fétilly",
+//        "Maison",
+//        550000,
+//        listOf(FAKE_PHOTO_LIST[0], FAKE_PHOTO_LIST[1]),
+//        DateTimeUtils.toSqlTimestamp(LocalDateTime.now()).toString()
+//    ),
+//    Property(
+//        UUID.randomUUID().toString(),
+//        "Appartement à saisir urgemment",
+//        "Appartement",
+//        225000,
+//        listOf(FAKE_PHOTO_LIST[2], FAKE_PHOTO_LIST[3]),
+//        DateTimeUtils.toSqlTimestamp(LocalDateTime.now()).toString()
+//    )
+//)
 

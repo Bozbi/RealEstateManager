@@ -5,6 +5,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import kotlinx.coroutines.tasks.await
 import java.io.File
+import java.lang.Exception
 
 object FirebaseStorageRepository {
 
@@ -16,4 +17,6 @@ object FirebaseStorageRepository {
         val storageChild = storageRef.child("${file.lastPathSegment}")
         storageChild.putFile(Uri.parse(uri)).await()
     }
+
+
 }

@@ -23,7 +23,6 @@ object AnimationHelper {
         animation.duration = 300
         animation.fillAfter = true
         animation.isFillEnabled = true
-
         return animation
     }
 

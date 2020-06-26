@@ -22,7 +22,7 @@ object ViewModelFactory : ViewModelProvider.Factory {
             ) as T
         }
         if(modelClass.isAssignableFrom(NewPropertyFragmentViewModel::class.java)){
-            return NewPropertyFragmentViewModel() as T
+            return NewPropertyFragmentViewModel(PropertyRepository,FileHelper) as T
         }
 
 

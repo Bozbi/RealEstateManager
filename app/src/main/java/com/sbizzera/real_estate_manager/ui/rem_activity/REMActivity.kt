@@ -1,6 +1,7 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity
 
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -45,7 +46,7 @@ class REMActivity : AppCompatActivity(), SelectPhotoSourceListener {
                 is OnLaunchGalleryClick -> {
                     startActivityForResult(action.intent, action.requestCode)
                 }
-                is OnPhotoEditorLaunch -> {
+                OnPhotoEditorLaunch -> {
                     supportFragmentManager.beginTransaction().add(R.id.container1, PhotoEditorFragment.newInstance())
                         .addToBackStack(null).commit()
                 }
@@ -57,6 +58,7 @@ class REMActivity : AppCompatActivity(), SelectPhotoSourceListener {
     override fun onPhotoEditorLaunch() {
         viewModel.onLaunchEditor()
     }
+
 
     override fun onAttachFragment(fragment: Fragment) {
         if (fragment is NewPropertyFragment) {
@@ -71,6 +73,8 @@ class REMActivity : AppCompatActivity(), SelectPhotoSourceListener {
     override fun onLaunchGalleryClick() {
         viewModel.onLaunchGalleryClick()
     }
+
+
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

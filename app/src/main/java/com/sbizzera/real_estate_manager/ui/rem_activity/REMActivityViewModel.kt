@@ -9,10 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sbizzera.real_estate_manager.App
-import com.sbizzera.real_estate_manager.data.photo.Photo
 import com.sbizzera.real_estate_manager.data.property.Property
 import com.sbizzera.real_estate_manager.data.property.PropertyRepository
-import com.sbizzera.real_estate_manager.utils.FAKE_PROPERTIES
+
 import com.sbizzera.real_estate_manager.utils.FileHelper
 import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
 import kotlinx.coroutines.launch
@@ -36,17 +35,17 @@ class REMActivityViewModel(
     init {
 //        populateDbForTesting()
 //        compareRegistersAndReact()
-        populateFirestoreForTesting()
+//        populateFirestoreForTesting()
 
 
     }
 
-    private fun populateFirestoreForTesting() {
-        val propertyList = FAKE_PROPERTIES
-        propertyList.forEach {
-            insertRemoteProperty(it)
-        }
-    }
+//    private fun populateFirestoreForTesting() {
+//        val propertyList = FAKE_PROPERTIES
+//        propertyList.forEach {
+//            insertRemoteProperty(it)
+//        }
+//    }
 
     private fun insertRemoteProperty(propertyToInsert: Property) {
         viewModelScope.launch {
@@ -61,13 +60,13 @@ class REMActivityViewModel(
         }
     }
 
-
-    private fun populateDbForTesting() {
-        val propertyList = FAKE_PROPERTIES
-        propertyList.forEach {
-            insertProperty(it)
-        }
-    }
+//
+//    private fun populateDbForTesting() {
+//        val propertyList = FAKE_PROPERTIES
+//        propertyList.forEach {
+//            insertProperty(it)
+//        }
+//    }
 
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -101,7 +100,7 @@ class REMActivityViewModel(
     }
 
     fun onLaunchEditor() {
-        viewAction.value = ViewAction.OnPhotoEditorLaunch()
+        viewAction.value = ViewAction.OnPhotoEditorLaunch
     }
 
 
@@ -110,7 +109,7 @@ class REMActivityViewModel(
         data class OnLaunchCameraClick(val intent: Intent, val requestCode: Int) : ViewAction()
         data class OnLaunchGalleryClick(val intent: Intent, val requestCode: Int) : ViewAction()
         data class OnPhotoSelected(val photoUri: String) : ViewAction()
-        class OnPhotoEditorLaunch ():ViewAction()
+        object OnPhotoEditorLaunch :ViewAction()
     }
 
 }
