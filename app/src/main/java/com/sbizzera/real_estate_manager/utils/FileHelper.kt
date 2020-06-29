@@ -7,6 +7,9 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import com.sbizzera.real_estate_manager.App
 import com.sbizzera.real_estate_manager.R
+import com.sbizzera.real_estate_manager.data.photo.Photo
+import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyUiModel
+import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyUiModel.PhotoUiModel
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -71,6 +74,26 @@ object FileHelper {
     fun fileExists(uri: String): Boolean {
         val file = File(appContext.contentResolver.getFileName(Uri.parse(uri)))
         return file.exists()
+    }
+
+    fun getUriFromFileName(fileName : String, propertyId: String):String{
+        //TODO do the same with all list?
+        return "${appContext.filesDir}/$propertyId/$fileName.jpg"
+    }
+
+    fun deleteOldPhotosFromPropertyDirectory(listPhoto:List<PhotoUiModel>, propertyId: String){
+        //TODO see if it works later
+        val dir = File("${appContext.filesDir}/$propertyId")
+        val files = dir.listFiles()
+        files?.forEach { file ->
+            val name = file.name.replace(".jpg","")
+            val size = listPhoto.filter {photo->
+                photo.photoId == name
+            }.size
+            if (size ==0){
+                file.delete()
+            }
+        }
     }
 
     fun deleteCache() {

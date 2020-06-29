@@ -28,45 +28,10 @@ class REMActivityViewModel(
     }
 
 
-    lateinit var currentTempPhotoUri: String
+    private lateinit var currentTempPhotoUri: String
 
     val viewAction = SingleLiveEvent<ViewAction>()
 
-    init {
-//        populateDbForTesting()
-//        compareRegistersAndReact()
-//        populateFirestoreForTesting()
-
-
-    }
-
-//    private fun populateFirestoreForTesting() {
-//        val propertyList = FAKE_PROPERTIES
-//        propertyList.forEach {
-//            insertRemoteProperty(it)
-//        }
-//    }
-
-    private fun insertRemoteProperty(propertyToInsert: Property) {
-        viewModelScope.launch {
-            propertyRepository.insertRemoteProperty(propertyToInsert)
-        }
-    }
-
-
-    private fun insertProperty(propertyToInsert: Property) {
-        viewModelScope.launch {
-            propertyRepository.insertLocalProperty(propertyToInsert)
-        }
-    }
-
-//
-//    private fun populateDbForTesting() {
-//        val propertyList = FAKE_PROPERTIES
-//        propertyList.forEach {
-//            insertProperty(it)
-//        }
-//    }
 
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">Real Estate Manager</string>
     <string name="app_package_name">com.sbizzera.real_estate_manager</string>
+    <string name="property_title_error">Title must be correctly filled</string>
+    <string name="property_description_error">Description must be correctly filled</string>
+    <string name="property_address_error">Address must be correctly filled</string>
+    <string name="property_city_code_error">City Code must be correctly filled</string>
+    <string name="property_city_name_error">City Name must be correctly filled</string>
+    <string name="property_price_error">Price must be correctly filled</string>
+    <string name="property_type_error">Type must be correctly filled</string>
+    <string name="property_surface_error">Surface must be correctly filled</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.sbizzera.real_estate_manager.data.property
+package com.sbizzera.real_estate_manager.data.utils
 
 enum class PropertyType (val typeName : String){
     HOUSE("House"),

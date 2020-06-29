@@ -6,7 +6,7 @@ import com.sbizzera.real_estate_manager.App
 import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyFragmentViewModel
 import com.sbizzera.real_estate_manager.data.property.PropertyRepository
 import com.sbizzera.real_estate_manager.ui.rem_activity.REMActivityViewModel
-import com.sbizzera.real_estate_manager.ui.rem_activity.newPropertyFragment.NewPropertyFragmentViewModel
+import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyFragmentViewModel
 import java.lang.IllegalArgumentException
 
 object ViewModelFactory : ViewModelProvider.Factory {
@@ -21,8 +21,8 @@ object ViewModelFactory : ViewModelProvider.Factory {
                 PropertyRepository
             ) as T
         }
-        if(modelClass.isAssignableFrom(NewPropertyFragmentViewModel::class.java)){
-            return NewPropertyFragmentViewModel(PropertyRepository,FileHelper) as T
+        if(modelClass.isAssignableFrom(EditPropertyFragmentViewModel::class.java)){
+            return EditPropertyFragmentViewModel(PropertyRepository,FileHelper,App.getInstance()) as T
         }
 
 

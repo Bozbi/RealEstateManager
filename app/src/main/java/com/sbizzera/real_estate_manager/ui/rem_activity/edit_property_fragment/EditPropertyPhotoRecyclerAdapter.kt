@@ -1,4 +1,4 @@
-package com.sbizzera.real_estate_manager.ui.rem_activity.newPropertyFragment
+package com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment
 
 import android.view.LayoutInflater
 import android.view.View
@@ -10,9 +10,9 @@ import com.sbizzera.real_estate_manager.data.photo.Photo
 import com.sbizzera.real_estate_manager.events.OnPhotoEditClickListener
 import kotlinx.android.synthetic.main.property_photo_item_view.view.*
 
-class NewPropertyPhotoRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+class EditPropertyPhotoRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
-    lateinit var listPhotos: List<Photo>
+    lateinit var listPhotos: List<EditPropertyUiModel.PhotoUiModel>
     lateinit var listener: OnPhotoEditClickListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -30,9 +30,9 @@ class NewPropertyPhotoRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHo
 
 
     inner class PropertyPhotoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(photo: Photo) {
-            Glide.with(itemView.photo_img).load(photo.uri).into(itemView.photo_img)
-            itemView.photo_title.text = photo.title
+        fun bind(photo: EditPropertyUiModel.PhotoUiModel) {
+            Glide.with(itemView.photo_img).load(photo.photoUri).into(itemView.photo_img)
+            itemView.photo_title.text = photo.photoTitle
             itemView.edit_btn.setOnClickListener {
                 listener.onPhotoEditClick(adapterPosition)
             }

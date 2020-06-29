@@ -9,11 +9,21 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sbizzera.real_estate_manager.R
+import com.sbizzera.real_estate_manager.events.OnPropertyChangeListener
+import com.sbizzera.real_estate_manager.events.OnPropertyClick
+import com.sbizzera.real_estate_manager.events.PropertyClickedListenable
+import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyFragmentViewModel.ListPropertyViewAction.AddPropertyClicked
+import com.sbizzera.real_estate_manager.utils.REFRESH_PROPERTIES_REQUEST_KEY
 import com.sbizzera.real_estate_manager.utils.ViewModelFactory
+import kotlinx.android.synthetic.main.fragment_list_property.*
 import kotlinx.android.synthetic.main.fragment_list_property.view.*
+import kotlinx.android.synthetic.main.fragment_list_property.view.add_property_fab
 
 class
-ListPropertyFragment : Fragment() {
+ListPropertyFragment : Fragment(), PropertyClickedListenable,OnPropertyChangeListener {
+
+    private lateinit var onPropertyClickListener: OnPropertyClick
+    private lateinit var viewModel: ListPropertyFragmentViewModel
 
     companion object {
         fun newInstance(): ListPropertyFragment {
@@ -31,21 +41,40 @@ ListPropertyFragment : Fragment() {
         val recyclerViewAdapter =
             ListPropertyFragmentAdapter()
 
-        view.listPropertyRecycler.apply {
+        view.list_property_recycler.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = recyclerViewAdapter
         }
 
-        val viewModel =
-            ViewModelProvider(this, ViewModelFactory)
-                .get(ListPropertyFragmentViewModel::class.java)
+        recyclerViewAdapter.onPropertyClickListener = onPropertyClickListener
 
-        viewModel.uiModel.observe(this) { model ->
-            with(recyclerViewAdapter){
+        viewModel = ViewModelProvider(this, ViewModelFactory)
+            .get(ListPropertyFragmentViewModel::class.java)
+
+        viewModel.uiModel.observe(viewLifecycleOwner) { model ->
+            with(recyclerViewAdapter) {
                 notifyDataSetChanged()
                 list = model.properties
             }
         }
+        viewModel.listPropertyViewAction.observe(viewLifecycleOwner) { viewAction ->
+            when (viewAction) {
+                AddPropertyClicked -> onPropertyClickListener.addPropertyClick(this)
+            }
+        }
+
+        view.add_property_fab.setOnClickListener {
+            viewModel.addPropertyClicked()
+        }
+
         return view
+    }
+
+    override fun setListener(listener: OnPropertyClick) {
+        onPropertyClickListener = listener
+    }
+
+    override fun onPropertyChange() {
+        viewModel.refreshProperties()
     }
 }
