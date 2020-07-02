@@ -10,6 +10,7 @@ import androidx.lifecycle.observe
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.events.*
 import com.sbizzera.real_estate_manager.ui.rem_activity.REMActivityViewModel.ViewAction.*
+import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyFragment
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyFragment
 import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyFragment
 import com.sbizzera.real_estate_manager.ui.rem_activity.photo_editor.PhotoEditorFragment
@@ -27,7 +28,7 @@ class REMActivity : AppCompatActivity(), SelectPhotoSourceListener,OnPropertyCli
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction().replace(
                 R.id.container1,
-                ListPropertyFragment.newInstance()
+                DetailsPropertyFragment.newInstance()
             ).commit()
         }
 

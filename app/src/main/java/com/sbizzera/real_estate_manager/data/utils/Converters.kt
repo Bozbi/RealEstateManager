@@ -32,7 +32,7 @@ class Converters {
     @TypeConverter
     fun fromJsonToPointOfInterestList(poiListJson:String):List<PointOfInterest>{
         val gson = Gson()
-        val type  = object : TypeToken<List<Photo>>(){}.type
+        val type  = object : TypeToken<List<PointOfInterest>>(){}.type
         return gson.fromJson(poiListJson,type)
     }
 }

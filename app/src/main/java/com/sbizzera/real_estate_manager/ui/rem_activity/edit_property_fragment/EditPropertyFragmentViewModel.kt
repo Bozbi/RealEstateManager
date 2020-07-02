@@ -17,7 +17,9 @@ import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.E
 import com.sbizzera.real_estate_manager.utils.FileHelper
 import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import java.util.*
@@ -211,11 +213,14 @@ class EditPropertyFragmentViewModel(
 
     private fun saveProperty() {
         val propertyToInsert = fromModelToProperty()
-        checkInsertOrDeletePhoto(_EditPropertyUiModelLD.value!!.photoList,propertyToInsert)
+        checkInsertOrDeletePhoto(_EditPropertyUiModelLD.value!!.photoList, propertyToInsert)
         viewModelScope.launch(IO) {
-            propertyRepository.insertLocalProperty(propertyToInsert)
+            val test = propertyRepository.insertLocalProperty(propertyToInsert)
+            println("debug : insertion return $test")
+            withContext(Main) {
+                viewAction.value = EditPropertyViewAction.CloseFragment
+            }
         }
-        viewAction.value = EditPropertyViewAction.CloseFragment
     }
 
     private fun fromModelToProperty(): Property {
@@ -256,22 +261,22 @@ class EditPropertyFragmentViewModel(
 
     }
 
-    private fun createPhotoList(photoUiModelList : List<PhotoUiModel>) : List<Photo> {
-        val listToReturn : MutableList<Photo> = mutableListOf()
+    private fun createPhotoList(photoUiModelList: List<PhotoUiModel>): List<Photo> {
+        val listToReturn: MutableList<Photo> = mutableListOf()
         photoUiModelList.forEach {
-            listToReturn.add(Photo(it.photoId,it.photoTitle))
+            listToReturn.add(Photo(it.photoId, it.photoTitle))
         }
         return listToReturn
     }
 
 
-    private fun checkInsertOrDeletePhoto(listPhotoUiModel: List<PhotoUiModel>,property : Property) {
+    private fun checkInsertOrDeletePhoto(listPhotoUiModel: List<PhotoUiModel>, property: Property) {
         listPhotoUiModel.forEach {
             if (!fileHelper.fileExists(it.photoUri)) {
                 fileHelper.saveImageToPropertyFolder(it.photoUri, property.propertyId, it.photoId)
             }
         }
-        fileHelper.deleteOldPhotosFromPropertyDirectory(listPhotoUiModel,property.propertyId)
+        fileHelper.deleteOldPhotosFromPropertyDirectory(listPhotoUiModel, property.propertyId)
         fileHelper.deleteCache()
     }
 
@@ -358,12 +363,11 @@ data class EditPropertyUiModel(
     val propertyPoiAirportIsChecked: Boolean = false,
     val propertyPoiDownTownIsChecked: Boolean = false,
     val propertyPoiCountrySideIsChecked: Boolean = false
-    )
-{
+) {
     data class PhotoUiModel(
         val photoId: String = UUID.randomUUID().toString(),
-        val photoTitle : String = "",
-        val photoUri :String
+        val photoTitle: String = "",
+        val photoUri: String
     )
 }
 

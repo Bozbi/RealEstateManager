@@ -5,28 +5,39 @@ import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.data.property.Property
 import com.sbizzera.real_estate_manager.events.OnPropertyClick
 import kotlinx.android.synthetic.main.list_property_item_view.view.*
+import kotlinx.android.synthetic.main.property_photo_item_view.view.*
 
-class ListPropertyFragmentAdapter : RecyclerView.Adapter<ListPropertyFragmentAdapter.ViewHolder>(){
+class ListPropertyFragmentAdapter : RecyclerView.Adapter<ListPropertyFragmentAdapter.ViewHolder>() {
 
     lateinit var onPropertyClickListener: OnPropertyClick
-    var list :List<Property> = mutableListOf()
+    var list: List<PropertyUiModel> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_property_item_view,parent,false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_property_item_view, parent, false)
         return ViewHolder(view)
     }
 
     override fun getItemCount(): Int = list.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.itemView.propertyTitle.text = list[position].propertyTitle
+        holder.bind(position)
     }
 
 
-
-    inner class ViewHolder(itemView : View):RecyclerView.ViewHolder(itemView)
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        fun bind(position: Int) {
+            with(itemView) {
+                val propertyModel = list[position]
+                property_title.text = propertyModel.title
+                property_type.text = propertyModel.type
+                property_price.text = propertyModel.price
+                Glide.with(this).load(propertyModel.photoUri).into(itemView.property_img)
+            }
+        }
+    }
 }

@@ -13,5 +13,5 @@ interface PropertyDao {
     suspend fun getAllProperties(): List<Property>
 
     @Insert(onConflict = REPLACE)
-    suspend fun insertProperty(property: Property)
+    suspend fun insertProperty(property: Property):Long
 }

@@ -1,15 +1,14 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment
 
 import android.app.DatePickerDialog
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.DatePicker
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
@@ -24,14 +23,11 @@ import com.sbizzera.real_estate_manager.events.OnPhotoSelectedListener
 import com.sbizzera.real_estate_manager.events.OnPropertyChangeListener
 import com.sbizzera.real_estate_manager.events.SelectPhotoSourceListener
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyFragmentViewModel.EditPropertyViewAction.*
-import com.sbizzera.real_estate_manager.utils.REFRESH_PROPERTIES_REQUEST_KEY
 import com.sbizzera.real_estate_manager.utils.ViewModelFactory
-import kotlinx.android.synthetic.main.fragment_new_property.*
-import kotlinx.android.synthetic.main.fragment_new_property.view.*
+import kotlinx.android.synthetic.main.fragment_edit_property.*
 
 class EditPropertyFragment : Fragment(), OnPhotoSelectedListener, OnPhotoEditClickListener,
     DatePickerDialog.OnDateSetListener {
-
 
     lateinit var onPropertyChangeListener: OnPropertyChangeListener
     private lateinit var viewModel: EditPropertyFragmentViewModel
@@ -45,12 +41,15 @@ class EditPropertyFragment : Fragment(), OnPhotoSelectedListener, OnPhotoEditCli
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_new_property, container, false)
+        return inflater.inflate(R.layout.fragment_edit_property, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewModel = ViewModelProvider(requireActivity(), ViewModelFactory).get(EditPropertyFragmentViewModel::class.java)
-        viewModel.editPropertyUiModel.observe(this) { modelEditProperty: EditPropertyUiModel ->
+        viewModel.editPropertyUiModel.observe(viewLifecycleOwner) { modelEditProperty: EditPropertyUiModel ->
             updateUi(modelEditProperty)
         }
-        viewModel.viewAction.observe(this) { viewAction ->
+        viewModel.viewAction.observe(viewLifecycleOwner) { viewAction ->
             when (viewAction) {
                 TakePhotoFromCamera -> listener.onLaunchCameraClick()
                 TakePhotoFromGallery -> listener.onLaunchGalleryClick()
@@ -68,6 +67,7 @@ class EditPropertyFragment : Fragment(), OnPhotoSelectedListener, OnPhotoEditCli
                 ).show()
                 CloseFragment -> {
                     onPropertyChangeListener.onPropertyChange()
+                    parentFragmentManager.setFragmentResult("REFRESH_PROPERTIES", bundleOf())
                     activity?.supportFragmentManager?.beginTransaction()?.remove(this)?.commit()
                 }
             }
@@ -78,33 +78,33 @@ class EditPropertyFragment : Fragment(), OnPhotoSelectedListener, OnPhotoEditCli
             requireContext(), R.layout.list_item,
             getTypeNameList()
         )
-        val autoCompleteTextView = view.property_type_edt.editText as AutoCompleteTextView
+        val autoCompleteTextView = property_type_edt.editText as AutoCompleteTextView
         autoCompleteTextView.setAdapter(propertyTypeAdapter)
 
         recyclerViewAdapter = EditPropertyPhotoRecyclerAdapter()
         mLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         val snapHelper = PagerSnapHelper()
 
-        recyclerView = view.property_photos_recycler_view.apply {
+        recyclerView = property_photos_recycler_view.apply {
             layoutManager = mLayoutManager
             adapter = recyclerViewAdapter
         }
         recyclerViewAdapter.listener = this
-        snapHelper.attachToRecyclerView(view.property_photos_recycler_view)
+        snapHelper.attachToRecyclerView(property_photos_recycler_view)
 
-        view.add_photo_from_camera_btn.setOnClickListener {
+        add_photo_from_camera_btn.setOnClickListener {
             viewModel.takePhotoFromCameraClicked()
         }
 
-        view.add_photo_from_gallery_btn.setOnClickListener {
+        add_photo_from_gallery_btn.setOnClickListener {
             viewModel.takePhotoFromGalleryClicked()
         }
 
-        view.property_sold_date_edt.setOnClickListener {
+        property_sold_date_edt.setOnClickListener {
             viewModel.soldDatePickerClicked()
         }
 
-        view.save_property_btn.setOnClickListener {
+        save_property_btn.setOnClickListener {
             viewModel.savePropertyClicked(
                 recyclerViewAdapter.listPhotos,
                 property_title_edt.text.toString(),
@@ -128,9 +128,6 @@ class EditPropertyFragment : Fragment(), OnPhotoSelectedListener, OnPhotoEditCli
                 property_sold_date_edt.text.toString()
             )
         }
-
-
-        return view
     }
 
 
