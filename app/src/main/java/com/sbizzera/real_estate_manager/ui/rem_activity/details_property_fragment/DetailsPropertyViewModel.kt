@@ -5,3 +5,8 @@ import androidx.lifecycle.ViewModel
 class DetailsPropertyViewModel : ViewModel() {
     // TODO: Implement the ViewModel
 }
+
+data class PhotoUiModel(
+    val photoTitle: String,
+    val photoUri: String
+)

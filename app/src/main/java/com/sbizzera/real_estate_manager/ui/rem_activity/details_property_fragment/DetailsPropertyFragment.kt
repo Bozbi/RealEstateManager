@@ -7,9 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.utils.ViewModelFactory
+import kotlinx.android.synthetic.main.details_property_fragment.*
 
 class DetailsPropertyFragment : Fragment() {
 
@@ -28,6 +30,8 @@ class DetailsPropertyFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewModel = ViewModelProvider(requireActivity(),ViewModelFactory).get(DetailsPropertyViewModel::class.java)
+        recycler_view.adapter = DetailsPropertyPhotoAdapter()
+        recycler_view.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
     }
 
 }

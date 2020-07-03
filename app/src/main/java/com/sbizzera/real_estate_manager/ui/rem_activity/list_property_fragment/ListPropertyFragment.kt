@@ -71,7 +71,6 @@ class ListPropertyFragment : Fragment(), PropertyClickedListenable ,OnPropertyCh
             viewModel.addPropertyClicked()
         }
         parentFragmentManager.setFragmentResultListener("REFRESH_PROPERTIES", viewLifecycleOwner) {_,_->
-            println("debug : in here")
             viewModel.refreshProperties()
         }
     }
