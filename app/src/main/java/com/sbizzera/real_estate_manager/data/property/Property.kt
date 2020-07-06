@@ -26,15 +26,6 @@ data class Property(
     val propertyBedRooms:Int,
     val propertyBathRooms:Int,
     val propertyPoiList : List<PointOfInterest>,
-    val soldDate : String
-
-//    ,
-//    @ColumnInfo(name = "surface") val surface: Int,
-//    @ColumnInfo(name = "rooms_count") val roomsCount: Int,
-//    @ColumnInfo(name = "description") val description: String,
-//    @ColumnInfo(name = "address") val address: String,
-//    @ColumnInfo(name = "insert_date") val insertDate: String,
-//    @ColumnInfo(name = "sell_date") val sellDate: String?,
-//    @ColumnInfo(name = "agent_name") val agentName: String
-
+    val soldDate : String,
+    val creationDate : String
 )

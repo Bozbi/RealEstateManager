@@ -13,6 +13,7 @@ import com.sbizzera.real_estate_manager.data.property.PropertyRepository
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyFragmentViewModel.EditPropertyViewAction.*
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyFragmentViewModel.PhotoEditorViewAction.*
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyUiModel.*
+import com.sbizzera.real_estate_manager.utils.CUSTOM_DATE_FORMATTER
 
 import com.sbizzera.real_estate_manager.utils.FileHelper
 import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
@@ -22,6 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
+import org.threeten.bp.format.DateTimeFormatter
 import java.util.*
 
 class EditPropertyFragmentViewModel(
@@ -100,7 +102,7 @@ class EditPropertyFragmentViewModel(
     }
 
     fun setSoldDate(year: Int, month: Int, dayOfMonth: Int) {
-        val soldDate = LocalDate.of(year, month, dayOfMonth).toString()
+        val soldDate = LocalDate.of(year, month, dayOfMonth).format(CUSTOM_DATE_FORMATTER)
         _EditPropertyUiModelLD.value = _EditPropertyUiModelLD.value?.copy(soldDate = soldDate)
     }
 
@@ -240,7 +242,7 @@ class EditPropertyFragmentViewModel(
         with(_EditPropertyUiModelLD.value) {
             return Property(
                 this!!.propertyId,
-                propertyTitle,
+                propertyTitle.capitalize(),
                 propertyType,
                 propertyPrice.toIntOrNull() ?: 0,
                 photoList,
@@ -254,7 +256,8 @@ class EditPropertyFragmentViewModel(
                 propertyBedroomCount.toIntOrNull() ?: 0,
                 propertyBathroomCount.toIntOrNull() ?: 0,
                 poiList,
-                soldDate
+                soldDate,
+                LocalDateTime.now().format(CUSTOM_DATE_FORMATTER)
             )
         }
 

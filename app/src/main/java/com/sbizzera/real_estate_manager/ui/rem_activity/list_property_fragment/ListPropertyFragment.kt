@@ -13,17 +13,19 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.events.OnPropertyChangeListener
-import com.sbizzera.real_estate_manager.events.OnPropertyClick
-import com.sbizzera.real_estate_manager.events.PropertyClickedListenable
-import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyFragmentViewModel.ListPropertyViewAction.AddPropertyClicked
+import com.sbizzera.real_estate_manager.events.OnPropertyClickEvent
+import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEvent
+import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEventListenable
+import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.PropertyFragmentsViewModel.ListPropertyViewAction.AddPropertyClicked
+import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.PropertyFragmentsViewModel.ListPropertyViewAction.DetailsPropertyClicked
 import com.sbizzera.real_estate_manager.utils.ViewModelFactory
 import kotlinx.android.synthetic.main.fragment_list_property.*
 
 
-class ListPropertyFragment : Fragment(), PropertyClickedListenable ,OnPropertyChangeListener{
+class ListPropertyFragment : Fragment(), OnPropertyClickEvent, OnUserAskTransactionEventListenable {
 
-    private lateinit var onPropertyClickListener: OnPropertyClick
-    private lateinit var viewModel: ListPropertyFragmentViewModel
+    private lateinit var viewModel: PropertyFragmentsViewModel
+    private lateinit var onUserAskTransactionEvent: OnUserAskTransactionEvent
 
     companion object {
         fun newInstance(): ListPropertyFragment {
@@ -41,6 +43,7 @@ class ListPropertyFragment : Fragment(), PropertyClickedListenable ,OnPropertyCh
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val recyclerViewAdapter = ListPropertyFragmentAdapter()
+        recyclerViewAdapter.onPropertyClickListener = this
 
         list_property_recycler.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -50,38 +53,49 @@ class ListPropertyFragment : Fragment(), PropertyClickedListenable ,OnPropertyCh
             addItemDecoration(itemDecoration)
         }
 
-        recyclerViewAdapter.onPropertyClickListener = onPropertyClickListener
 
         viewModel = ViewModelProvider(requireActivity(), ViewModelFactory)
-            .get(ListPropertyFragmentViewModel::class.java)
+            .get(PropertyFragmentsViewModel::class.java)
 
-        viewModel.uiModel.observe(viewLifecycleOwner) { model ->
+        viewModel.listUiState.observe(viewLifecycleOwner) { model ->
             with(recyclerViewAdapter) {
-                list = model.properties
+                list = model.listPropertyItems
                 notifyDataSetChanged()
             }
         }
-        viewModel.listPropertyViewAction.observe(viewLifecycleOwner) { viewAction ->
+        viewModel.listViewAction.observe(viewLifecycleOwner) { viewAction ->
             when (viewAction) {
-                AddPropertyClicked -> onPropertyClickListener.addPropertyClick(this)
+                AddPropertyClicked -> {
+                    onUserAskTransactionEvent.onAddPropertyAsked()
+                }
+                DetailsPropertyClicked -> {
+                    onUserAskTransactionEvent.onPropertyDetailsAsked()
+                }
             }
         }
 
         add_property_fab.setOnClickListener {
             viewModel.addPropertyClicked()
         }
-        parentFragmentManager.setFragmentResultListener("REFRESH_PROPERTIES", viewLifecycleOwner) {_,_->
+        parentFragmentManager.setFragmentResultListener("REFRESH_PROPERTIES", viewLifecycleOwner) { _, _ ->
             viewModel.refreshProperties()
         }
     }
 
-    override fun setListener(listener: OnPropertyClick) {
-        onPropertyClickListener = listener
+    override fun onPropertyItemClick(position: Int) {
+        viewModel.onPropertyItemClick(position)
     }
 
-    override fun onPropertyChange() {
+    override fun onAddPropertyClick(listener: OnPropertyChangeListener) {
 
     }
 
+    override fun onModifyPropertyClicked() {
+
+    }
+
+    override fun setListener(listener: OnUserAskTransactionEvent) {
+        onUserAskTransactionEvent = listener
+    }
 
 }
