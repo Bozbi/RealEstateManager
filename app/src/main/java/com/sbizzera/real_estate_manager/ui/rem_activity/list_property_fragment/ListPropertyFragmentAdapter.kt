@@ -36,7 +36,7 @@ class ListPropertyFragmentAdapter : RecyclerView.Adapter<ListPropertyFragmentAda
                 property_price.text = propertyModel.price
                 Glide.with(this).load(propertyModel.photoUri).into(itemView.property_img)
                 setOnClickListener {
-                    onPropertyClickListener.onPropertyItemClick(adapterPosition)
+                    onPropertyClickListener.onPropertyItemClick(propertyModel.id)
                 }
             }
         }

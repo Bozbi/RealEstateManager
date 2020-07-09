@@ -6,11 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.sbizzera.real_estate_manager.R
-import com.sbizzera.real_estate_manager.events.OnPropertyClickEvent
-import com.sbizzera.real_estate_manager.events.OnPropertyClickEventListenable
 import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyPhotoAdapter.DetailsPhotoViewHolder
-import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.DetailsPhotoUiState
-import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyFragmentAdapter
 import kotlinx.android.synthetic.main.photo_in_detail_item.view.*
 
 class DetailsPropertyPhotoAdapter : RecyclerView.Adapter<DetailsPhotoViewHolder>() {

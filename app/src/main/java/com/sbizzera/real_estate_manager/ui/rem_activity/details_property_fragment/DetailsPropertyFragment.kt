@@ -10,22 +10,22 @@ import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.sbizzera.real_estate_manager.R
-import com.sbizzera.real_estate_manager.events.OnPropertyChangeListener
-import com.sbizzera.real_estate_manager.events.OnPropertyClickEvent
-import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.DetailsUiState
-import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.PropertyFragmentsViewModel
-import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.PropertyFragmentsViewModel.DetailsViewAction.ModifyPropertyClicked
+import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEvent
+import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEventListenable
+import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyViewModel.DetailsViewAction.ModifyPropertyClicked
 import com.sbizzera.real_estate_manager.utils.ViewModelFactory
 import kotlinx.android.synthetic.main.details_property_fragment.*
 
-class DetailsPropertyFragment : Fragment(){
+class DetailsPropertyFragment : Fragment(),OnUserAskTransactionEventListenable{
+
 
     companion object {
         fun newInstance() = DetailsPropertyFragment()
     }
 
-    private lateinit var viewModel: PropertyFragmentsViewModel
+    private lateinit var viewModelDetails: DetailsPropertyViewModel
     private val recyclerAdapter = DetailsPropertyPhotoAdapter()
+    private lateinit var onUserAskTransactionEvent: OnUserAskTransactionEvent
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -33,24 +33,23 @@ class DetailsPropertyFragment : Fragment(){
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel = ViewModelProvider(requireActivity(), ViewModelFactory).get(PropertyFragmentsViewModel::class.java)
+        viewModelDetails = ViewModelProvider(requireActivity(), ViewModelFactory).get(DetailsPropertyViewModel::class.java)
         recycler_view.adapter = recyclerAdapter
         recycler_view.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
-        viewModel.detailsUiStateLD.observe(requireActivity()) { model ->
+        viewModelDetails.detailsUiStateLD.observe(viewLifecycleOwner) { model ->
             updateUi(model)
         }
-        viewModel.detailsViewAction.observe(requireActivity()) { action ->
+        viewModelDetails.detailsViewAction.observe(viewLifecycleOwner) { action ->
             when (action) {
                 ModifyPropertyClicked -> {
-                    //TODO interface with REMActivity
+                    onUserAskTransactionEvent.onModifyPropertyAsked()
                 }
             }
         }
         modify_txt.setOnClickListener {
-            viewModel.modifyPropertyClicked()
+            viewModelDetails.modifyPropertyClicked()
         }
-
     }
 
     private fun updateUi(model: DetailsUiState) {
@@ -67,9 +66,13 @@ class DetailsPropertyFragment : Fragment(){
         description_txt.text = model.description
         address_txt.text = model.addressText
         poi_txt.text = model.poiText
-        Glide.with(map_img).load(model.staticMapUri).into(map_img)
+        Glide.with(map_img).load(model.staticMapUri).placeholder(R.drawable.ic_map).into(map_img)
     }
 
+
+    override fun setListener(listener: OnUserAskTransactionEvent) {
+            onUserAskTransactionEvent = listener
+    }
    // TODO Create BasePropertyFragment for avoiding empty functions
 
 }

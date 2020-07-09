@@ -11,8 +11,9 @@ object PropertyRepository {
     private val propertyDao = AppLocalDatabase.getInstance(App.getInstance()).propertyDao()
     private val firestoreProperties = Firebase.firestore.collection("properties")
 
-    suspend fun insertLocalProperty(property: Property)=propertyDao.insertProperty(property)
-    suspend fun getAllLocalProperties() = propertyDao.getAllProperties()
+    fun insertLocalProperty(property: Property)=propertyDao.insertProperty(property)
+    fun getAllLocalProperties() = propertyDao.getAllProperties()
+    fun getPropertyById(propertyId: String) = propertyDao.getPropertyById(propertyId)
 
     suspend fun insertRemoteProperty(property: Property) {
         firestoreProperties.document(property.propertyId).set(property).await()

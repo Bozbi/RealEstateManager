@@ -14,18 +14,17 @@ import androidx.lifecycle.observe
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.sbizzera.real_estate_manager.R
-import com.sbizzera.real_estate_manager.data.photo.Photo
-import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyFragmentViewModel
-import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyFragmentViewModel.PhotoEditorViewAction.CloseFragment
-import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyFragmentViewModel.PhotoEditorViewAction.TitleEmptyError
-import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyUiModel
+import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyViewModel
+import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditUiState
 import com.sbizzera.real_estate_manager.utils.ViewModelFactory
+import kotlinx.android.synthetic.main.fragment_photo_editor.*
 import kotlinx.android.synthetic.main.fragment_photo_editor.view.*
+
 
 
 class PhotoEditorFragment() : Fragment() {
 
-    private lateinit var viewModel: EditPropertyFragmentViewModel
+    private lateinit var viewModel: EditPropertyViewModel
 
     private lateinit var photoImg: ImageView
     private lateinit var photoTitle: TextView
@@ -35,20 +34,23 @@ class PhotoEditorFragment() : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_photo_editor, container, false)
+        return  inflater.inflate(R.layout.fragment_photo_editor, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         photoImg = view.current_photo_img
         photoTitle = view.photo_title_edit_text
-        viewModel = ViewModelProvider(requireActivity(), ViewModelFactory).get(EditPropertyFragmentViewModel::class.java)
-        viewModel.photoEditorViewAction.observe(this) { viewAction ->
+        viewModel = ViewModelProvider(this, ViewModelFactory).get(EditPropertyViewModel::class.java)
+        viewModel.photoEditorViewAction.observe(viewLifecycleOwner) { viewAction ->
             when (viewAction) {
-                TitleEmptyError -> {
+                EditPropertyViewModel.PhotoEditorViewAction.TitleEmptyError -> {
                     Snackbar.make(
                         view.photo_editor_fragment_container,
                         "Please give a title to this Photo",
                         Snackbar.LENGTH_LONG
                     ).show()
                 }
-                CloseFragment -> {
+                EditPropertyViewModel.PhotoEditorViewAction.CloseFragment -> {
                     hideKeyboard()
                     activity?.supportFragmentManager?.beginTransaction()?.remove(this)?.commit()
                 }
@@ -57,20 +59,16 @@ class PhotoEditorFragment() : Fragment() {
         }
 
         updateUi(viewModel.currentPhoto)
-
-        view.delete_photo_btn.setOnClickListener {
+        delete_photo_btn.setOnClickListener {
             viewModel.onDeletePhotoInEditor()
         }
-
         view.save_photo_btn.setOnClickListener {
             viewModel.onSavePhotoInEditor(photoTitle.text.toString())
         }
-
-
-        return view
     }
 
-    private fun updateUi(photo: EditPropertyUiModel.PhotoUiModel) {
+
+    private fun updateUi(photo: EditUiState.PhotoInEditUiState) {
         Glide.with(photoImg).load(photo.photoUri).into(photoImg)
         photoTitle.text = photo.photoTitle
     }

@@ -15,17 +15,22 @@ data class Property(
     val propertyType: String,
     val price: Int,
     @TypeConverters(Converters::class)
-    val photoList:List<Photo>,
-    val modificationDate : String,
-    val propertyDescription :String,
-    val propertyAddress : String,
+    val photoList: List<Photo>,
+    val modificationDate: String,
+    val propertyDescription: String,
+    val propertyAddress: String,
     val propertyCityCode: String,
     val propertyCityName: String,
-    val propertySurface :Int,
-    val propertyRooms:Int,
-    val propertyBedRooms:Int,
-    val propertyBathRooms:Int,
-    val propertyPoiList : List<PointOfInterest>,
-    val soldDate : String,
-    val creationDate : String
+    val propertySurface: Int,
+    val propertyRooms: Int,
+    val propertyBedRooms: Int,
+    val propertyBathRooms: Int,
+    val propertyPoiList: List<PointOfInterest>,
+    val soldDate: String,
+    val creationDate: String
 )
+
+
+
+
+

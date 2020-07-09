@@ -1,5 +1,5 @@
 package com.sbizzera.real_estate_manager.events
 
-interface OnPhotoEditClickListener {
+interface OnPhotoActionListener {
     fun onPhotoEditClick(position : Int)
 }

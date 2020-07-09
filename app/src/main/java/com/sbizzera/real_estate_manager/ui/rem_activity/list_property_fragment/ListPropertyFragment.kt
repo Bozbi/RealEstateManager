@@ -6,25 +6,23 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sbizzera.real_estate_manager.R
-import com.sbizzera.real_estate_manager.events.OnPropertyChangeListener
 import com.sbizzera.real_estate_manager.events.OnPropertyClickEvent
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEvent
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEventListenable
-import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.PropertyFragmentsViewModel.ListPropertyViewAction.AddPropertyClicked
-import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.PropertyFragmentsViewModel.ListPropertyViewAction.DetailsPropertyClicked
+import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel.ListPropertyViewAction.AddPropertyClicked
+import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel.ListPropertyViewAction.DetailsPropertyClicked
 import com.sbizzera.real_estate_manager.utils.ViewModelFactory
 import kotlinx.android.synthetic.main.fragment_list_property.*
 
 
 class ListPropertyFragment : Fragment(), OnPropertyClickEvent, OnUserAskTransactionEventListenable {
 
-    private lateinit var viewModel: PropertyFragmentsViewModel
+    private lateinit var viewModel: ListPropertyViewModel
     private lateinit var onUserAskTransactionEvent: OnUserAskTransactionEvent
 
     companion object {
@@ -54,8 +52,8 @@ class ListPropertyFragment : Fragment(), OnPropertyClickEvent, OnUserAskTransact
         }
 
 
-        viewModel = ViewModelProvider(requireActivity(), ViewModelFactory)
-            .get(PropertyFragmentsViewModel::class.java)
+        viewModel = ViewModelProvider(this, ViewModelFactory)
+            .get(ListPropertyViewModel::class.java)
 
         viewModel.listUiState.observe(viewLifecycleOwner) { model ->
             with(recyclerViewAdapter) {
@@ -77,16 +75,13 @@ class ListPropertyFragment : Fragment(), OnPropertyClickEvent, OnUserAskTransact
         add_property_fab.setOnClickListener {
             viewModel.addPropertyClicked()
         }
-        parentFragmentManager.setFragmentResultListener("REFRESH_PROPERTIES", viewLifecycleOwner) { _, _ ->
-            viewModel.refreshProperties()
-        }
     }
 
-    override fun onPropertyItemClick(position: Int) {
-        viewModel.onPropertyItemClick(position)
+    override fun onPropertyItemClick(propertyId: String) {
+        viewModel.onPropertyItemClick(propertyId)
     }
 
-    override fun onAddPropertyClick(listener: OnPropertyChangeListener) {
+    override fun onAddPropertyClick() {
 
     }
 

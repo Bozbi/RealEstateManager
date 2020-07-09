@@ -4,16 +4,12 @@ import android.content.ContentResolver
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import com.sbizzera.real_estate_manager.App
 import com.sbizzera.real_estate_manager.R
-import com.sbizzera.real_estate_manager.data.photo.Photo
-import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyUiModel
-import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyUiModel.PhotoUiModel
+import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditUiState
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.util.*
 
 object FileHelper {
 
@@ -81,7 +77,7 @@ object FileHelper {
         return "${appContext.filesDir}/$propertyId/$fileName.jpg"
     }
 
-    fun deleteOldPhotosFromPropertyDirectory(listPhoto:List<PhotoUiModel>, propertyId: String){
+    fun deleteOldPhotosFromPropertyDirectory(listPhoto:List<EditUiState.PhotoInEditUiState>, propertyId: String){
         //TODO see if it works later
         val dir = File("${appContext.filesDir}/$propertyId")
         val files = dir.listFiles()
