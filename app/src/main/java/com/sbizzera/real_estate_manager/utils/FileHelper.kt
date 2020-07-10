@@ -11,10 +11,14 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
-object FileHelper {
+class FileHelper private constructor() {
 
-    private val appContext = App.getInstance()
-    private val tempStorage = File("${ appContext.filesDir}/temp")
+    companion object {
+        val instance: FileHelper by lazy { FileHelper() }
+    }
+
+    private val appContext = App.instance
+    private val tempStorage = File("${appContext.filesDir}/temp")
 
     fun createEmptyTempPhotoFileAndGetUriBack(): String {
         val file =
@@ -51,7 +55,7 @@ object FileHelper {
         return ""
     }
 
-    fun saveImageToPropertyFolder(path: String?, propertyId: String,photoId:String): String {
+    fun saveImageToPropertyFolder(path: String?, propertyId: String, photoId: String): String {
         var fileToCopy = File(path!!)
         if (!fileToCopy.exists()) {
             fileToCopy = File(
@@ -72,21 +76,21 @@ object FileHelper {
         return file.exists()
     }
 
-    fun getUriFromFileName(fileName : String, propertyId: String):String{
+    fun getUriFromFileName(fileName: String, propertyId: String): String {
         //TODO do the same with all list?
         return "${appContext.filesDir}/$propertyId/$fileName.jpg"
     }
 
-    fun deleteOldPhotosFromPropertyDirectory(listPhoto:List<EditUiState.PhotoInEditUiState>, propertyId: String){
+    fun deleteOldPhotosFromPropertyDirectory(listPhoto: List<EditUiState.PhotoInEditUiState>, propertyId: String) {
         //TODO see if it works later
         val dir = File("${appContext.filesDir}/$propertyId")
         val files = dir.listFiles()
         files?.forEach { file ->
-            val name = file.name.replace(".jpg","")
-            val size = listPhoto.filter {photo->
+            val name = file.name.replace(".jpg", "")
+            val size = listPhoto.filter { photo ->
                 photo.photoId == name
             }.size
-            if (size ==0){
+            if (size == 0) {
                 file.delete()
             }
         }

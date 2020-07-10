@@ -66,7 +66,7 @@ class DetailsPropertyFragment : Fragment(),OnUserAskTransactionEventListenable{
         description_txt.text = model.description
         address_txt.text = model.addressText
         poi_txt.text = model.poiText
-        Glide.with(map_img).load(model.staticMapUri).placeholder(R.drawable.ic_map).into(map_img)
+        Glide.with(map_img).load(model.staticMapUri).into(map_img)
     }
 
 

@@ -13,7 +13,9 @@ import kotlinx.android.synthetic.main.property_photo_item_view.view.*
 class EditPropertyPhotoRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() , OnPhotoActionListenable{
 
 
-    lateinit var listPhotos: List<EditUiState.PhotoInEditUiState>
+//    lateinit var listPhotos: List<EditUiState.PhotoInEditUiState>
+    var listPhotos: List<EditUiState.PhotoInEditUiState> = mutableListOf()
+
     lateinit var onPhotoActionListener: OnPhotoActionListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

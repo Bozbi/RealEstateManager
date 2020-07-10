@@ -6,8 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
@@ -21,25 +19,19 @@ import kotlinx.android.synthetic.main.fragment_photo_editor.*
 import kotlinx.android.synthetic.main.fragment_photo_editor.view.*
 
 
-
 class PhotoEditorFragment() : Fragment() {
 
     private lateinit var viewModel: EditPropertyViewModel
-
-    private lateinit var photoImg: ImageView
-    private lateinit var photoTitle: TextView
 
     companion object {
         fun newInstance(): PhotoEditorFragment = PhotoEditorFragment()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return  inflater.inflate(R.layout.fragment_photo_editor, container, false)
+        return inflater.inflate(R.layout.fragment_photo_editor, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        photoImg = view.current_photo_img
-        photoTitle = view.photo_title_edit_text
         viewModel = ViewModelProvider(this, ViewModelFactory).get(EditPropertyViewModel::class.java)
         viewModel.photoEditorViewAction.observe(viewLifecycleOwner) { viewAction ->
             when (viewAction) {
@@ -54,29 +46,28 @@ class PhotoEditorFragment() : Fragment() {
                     hideKeyboard()
                     activity?.supportFragmentManager?.beginTransaction()?.remove(this)?.commit()
                 }
-
             }
         }
 
         updateUi(viewModel.currentPhoto)
-        delete_photo_btn.setOnClickListener {
-            viewModel.onDeletePhotoInEditor()
-        }
-        view.save_photo_btn.setOnClickListener {
-            viewModel.onSavePhotoInEditor(photoTitle.text.toString())
-        }
+//        delete_photo_btn.setOnClickListener {
+//            viewModel.onDeletePhotoInEditor()
+//        }
+//        save_photo_btn.setOnClickListener {
+//            viewModel.onSavePhotoInEditor(photo_title_edit_text.text.toString())
+//        }
     }
 
 
     private fun updateUi(photo: EditUiState.PhotoInEditUiState) {
-        Glide.with(photoImg).load(photo.photoUri).into(photoImg)
-        photoTitle.text = photo.photoTitle
+        Glide.with(current_photo_img).load(photo.photoUri).into(current_photo_img)
+        photo_title_edit_text.setText(photo.photoTitle)
     }
 
     private fun hideKeyboard() {
-        photoTitle.clearFocus()
+        photo_title_edit_text.clearFocus()
         (activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
-            photoTitle.windowToken,
+            photo_title_edit_text.windowToken,
             0
         )
     }

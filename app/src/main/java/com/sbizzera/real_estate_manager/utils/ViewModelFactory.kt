@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.sbizzera.real_estate_manager.App
 import com.sbizzera.real_estate_manager.data.CurrentPropertyIdRepository
+import com.sbizzera.real_estate_manager.data.PropertyInModificationRepository
 import com.sbizzera.real_estate_manager.data.property.PropertyRepository
 import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyViewModel
 import com.sbizzera.real_estate_manager.ui.rem_activity.REMActivityViewModel
@@ -15,30 +16,32 @@ object ViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(REMActivityViewModel::class.java)) {
             return REMActivityViewModel(
-                PropertyRepository,
-                FileHelper, App.getInstance()
+                PropertyRepository.instance,
+                FileHelper.instance
+                , App.instance
             ) as T
         }
         if (modelClass.isAssignableFrom(DetailsPropertyViewModel::class.java)) {
             return DetailsPropertyViewModel(
-                PropertyRepository,
-                CurrentPropertyIdRepository,
-                FileHelper
+                PropertyRepository.instance,
+                CurrentPropertyIdRepository.instance,
+                FileHelper.instance
             ) as T
         }
         if (modelClass.isAssignableFrom(ListPropertyViewModel::class.java)) {
             return ListPropertyViewModel(
-                CurrentPropertyIdRepository,
-                PropertyRepository,
-                FileHelper
+                CurrentPropertyIdRepository.instance,
+                PropertyRepository.instance,
+                FileHelper.instance
             ) as T
         }
         if (modelClass.isAssignableFrom(EditPropertyViewModel::class.java)) {
             return EditPropertyViewModel(
-                CurrentPropertyIdRepository,
-                PropertyRepository,
-                FileHelper,
-                App.getInstance()
+                CurrentPropertyIdRepository.instance,
+                PropertyInModificationRepository.instance,
+                PropertyRepository.instance,
+                FileHelper.instance,
+                App.instance
             ) as T
         }
         throw IllegalArgumentException("not such a viewModel Class")

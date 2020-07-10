@@ -17,7 +17,7 @@ import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
 
 class DetailsPropertyViewModel(
     private val propertyRepository: PropertyRepository,
-    private val currentPropertyRepository: CurrentPropertyIdRepository,
+    private val currentPropertyIdRepository: CurrentPropertyIdRepository,
     private val fileHelper: FileHelper
 ) : ViewModel() {
 
@@ -27,7 +27,7 @@ class DetailsPropertyViewModel(
 
     init {
         detailsUiStateLD =
-            Transformations.switchMap(currentPropertyRepository.currentPropertyIdLiveData) { currentPropertyId ->
+            Transformations.switchMap(currentPropertyIdRepository.currentPropertyIdLiveData) { currentPropertyId ->
                 val propertyLiveData = propertyRepository.getPropertyById(currentPropertyId)
                 Transformations.map(propertyLiveData) { property ->
                     fromPropertyToDetailUiState(property)

@@ -7,12 +7,12 @@ class App : MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()
-        instance = this
+        INSTANCE = this
         AndroidThreeTen.init(this)
     }
 
     companion object {
-        private lateinit var instance: App
-        fun getInstance(): App = instance
+        private lateinit var INSTANCE: App
+        val instance: App by lazy { INSTANCE }
     }
 }

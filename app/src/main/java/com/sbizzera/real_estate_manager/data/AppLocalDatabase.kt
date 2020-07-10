@@ -17,12 +17,10 @@ abstract class AppLocalDatabase : RoomDatabase() {
     abstract fun propertyDao(): PropertyDao
 
     companion object {
-
         private var instance: AppLocalDatabase? = null
 
         fun getInstance(context: Context): AppLocalDatabase {
             return instance ?: buildDatabase(context).also { instance = it }
-
         }
 
         private fun buildDatabase(context: Context): AppLocalDatabase {
@@ -33,7 +31,5 @@ abstract class AppLocalDatabase : RoomDatabase() {
             )
                 .build()
         }
-
     }
-
 }

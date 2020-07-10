@@ -14,7 +14,7 @@ import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
 
 class ListPropertyViewModel(
     private val currentPropertyRepository: CurrentPropertyIdRepository,
-    private val propertyRepository: PropertyRepository,
+    propertyRepository: PropertyRepository,
     private val fileHelper : FileHelper
 ) : ViewModel() {
 
@@ -29,7 +29,7 @@ class ListPropertyViewModel(
 
 
     fun addPropertyClicked() {
-        currentPropertyRepository.currentPropertyIdLiveData.value = ""
+        currentPropertyRepository.currentPropertyIdLiveData.value = null
         listViewAction.value = AddPropertyClicked
     }
 
