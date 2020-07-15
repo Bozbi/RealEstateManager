@@ -1,64 +1,64 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment
 
 import android.app.Application
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import android.view.View
+import androidx.lifecycle.*
+import com.sbizzera.real_estate_manager.R
+import com.sbizzera.real_estate_manager.data.CurrentEditedPhotoRepository
 import com.sbizzera.real_estate_manager.data.CurrentPropertyIdRepository
 import com.sbizzera.real_estate_manager.data.PropertyInModificationRepository
 import com.sbizzera.real_estate_manager.data.photo.Photo
 import com.sbizzera.real_estate_manager.data.property.PointOfInterest
 import com.sbizzera.real_estate_manager.data.property.Property
 import com.sbizzera.real_estate_manager.data.property.PropertyRepository
+import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyViewModel.EditPropertyViewAction.LaunchEditor
 import com.sbizzera.real_estate_manager.utils.CUSTOM_DATE_FORMATTER
 import com.sbizzera.real_estate_manager.utils.FileHelper
 import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
-import kotlinx.coroutines.Dispatchers
+import com.sbizzera.real_estate_manager.utils.toPhotoInEditUiState
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import java.util.*
 import kotlin.collections.set
 
 class EditPropertyViewModel(
-    currentPropertyIdRepository: CurrentPropertyIdRepository,
+    private val currentPropertyIdRepository: CurrentPropertyIdRepository,
     private val propertyInModificationRepository: PropertyInModificationRepository,
     private val propertyRepository: PropertyRepository,
     private val fileHelper: FileHelper,
+    private val currentPhotoRepository: CurrentEditedPhotoRepository,
     private val app: Application
 ) : ViewModel() {
 
     val editViewAction = SingleLiveEvent<EditPropertyViewAction>()
-    val editUiStateLD: LiveData<EditUiState>
-
-    val photoEditorViewAction = SingleLiveEvent<PhotoEditorViewAction>()
-    lateinit var currentPhoto: EditUiState.PhotoInEditUiState
+    val editUiStateLD :LiveData<EditUiState>
 
     init {
-
-        val currentPropertyId = currentPropertyIdRepository.currentPropertyIdLiveData.value
-        if (currentPropertyId != null) {
-            viewModelScope.launch(Dispatchers.IO) {
-                val property = propertyRepository.getPropertyByIdAsync(currentPropertyId)
-                withContext(Dispatchers.Main) {
-                    val editUiState = fromPropertyToEditUiState(property, fileHelper)
-                    propertyInModificationRepository.propertyInModificationLD.value = editUiState
+        //TODO Nino can we do this better
+        editUiStateLD =
+            Transformations.switchMap(currentPropertyIdRepository.currentPropertyIdLiveData) { propertyId ->
+                if (propertyId != null) {
+                    Transformations.switchMap(propertyRepository.getPropertyById(propertyId)) { property ->
+                        propertyInModificationRepository.propertyInModificationLD.value = fromPropertyToEditUiState(property,fileHelper)
+                        propertyInModificationRepository.propertyInModificationLD
+                    }
+                } else {
+                    propertyInModificationRepository.propertyInModificationLD.value = EditUiState()
+                    propertyInModificationRepository.propertyInModificationLD
                 }
             }
-        }else{
-            propertyInModificationRepository.propertyInModificationLD.value = EditUiState()
-        }
-        editUiStateLD = propertyInModificationRepository.propertyInModificationLD
     }
+
 
 
     fun takePhotoFromCameraClicked() {
-        editViewAction.value = EditPropertyViewAction.TakePhotoFromCamera
+        editViewAction.value = EditPropertyViewAction.TakePhotoFromCamera(fileHelper)
     }
 
     fun takePhotoFromGalleryClicked() {
-        editViewAction.value = EditPropertyViewAction.TakePhotoFromGallery
+        editViewAction.value = EditPropertyViewAction.TakePhotoFromGallery(fileHelper)
     }
 
     fun soldDatePickerClicked() {
@@ -67,188 +67,126 @@ class EditPropertyViewModel(
             EditPropertyViewAction.DisplayDatePicker(date.year, date.monthValue, date.dayOfMonth)
     }
 
-//    fun savePropertyClicked(
-//        propertyListPhoto: List<EditUiState.PhotoInEditUiState>,
-//        propertyTitle: String,
-//        propertyDescription: String,
-//        propertyAddress: String,
-//        propertyCityCode: String,
-//        propertyCityName: String,
-//        propertyPrice: String,
-//        propertyType: String,
-//        propertySurface: String,
-//        propertyRoomCount: String,
-//        propertyBedroomCount: String,
-//        propertyBathroomCount: String,
-//        hasSchool: Boolean,
-//        hasTransport: Boolean,
-//        hasShop: Boolean,
-//        hasParcs: Boolean,
-//        hasAirport: Boolean,
-//        hasDownTown: Boolean,
-//        hasCountrySide: Boolean,
-//        propertySoldDate: String
-//    ) {
-//        editUiStateModifiedLD.value =
-//            editUiStateModifiedLD.value?.copy(
-//                photoList = propertyListPhoto as MutableList<EditUiState.PhotoInEditUiState>,
-//                propertyTitle = propertyTitle,
-//                propertyDescription = propertyDescription,
-//                propertyAddress = propertyAddress,
-//                propertyCityCode = propertyCityCode,
-//                propertyCityName = propertyCityName,
-//                propertyPrice = propertyPrice,
-//                propertyType = propertyType,
-//                propertySurface = propertySurface,
-//                propertyRoomCount = propertyRoomCount,
-//                propertyBedroomCount = propertyBedroomCount,
-//                propertyBathroomCount = propertyBathroomCount,
-//                propertySoldDate = propertySoldDate
-//
-//            )
-//        if (!allInfoCorrect()) {
-//            editViewAction.value = EditPropertyViewAction.FillInError
-//            return
-//        }
-//        saveProperty()
-//    }
+    fun savePropertyClicked() {
+        if (!allInfoCorrect()) {
+            editViewAction.value = EditPropertyViewAction.FillInError
+            return
+        }
+        saveProperty()
+    }
 
-//    private fun allInfoCorrect(): Boolean {
-//        var allInfoCorrect = true
-//        val state = editUiStateModifiedLD.value!!
-//        state.let {
-//            with(it) {
-//
-//                if (photoList.isEmpty()) {
-//                    allInfoCorrect = false
-//                }
-//                if (propertyTitle.isEmpty()) {
-//                    allInfoCorrect = false
-//                    this@EditPropertyViewModel.editUiStateModifiedLD.value =
-//                        this@EditPropertyViewModel.editUiStateLD.value?.copy(
-//                            propertyTitleError = app.resources.getString(
-//                                R.string.property_title_error
-//                            )
-//                        )
-//                }
-//                if (propertyDescription.isEmpty()) {
-//                    allInfoCorrect = false
-//                    this@EditPropertyViewModel.editUiStateModifiedLD.value =
-//                        this@EditPropertyViewModel.editUiStateModifiedLD.value?.copy(
-//                            propertyDescriptionError = app.resources.getString(
-//                                R.string.property_description_error
-//                            )
-//                        )
-//                }
-//
-//                if (this.propertyAddress.isEmpty()) {
-//                    allInfoCorrect = false
-//                    this@EditPropertyViewModel.editUiStateModifiedLD.value =
-//                        this@EditPropertyViewModel.editUiStateModifiedLD.value?.copy(
-//                            propertyAddressError = app.resources.getString(
-//                                R.string.property_address_error
-//                            )
-//                        )
-//                }
-//                if (this.propertyCityCode.isEmpty()) {
-//                    allInfoCorrect = false
-//                    this@EditPropertyViewModel.editUiStateModifiedLD.value =
-//                        this@EditPropertyViewModel.editUiStateModifiedLD.value?.copy(
-//                            propertyCityCodeError = app.resources.getString(
-//                                R.string.property_city_code_error
-//                            )
-//                        )
-//                }
-//                if (propertyCityName.isEmpty()) {
-//                    allInfoCorrect = false
-//                    this@EditPropertyViewModel.editUiStateModifiedLD.value =
-//                        this@EditPropertyViewModel.editUiStateModifiedLD.value?.copy(
-//                            propertyCityNameError = app.resources.getString(
-//                                R.string.property_city_name_error
-//                            )
-//                        )
-//                }
-//                if (propertyPrice.isEmpty()) {
-//                    allInfoCorrect = false
-//                    this@EditPropertyViewModel.editUiStateModifiedLD.value =
-//                        this@EditPropertyViewModel.editUiStateModifiedLD.value?.copy(
-//                            propertyPriceError = app.resources.getString(
-//                                R.string.property_price_error
-//                            )
-//                        )
-//                }
-//                if (propertyType.isEmpty()) {
-//                    allInfoCorrect = false
-//                    this@EditPropertyViewModel.editUiStateModifiedLD.value =
-//                        this@EditPropertyViewModel.editUiStateModifiedLD.value?.copy(
-//                            propertyTypeError = app.resources.getString(
-//                                R.string.property_type_error
-//                            )
-//                        )
-//                }
-//                if (propertySurface.isEmpty()) {
-//                    allInfoCorrect = false
-//                    this@EditPropertyViewModel.editUiStateModifiedLD.value =
-//                        this@EditPropertyViewModel.editUiStateModifiedLD.value?.copy(
-//                            propertySurfaceError = app.resources.getString(
-//                                R.string.property_surface_error
-//                            )
-//                        )
-//                }
-//            }
-//        }
-//
-//        return allInfoCorrect
-//    }
+    private fun allInfoCorrect(): Boolean {
+        var allInfoCorrect = true
+        var state = propertyInModificationRepository.propertyInModificationLD.value!!
+        state = state.copy(
+            propertyTitleError = null,
+            addPhotoVisibility = View.INVISIBLE,
+            propertyDescriptionError = null,
+            propertyAddressError = null,
+            propertyCityCodeError = null,
+            propertyCityNameError = null,
+            propertyPriceError = null,
+            propertyTypeError = null,
+            propertySurfaceError = null
+        )
+        with(state) {
+            if (photoList.isEmpty()) {
+                allInfoCorrect = false
+                state = state.copy(addPhotoVisibility = View.VISIBLE)
+            }
+            if (propertyTitle.isNullOrEmpty()) {
+                allInfoCorrect = false
+                state = state.copy(propertyTitleError = app.resources.getString(R.string.property_title_error))
+            }
+            if (propertyDescription.isNullOrEmpty()) {
+                allInfoCorrect = false
+                state = state.copy(propertyDescriptionError = app.resources.getString(R.string.property_description_error))
+            }
 
-//    private fun saveProperty() {
-//        val propertyToInsert = fromEditUiStateToProperty()
-//        checkInsertOrDeletePhoto(editUiStateModifiedLD.value!!.photoList, propertyToInsert)
-//        propertyRepository.insertLocalProperty(propertyToInsert)
-//        editViewAction.value = EditPropertyViewAction.CloseFragment
-//    }
+            if (this.propertyAddress.isNullOrEmpty()) {
+                allInfoCorrect = false
+                state = state.copy(propertyAddressError = app.resources.getString(R.string.property_address_error))
+            }
+            if (this.propertyCityCode.isNullOrEmpty()) {
+                allInfoCorrect = false
+                state = state.copy(propertyCityCodeError = app.resources.getString(R.string.property_city_code_error))
+            }
+            if (propertyCityName.isNullOrEmpty()) {
+                allInfoCorrect = false
+                state = state.copy(propertyCityNameError = app.resources.getString(R.string.property_city_name_error))
+            }
+            if (propertyPrice.isNullOrEmpty()) {
+                allInfoCorrect = false
+                state = state.copy(propertyPriceError = app.resources.getString(R.string.property_price_error))
+            }
+            if (propertyType.isNullOrEmpty()) {
+                allInfoCorrect = false
+                state = state.copy(propertyTypeError = app.resources.getString(R.string.property_type_error))
+            }
+            if (propertySurface.isNullOrEmpty()) {
+                allInfoCorrect = false
+                state = state.copy(propertySurfaceError = app.resources.getString(R.string.property_surface_error))
+            }
+        }
+        propertyInModificationRepository.propertyInModificationLD.value = state
 
-    private fun checkInsertOrDeletePhoto(listPhotoUiModel: List<EditUiState.PhotoInEditUiState>, property: Property) {
-        listPhotoUiModel.forEach {
+        return allInfoCorrect
+    }
+
+
+    private fun saveProperty() {
+        val currentEditUiState = propertyInModificationRepository.propertyInModificationLD.value!!
+        checkInsertOrDeletePhoto(currentEditUiState)
+        val propertyToInsert = fromEditUiStateToProperty()
+        viewModelScope.launch(IO) {
+            propertyRepository.insertLocalProperty(propertyToInsert)
+        }
+        editViewAction.value = EditPropertyViewAction.CloseFragment
+    }
+
+    private fun checkInsertOrDeletePhoto(property: EditUiState) {
+        property.photoList.forEach {
             if (!fileHelper.fileExists(it.photoUri)) {
                 fileHelper.saveImageToPropertyFolder(it.photoUri, property.propertyId, it.photoId)
             }
         }
-        fileHelper.deleteOldPhotosFromPropertyDirectory(listPhotoUiModel, property.propertyId)
+        fileHelper.deleteOldPhotosFromPropertyDirectory(property)
         fileHelper.deleteCache()
     }
 
 
     fun onPhotoSelected(uri: String) {
-        currentPhoto = EditUiState.PhotoInEditUiState(photoUri = uri)
-        editViewAction.value = EditPropertyViewAction.LaunchEditor
+        currentPhotoRepository.currentPhotoLD.value = PhotoOnEdit(photoUri = uri)
+        editViewAction.value = LaunchEditor
     }
 
     fun editPhotoClicked(recyclerPosition: Int) {
-        currentPhoto = this.editUiStateLD.value!!.photoList[recyclerPosition]
-        editViewAction.value = EditPropertyViewAction.LaunchEditor
+        currentPhotoRepository.currentPhotoLD.value =
+            propertyInModificationRepository.propertyInModificationLD.value!!.photoList[recyclerPosition]
+        editViewAction.value = LaunchEditor
     }
 
     private fun fromEditUiStateToProperty(): Property {
-        val photoList = createPhotoList(this.editUiStateLD.value!!.photoList)
-        with(this.editUiStateLD.value) {
+        var currentPropertyToInsert = propertyInModificationRepository.propertyInModificationLD.value!!
+        val photoList = createPhotoList(propertyInModificationRepository.propertyInModificationLD.value!!.photoList)
+        with(currentPropertyToInsert) {
             return Property(
-                this!!.propertyId,
-                propertyTitle.capitalize(),
-                propertyType,
-                propertyPrice.toIntOrNull() ?: 0,
+                propertyId,
+                propertyTitle.toString().capitalize(),
+                propertyType.toString(),
+                propertyPrice.toString().toIntOrNull() ?: 0,
                 photoList,
                 LocalDateTime.now().toString(),
-                propertyDescription,
-                propertyAddress,
-                propertyCityCode,
-                propertyCityName,
-                propertySurface.toIntOrNull() ?: 0,
-                propertyRoomCount.toIntOrNull() ?: 0,
-                propertyBedroomCount.toIntOrNull() ?: 0,
-                propertyBathroomCount.toIntOrNull() ?: 0,
+                propertyDescription.toString(),
+                propertyAddress.toString(),
+                propertyCityCode.toString(),
+                propertyCityName.toString(),
+                propertySurface?.toString()?.toIntOrNull() ?: 0,
+                propertyRoomCount?.toString()?.toIntOrNull() ?: 0,
+                propertyBedroomCount?.toString()?.toIntOrNull() ?: 0,
+                propertyBathroomCount?.toString()?.toIntOrNull() ?: 0,
                 createPoiList(propertyPoiMap),
-                propertySoldDate,
+                propertySoldDate.toString(),
                 LocalDateTime.now().format(CUSTOM_DATE_FORMATTER)
             )
         }
@@ -262,6 +200,7 @@ class EditPropertyViewModel(
             return EditUiState(
                 propertyId = propertyId,
                 photoList = photoList.toPhotoInEditUiState(fileHelper, propertyId),
+                addPhotoVisibility = if (this.photoList.isEmpty()) View.VISIBLE else View.INVISIBLE,
                 propertyTitle = propertyTitle,
                 propertyDescription = propertyDescription,
                 propertyAddress = propertyAddress,
@@ -284,7 +223,7 @@ class EditPropertyViewModel(
     ): MutableMap<String, Boolean> {
         val propertyPoiMap = mutableMapOf<String, Boolean>()
         poiList.forEach {
-            propertyPoiMap[it.value] = true
+            propertyPoiMap[it.label] = true
         }
         return propertyPoiMap
     }
@@ -293,58 +232,20 @@ class EditPropertyViewModel(
         poiMap: Map<String, Boolean>
     ): List<PointOfInterest> {
         val poiListToReturn = mutableListOf<PointOfInterest>()
-        poiMap.forEach {
-            poiListToReturn.add(PointOfInterest.valueOf(it.key))
+        for (entry in poiMap) {
+            poiListToReturn.add(PointOfInterest.valueOf(entry.key.toUpperCase()))
         }
+
         return poiListToReturn
     }
 
-    private fun createPhotoList(photoUiModelList: List<EditUiState.PhotoInEditUiState>): List<Photo> {
+    private fun createPhotoList(photoUiModelList: List<PhotoOnEdit>): List<Photo> {
         val listToReturn: MutableList<Photo> = mutableListOf()
         photoUiModelList.forEach {
             listToReturn.add(Photo(it.photoId, it.photoTitle))
         }
         return listToReturn
     }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //  PhotoEditorFragment Methods
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//    fun onDeletePhotoInEditor() {
-//        //DeletePhotoFromList()
-//        val photoList = this.editUiStateLD.value!!.photoList
-//        photoList.remove(currentPhoto)
-//        editUiStateModifiedLD.value = this.editUiStateLD.value?.copy(photoList = photoList)
-//        photoEditorViewAction.value =
-//            CloseFragment
-//    }
-//
-//    fun onSavePhotoInEditor(photoTitle: String) {
-//        val currentPhotoList = this.editUiStateLD.value!!.photoList
-//        if (photoTitle.isEmpty()) {
-//            photoEditorViewAction.value = TitleEmptyError
-//            return
-//        }
-//        var photoToInsert = currentPhoto.copy(photoTitle = photoTitle)
-//        if (currentPhoto in currentPhotoList) {
-//            val indexOfCurrentPhoto = currentPhotoList.indexOf(currentPhoto)
-//            currentPhotoList.remove(currentPhoto)
-//            currentPhotoList.add(indexOfCurrentPhoto, photoToInsert)
-//            editUiStateModifiedLD.value = this.editUiStateLD.value?.copy(photoList = currentPhotoList)
-//            editViewAction.value =
-//                MoveRecyclerToPosition(indexOfCurrentPhoto)
-//
-//        } else {
-//            photoToInsert = photoToInsert.copy(photoId = UUID.randomUUID().toString())
-//            currentPhotoList.add(photoToInsert)
-//            editUiStateModifiedLD.value = this.editUiStateLD.value?.copy(photoList = currentPhotoList)
-//            editViewAction.value =
-//                MoveRecyclerToPosition(currentPhotoList.size - 1)
-//        }
-//        photoEditorViewAction.value =
-//            CloseFragment
-//    }
 
     fun onTitleChange(title: String) {
         propertyInModificationRepository.propertyInModificationLD.value =
@@ -381,7 +282,7 @@ class EditPropertyViewModel(
             propertyInModificationRepository.propertyInModificationLD.value?.copy(propertyType = type)
     }
 
-    fun onSurfaceChange(surface: String) {
+    fun onSurfaceChange(surface: CharSequence?) {
         propertyInModificationRepository.propertyInModificationLD.value =
             propertyInModificationRepository.propertyInModificationLD.value?.copy(propertySurface = surface)
     }
@@ -415,67 +316,53 @@ class EditPropertyViewModel(
             propertyInModificationRepository.propertyInModificationLD.value?.copy(propertySoldDate = soldDate)
     }
 
+    override fun onCleared() {
+        propertyInModificationRepository.propertyInModificationLD.value = null
+        println("debug : on ClearedVM propertymodified value ${propertyInModificationRepository.propertyInModificationLD.value}")
+    }
+
     sealed class EditPropertyViewAction {
-        object TakePhotoFromCamera : EditPropertyViewAction()
-        object TakePhotoFromGallery : EditPropertyViewAction()
+        class TakePhotoFromCamera(val fileHelper: FileHelper) : EditPropertyViewAction()
+        class TakePhotoFromGallery(val fileHelper: FileHelper) : EditPropertyViewAction()
         object LaunchEditor : EditPropertyViewAction()
         class MoveRecyclerToPosition(val position: Int) : EditPropertyViewAction()
         class DisplayDatePicker(val year: Int, val month: Int, val day: Int) : EditPropertyViewAction()
         object FillInError : EditPropertyViewAction()
         object CloseFragment : EditPropertyViewAction()
     }
-
-    sealed class PhotoEditorViewAction {
-        object CloseFragment : PhotoEditorViewAction()
-        object TitleEmptyError : PhotoEditorViewAction()
-    }
 }
 
 data class EditUiState(
     val propertyId: String = UUID.randomUUID().toString(),
-    val photoList: MutableList<PhotoInEditUiState> = mutableListOf(),
-    val propertyTitle: String = "",
+    val photoList: MutableList<PhotoOnEdit> = mutableListOf(),
+    val addPhotoVisibility: Int = View.VISIBLE,
+    val propertyTitle: CharSequence? = null,
     val propertyTitleError: String? = null,
-    val propertyDescription: String = "",
+    val propertyDescription: CharSequence? = null,
     val propertyDescriptionError: String? = null,
-    val propertyAddress: String = "",
+    val propertyAddress: CharSequence? = null,
     val propertyAddressError: String? = null,
-    val propertyCityCode: String = "",
+    val propertyCityCode: CharSequence? = null,
     val propertyCityCodeError: String? = null,
-    val propertyCityName: String = "",
+    val propertyCityName: CharSequence? = null,
     val propertyCityNameError: String? = null,
-    val propertyPrice: String = "",
+    val propertyPrice: CharSequence? = null,
     val propertyPriceError: String? = null,
-    val propertyType: String = "",
+    val propertyType: CharSequence? = null,
     val propertyTypeError: String? = null,
-    val propertySurface: String = "",
+    val propertySurface: CharSequence? = null,
     val propertySurfaceError: String? = null,
-    val propertyRoomCount: String = "",
-    val propertyBedroomCount: String = "",
-    val propertyBathroomCount: String = "",
-    val propertySoldDate: String = "",
+    val propertyRoomCount: CharSequence? = null,
+    val propertyBedroomCount: CharSequence? = null,
+    val propertyBathroomCount: CharSequence? = null,
+    val propertySoldDate: CharSequence? = null,
     val propertyPoiMap: MutableMap<String, Boolean> = mutableMapOf()
-) {
-    data class PhotoInEditUiState(
-        val photoId: String = UUID.randomUUID().toString(),
-        val photoTitle: String = "",
-        val photoUri: String
-    )
-}
+)
 
-fun List<Photo>.toPhotoInEditUiState(
-    fileHelper: FileHelper,
-    propertyId: String
-): MutableList<EditUiState.PhotoInEditUiState> {;
-    val listToReturn = mutableListOf<EditUiState.PhotoInEditUiState>()
-    forEach {
-        listToReturn.add(
-            EditUiState.PhotoInEditUiState(
-                photoId = it.photoId,
-                photoTitle = it.title,
-                photoUri = fileHelper.getUriFromFileName(it.photoId, propertyId)
-            )
-        )
-    }
-    return listToReturn
-}
+data class PhotoOnEdit(
+    val photoId: String = UUID.randomUUID().toString(),
+    val photoTitle: String = "",
+    val photoUri: String
+)
+
+

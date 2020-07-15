@@ -96,7 +96,7 @@ class DetailsPropertyViewModel(
         } else {
             val poiListValues = mutableListOf<String>()
             propertyPoiList.forEach {
-                poiListValues.add(it.value)
+                poiListValues.add(it.label)
             }
             poiListValues.joinToString(", ", "Near ", ".")
         }

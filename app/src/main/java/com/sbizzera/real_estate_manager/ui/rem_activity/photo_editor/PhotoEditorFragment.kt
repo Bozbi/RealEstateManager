@@ -12,8 +12,7 @@ import androidx.lifecycle.observe
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.sbizzera.real_estate_manager.R
-import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyViewModel
-import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditUiState
+import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.PhotoOnEdit
 import com.sbizzera.real_estate_manager.utils.ViewModelFactory
 import kotlinx.android.synthetic.main.fragment_photo_editor.*
 import kotlinx.android.synthetic.main.fragment_photo_editor.view.*
@@ -21,7 +20,7 @@ import kotlinx.android.synthetic.main.fragment_photo_editor.view.*
 
 class PhotoEditorFragment() : Fragment() {
 
-    private lateinit var viewModel: EditPropertyViewModel
+    private lateinit var viewModel: PhotoEditorViewModel
 
     companion object {
         fun newInstance(): PhotoEditorFragment = PhotoEditorFragment()
@@ -32,34 +31,36 @@ class PhotoEditorFragment() : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel = ViewModelProvider(this, ViewModelFactory).get(EditPropertyViewModel::class.java)
+        viewModel = ViewModelProvider(this, ViewModelFactory).get(PhotoEditorViewModel::class.java)
+
+        updateUi(viewModel.currentPhotoEdited)
+
         viewModel.photoEditorViewAction.observe(viewLifecycleOwner) { viewAction ->
             when (viewAction) {
-                EditPropertyViewModel.PhotoEditorViewAction.TitleEmptyError -> {
+                PhotoEditorViewModel.PhotoEditorViewAction.TitleEmptyError -> {
                     Snackbar.make(
                         view.photo_editor_fragment_container,
                         "Please give a title to this Photo",
                         Snackbar.LENGTH_LONG
                     ).show()
                 }
-                EditPropertyViewModel.PhotoEditorViewAction.CloseFragment -> {
+                PhotoEditorViewModel.PhotoEditorViewAction.CloseFragment -> {
                     hideKeyboard()
                     activity?.supportFragmentManager?.beginTransaction()?.remove(this)?.commit()
                 }
             }
         }
 
-        updateUi(viewModel.currentPhoto)
-//        delete_photo_btn.setOnClickListener {
-//            viewModel.onDeletePhotoInEditor()
-//        }
-//        save_photo_btn.setOnClickListener {
-//            viewModel.onSavePhotoInEditor(photo_title_edit_text.text.toString())
-//        }
+        delete_photo_btn.setOnClickListener {
+            viewModel.onDeletePhotoInEditor()
+        }
+        save_photo_btn.setOnClickListener {
+            viewModel.onSavePhotoInEditor(photo_title_edit_text.text.toString())
+        }
     }
 
 
-    private fun updateUi(photo: EditUiState.PhotoInEditUiState) {
+    private fun updateUi(photo: PhotoOnEdit) {
         Glide.with(current_photo_img).load(photo.photoUri).into(current_photo_img)
         photo_title_edit_text.setText(photo.photoTitle)
     }

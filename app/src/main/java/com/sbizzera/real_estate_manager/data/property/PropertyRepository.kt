@@ -17,15 +17,12 @@ class PropertyRepository private constructor() {
     }
 
 
-    fun insertLocalProperty(property: Property) = propertyDao.insertProperty(property)
+    suspend fun insertLocalProperty(property: Property) = propertyDao.insertProperty(property)
     fun getAllLocalProperties() = propertyDao.getAllProperties()
     fun getPropertyById(propertyId: String) :LiveData<Property> {
         return propertyDao.getPropertyById(propertyId)
     }
 
-    suspend fun getPropertyByIdAsync(propertyId: String) :Property {
-        return propertyDao.getPropertyByIdAsync(propertyId)
-    }
 
 
     suspend fun insertRemoteProperty(property: Property) {

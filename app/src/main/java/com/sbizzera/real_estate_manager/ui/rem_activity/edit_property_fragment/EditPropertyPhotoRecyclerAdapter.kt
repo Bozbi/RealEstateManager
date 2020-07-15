@@ -13,9 +13,7 @@ import kotlinx.android.synthetic.main.property_photo_item_view.view.*
 class EditPropertyPhotoRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() , OnPhotoActionListenable{
 
 
-//    lateinit var listPhotos: List<EditUiState.PhotoInEditUiState>
-    var listPhotos: List<EditUiState.PhotoInEditUiState> = mutableListOf()
-
+    var listPhotos: List<PhotoOnEdit> = listOf()
     lateinit var onPhotoActionListener: OnPhotoActionListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -32,7 +30,7 @@ class EditPropertyPhotoRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     inner class PropertyPhotoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(photo: EditUiState.PhotoInEditUiState) {
+        fun bind(photo: PhotoOnEdit) {
             Glide.with(itemView.photo_img).load(photo.photoUri).into(itemView.photo_img)
             itemView.photo_title.text = photo.photoTitle
             itemView.edit_btn.setOnClickListener {

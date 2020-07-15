@@ -7,6 +7,7 @@ import androidx.core.content.FileProvider
 import com.sbizzera.real_estate_manager.App
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditUiState
+import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.PhotoOnEdit
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -72,7 +73,11 @@ class FileHelper private constructor() {
     }
 
     fun fileExists(uri: String): Boolean {
-        val file = File(appContext.contentResolver.getFileName(Uri.parse(uri)))
+        //TODO Nino alors la je ne pige pas !!!
+        var file = File(appContext.contentResolver.getFileName(Uri.parse(uri)))
+        if(!file.exists()){
+            file =File(uri)
+        }
         return file.exists()
     }
 
@@ -81,13 +86,13 @@ class FileHelper private constructor() {
         return "${appContext.filesDir}/$propertyId/$fileName.jpg"
     }
 
-    fun deleteOldPhotosFromPropertyDirectory(listPhoto: List<EditUiState.PhotoInEditUiState>, propertyId: String) {
+    fun deleteOldPhotosFromPropertyDirectory(property: EditUiState) {
         //TODO see if it works later
-        val dir = File("${appContext.filesDir}/$propertyId")
+        val dir = File("${appContext.filesDir}/${property.propertyId}")
         val files = dir.listFiles()
         files?.forEach { file ->
             val name = file.name.replace(".jpg", "")
-            val size = listPhoto.filter { photo ->
+            val size = property.photoList.filter { photo ->
                 photo.photoId == name
             }.size
             if (size == 0) {

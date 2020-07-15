@@ -10,7 +10,5 @@ class PropertyInModificationRepository private constructor(){
             PropertyInModificationRepository()
         }
     }
-
-    val propertyInModificationLD = MutableLiveData<EditUiState>()
-
+    val propertyInModificationLD = MutableLiveData<EditUiState>(null)
 }
