@@ -146,7 +146,7 @@ class EditPropertyViewModel(
 
     private fun checkInsertOrDeletePhoto(property: EditUiState) {
         property.photoList.forEach {
-            if (!fileHelper.fileExists(it.photoUri)) {
+            if (!fileHelper.fileExistsInPropertyFolder(it.photoId,property.propertyId)) {
                 fileHelper.saveImageToPropertyFolder(it.photoUri, property.propertyId, it.photoId)
             }
         }

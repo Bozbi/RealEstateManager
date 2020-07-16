@@ -72,12 +72,9 @@ class FileHelper private constructor() {
         return Uri.fromFile(newFile).toString()
     }
 
-    fun fileExists(uri: String): Boolean {
+    fun fileExistsInPropertyFolder(photoId:String,propertyId:String): Boolean {
         //TODO Nino alors la je ne pige pas !!!
-        var file = File(appContext.contentResolver.getFileName(Uri.parse(uri)))
-        if(!file.exists()){
-            file =File(uri)
-        }
+        var file = File("${appContext.filesDir}/$propertyId/$photoId.jpg")
         return file.exists()
     }
 
