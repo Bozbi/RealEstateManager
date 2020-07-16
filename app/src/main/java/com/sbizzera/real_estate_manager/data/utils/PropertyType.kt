@@ -12,7 +12,5 @@ fun getTypeNameList():List<String>{
     PropertyType.values().forEach {
         listToReturn.add(it.typeName)
     }
-//    println("debug : ${PropertyType.valueOf("House")}")
-    println("debug : ${PropertyType.valueOf("HOUSE")}")
     return listToReturn
 }
