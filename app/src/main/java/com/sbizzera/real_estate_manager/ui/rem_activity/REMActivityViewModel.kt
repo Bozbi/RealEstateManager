@@ -30,11 +30,16 @@ class REMActivityViewModel: ViewModel() {
         viewAction.value = ViewAction.LaunchEditProperty
     }
 
+    fun onMapAsked() {
+        viewAction.value = ViewAction.LaunchMap
+    }
+
 
     sealed class ViewAction {
         object LaunchPhotoEditor :ViewAction()
         object LaunchDetails : ViewAction()
         object LaunchEditProperty : ViewAction()
+        object LaunchMap: ViewAction()
     }
 
 }

@@ -73,7 +73,7 @@ class FileHelper private constructor() {
     }
 
     fun fileExistsInPropertyFolder(photoId:String,propertyId:String): Boolean {
-        //TODO Nino alors la je ne pige pas !!!
+
         var file = File("${appContext.filesDir}/$propertyId/$photoId.jpg")
         return file.exists()
     }
@@ -84,7 +84,6 @@ class FileHelper private constructor() {
     }
 
     fun deleteOldPhotosFromPropertyDirectory(property: EditUiState) {
-        //TODO see if it works later
         val dir = File("${appContext.filesDir}/${property.propertyId}")
         val files = dir.listFiles()
         files?.forEach { file ->

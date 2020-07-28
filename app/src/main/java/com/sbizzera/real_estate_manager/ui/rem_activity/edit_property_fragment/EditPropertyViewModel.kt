@@ -2,7 +2,10 @@ package com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment
 
 import android.app.Application
 import android.view.View
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.data.CurrentEditedPhotoRepository
 import com.sbizzera.real_estate_manager.data.CurrentPropertyIdRepository
@@ -17,7 +20,9 @@ import com.sbizzera.real_estate_manager.utils.FileHelper
 import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
 import com.sbizzera.real_estate_manager.utils.toPhotoInEditUiState
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import java.util.*
@@ -33,15 +38,15 @@ class EditPropertyViewModel(
 ) : ViewModel() {
 
     val editViewAction = SingleLiveEvent<EditPropertyViewAction>()
-    val editUiStateLD :LiveData<EditUiState>
+    val editUiStateLD: LiveData<EditUiState>
 
     init {
-        //TODO Nino can we do this better
         editUiStateLD =
             Transformations.switchMap(currentPropertyIdRepository.currentPropertyIdLiveData) { propertyId ->
                 if (propertyId != null) {
-                    Transformations.switchMap(propertyRepository.getPropertyById(propertyId)) { property ->
-                        propertyInModificationRepository.propertyInModificationLD.value = fromPropertyToEditUiState(property,fileHelper)
+                    Transformations.switchMap(propertyRepository.getPropertyByIdLD(propertyId)) { property ->
+                        propertyInModificationRepository.propertyInModificationLD.value =
+                            fromPropertyToEditUiState(property, fileHelper)
                         propertyInModificationRepository.propertyInModificationLD
                     }
                 } else {
@@ -50,7 +55,6 @@ class EditPropertyViewModel(
                 }
             }
     }
-
 
 
     fun takePhotoFromCameraClicked() {
@@ -73,6 +77,7 @@ class EditPropertyViewModel(
             return
         }
         saveProperty()
+
     }
 
     private fun allInfoCorrect(): Boolean {
@@ -134,19 +139,22 @@ class EditPropertyViewModel(
     }
 
 
+
     private fun saveProperty() {
         val currentEditUiState = propertyInModificationRepository.propertyInModificationLD.value!!
         checkInsertOrDeletePhoto(currentEditUiState)
         val propertyToInsert = fromEditUiStateToProperty()
         viewModelScope.launch(IO) {
             propertyRepository.insertLocalProperty(propertyToInsert)
+            withContext(Main) {
+                editViewAction.value = EditPropertyViewAction.CloseFragment
+            }
         }
-        editViewAction.value = EditPropertyViewAction.CloseFragment
     }
 
     private fun checkInsertOrDeletePhoto(property: EditUiState) {
         property.photoList.forEach {
-            if (!fileHelper.fileExistsInPropertyFolder(it.photoId,property.propertyId)) {
+            if (!fileHelper.fileExistsInPropertyFolder(it.photoId, property.propertyId)) {
                 fileHelper.saveImageToPropertyFolder(it.photoUri, property.propertyId, it.photoId)
             }
         }
@@ -186,7 +194,7 @@ class EditPropertyViewModel(
                 propertyBedroomCount?.toString()?.toIntOrNull() ?: 0,
                 propertyBathroomCount?.toString()?.toIntOrNull() ?: 0,
                 createPoiList(propertyPoiMap),
-                propertySoldDate.toString(),
+                propertySoldDate?.toString()?:"",
                 LocalDateTime.now().format(CUSTOM_DATE_FORMATTER)
             )
         }
@@ -318,7 +326,6 @@ class EditPropertyViewModel(
 
     override fun onCleared() {
         propertyInModificationRepository.propertyInModificationLD.value = null
-        println("debug : on ClearedVM propertymodified value ${propertyInModificationRepository.propertyInModificationLD.value}")
     }
 
     sealed class EditPropertyViewAction {
@@ -328,6 +335,7 @@ class EditPropertyViewModel(
         class MoveRecyclerToPosition(val position: Int) : EditPropertyViewAction()
         class DisplayDatePicker(val year: Int, val month: Int, val day: Int) : EditPropertyViewAction()
         object FillInError : EditPropertyViewAction()
+        object AddressError : EditPropertyViewAction()
         object CloseFragment : EditPropertyViewAction()
     }
 }

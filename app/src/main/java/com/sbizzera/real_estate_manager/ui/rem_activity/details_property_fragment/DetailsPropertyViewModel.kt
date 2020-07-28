@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.sbizzera.real_estate_manager.BuildConfig
+import com.sbizzera.real_estate_manager.data.CurrentPhotoPositionRepo
 import com.sbizzera.real_estate_manager.data.CurrentPropertyIdRepository
 import com.sbizzera.real_estate_manager.data.photo.Photo
 import com.sbizzera.real_estate_manager.data.property.PointOfInterest
@@ -17,7 +18,8 @@ import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
 
 class DetailsPropertyViewModel(
     private val propertyRepository: PropertyRepository,
-    private val currentPropertyIdRepository: CurrentPropertyIdRepository,
+   currentPropertyIdRepository: CurrentPropertyIdRepository,
+    private val currentPhotoPositionRepo: CurrentPhotoPositionRepo,
     private val fileHelper: FileHelper
 ) : ViewModel() {
 
@@ -28,7 +30,7 @@ class DetailsPropertyViewModel(
     init {
         detailsUiStateLD =
             Transformations.switchMap(currentPropertyIdRepository.currentPropertyIdLiveData) { currentPropertyId ->
-                val propertyLiveData = propertyRepository.getPropertyById(currentPropertyId)
+                val propertyLiveData = propertyRepository.getPropertyByIdLD(currentPropertyId)
                 Transformations.map(propertyLiveData) { property ->
                     fromPropertyToDetailUiState(property)
                 }
@@ -79,7 +81,7 @@ class DetailsPropertyViewModel(
 
 
     private fun createAvailabilityText(creationDate: String, soldDate: String): String {
-        return if (soldDate.isEmpty()) {
+        return if (soldDate.isNullOrEmpty()) {
             "available since $creationDate"
         } else {
             "sold on $soldDate"
@@ -105,7 +107,7 @@ class DetailsPropertyViewModel(
     private fun createStaticMapsUri(propertyAddress: String, propertyCityCode: String, propertyCityName: String): String {
         var addressRequestString = "$propertyAddress $propertyCityCode $propertyCityName"
         addressRequestString = addressRequestString.replace("'", "%").replace(" ", "+")
-        return "https://maps.googleapis.com/maps/api/staticmap?center=$addressRequestString&markers=color:blue%7C$addressRequestString&zoom=19&size=600x600&key=${BuildConfig.MAPS_STATIC_API_KEY}"
+        return "https://maps.googleapis.com/maps/api/staticmap?center=$addressRequestString&markers=color:blue%7C$addressRequestString&zoom=19&size=640x640&key=${BuildConfig.MAPS_STATIC_API_KEY}"
     }
 
 
@@ -117,9 +119,29 @@ class DetailsPropertyViewModel(
         detailsViewAction.value = ModifyPropertyClicked
     }
 
+    fun photoClicked(position: Int) {
+        currentPhotoPositionRepo.currentPhotoPosition = position
+    }
+
+    fun onViewHolderBound(position: Int) {
+        if(position == currentPhotoPositionRepo.currentPhotoPosition){
+            detailsViewAction.value = DetailsViewAction.ViewHolderReady
+        }
+    }
+
+    fun getCurrentPhotoPosition():Int = currentPhotoPositionRepo.currentPhotoPosition
+
+    fun checkScrollNecessity(firstCompletelyVisibleItemPosition: Int, lastCompletelyVisibleItemPosition: Int) {
+        if (currentPhotoPositionRepo.currentPhotoPosition !in firstCompletelyVisibleItemPosition..lastCompletelyVisibleItemPosition){
+            detailsViewAction.value = DetailsViewAction.ScrollToPosition(currentPhotoPositionRepo.currentPhotoPosition)
+        }
+    }
+
 
     sealed class DetailsViewAction() {
         object ModifyPropertyClicked : DetailsViewAction()
+        object ViewHolderReady : DetailsViewAction()
+        class ScrollToPosition(val position: Int) : DetailsViewAction()
     }
 }
 

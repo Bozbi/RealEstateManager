@@ -62,15 +62,17 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
             when (viewAction) {
                 is TakePhotoFromCamera -> {
                     registerForActivityResult(
-                        TakePictureContract(fileHelper = viewAction.fileHelper)) {
-                        it?.let { launchEditorWithUriReceived(it)}
+                        TakePictureContract(fileHelper = viewAction.fileHelper)
+                    ) {
+                        it?.let { launchEditorWithUriReceived(it) }
                     }.launch(null)
                 }
 
                 is TakePhotoFromGallery -> {
                     registerForActivityResult(
-                        TakePictureFromGalleryContract(fileHelper = viewAction.fileHelper)){
-                        it?.let { launchEditorWithUriReceived(it)}
+                        TakePictureFromGalleryContract(fileHelper = viewAction.fileHelper)
+                    ) {
+                        it?.let { launchEditorWithUriReceived(it) }
                     }.launch(null)
                 }
                 LaunchEditor -> onUserAskTransactionEventListener.onPhotoEditorAsked()
@@ -86,7 +88,7 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
                     Snackbar.LENGTH_LONG
                 ).show()
                 CloseFragment -> {
-                    activity?.supportFragmentManager?.beginTransaction()?.remove(this)?.commit()
+                    activity?.supportFragmentManager?.popBackStack()
                 }
             }
         }
@@ -186,11 +188,10 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
     }
 
     private fun launchEditorWithUriReceived(it: String) {
-            viewModel.onPhotoSelected(it)
+        viewModel.onPhotoSelected(it)
     }
 
     private fun addChips() {
-        //TODO How To insert This in VM is it mandatory
         PointOfInterest.values().forEach {
             val chipToAdd =
                 MyCustomChip(chip_group.context)
@@ -237,8 +238,12 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
     }
 
 
-    override fun onPhotoEditClick(position: Int) {
+    override fun onPhotoClick(position: Int) {
         viewModel.editPhotoClicked(position)
+    }
+
+    override fun onPhotoClickForTransition(position: Int, transitionView: View) {
+       // TODO("Not yet implemented")
     }
 
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {

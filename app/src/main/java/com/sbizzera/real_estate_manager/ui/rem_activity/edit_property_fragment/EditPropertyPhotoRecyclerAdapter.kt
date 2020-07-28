@@ -34,7 +34,7 @@ class EditPropertyPhotoRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewH
             Glide.with(itemView.photo_img).load(photo.photoUri).into(itemView.photo_img)
             itemView.photo_title.text = photo.photoTitle
             itemView.edit_btn.setOnClickListener {
-                onPhotoActionListener.onPhotoEditClick(adapterPosition)
+                onPhotoActionListener.onPhotoClick(adapterPosition)
             }
         }
     }

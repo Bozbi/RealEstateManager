@@ -7,11 +7,14 @@ import com.sbizzera.real_estate_manager.data.CurrentPropertyIdRepository
 import com.sbizzera.real_estate_manager.data.PropertyInModificationRepository
 import com.sbizzera.real_estate_manager.data.property.PropertyRepository
 import com.sbizzera.real_estate_manager.data.CurrentEditedPhotoRepository
+import com.sbizzera.real_estate_manager.data.CurrentPhotoPositionRepo
 import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyViewModel
 import com.sbizzera.real_estate_manager.ui.rem_activity.REMActivityViewModel
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyViewModel
 import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel
+import com.sbizzera.real_estate_manager.ui.rem_activity.map_fragment.MapViewModel
 import com.sbizzera.real_estate_manager.ui.rem_activity.photo_editor.PhotoEditorViewModel
+import com.sbizzera.real_estate_manager.ui.rem_activity.photo_viewer_fragment.PhotoViewerViewModel
 
 object ViewModelFactory : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
@@ -23,6 +26,7 @@ object ViewModelFactory : ViewModelProvider.Factory {
             return DetailsPropertyViewModel(
                 PropertyRepository.instance,
                 CurrentPropertyIdRepository.instance,
+                CurrentPhotoPositionRepo.instance,
                 FileHelper.instance
             ) as T
         }
@@ -48,6 +52,17 @@ object ViewModelFactory : ViewModelProvider.Factory {
                 CurrentEditedPhotoRepository.instance,
                 PropertyInModificationRepository.instance
             ) as T
+        }
+        if(modelClass.isAssignableFrom(PhotoViewerViewModel::class.java)){
+            return PhotoViewerViewModel(
+                CurrentPropertyIdRepository.instance,
+                PropertyRepository.instance,
+                CurrentPhotoPositionRepo.instance,
+                FileHelper.instance
+            )as T
+        }
+        if(modelClass.isAssignableFrom(MapViewModel::class.java)){
+            return MapViewModel(App.instance) as T
         }
         throw IllegalArgumentException("not such a viewModel Class")
     }

@@ -5,9 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:clickable="true"
-    android:focusable="true"
     tools:context=".ui.rem_activity.details_property_fragment.DetailsPropertyFragment">
 
 
@@ -100,7 +97,7 @@
             android:rotation="90"
             android:src="@drawable/ic_surface"
             android:tint="@color/colorPrimaryDark"
-            app:layout_constraintLeft_toLeftOf="@id/surface_label"
+            app:layout_constraintStart_toStartOf="@id/surface_label"
             app:layout_constraintTop_toBottomOf="@id/surface_label"
 
             />

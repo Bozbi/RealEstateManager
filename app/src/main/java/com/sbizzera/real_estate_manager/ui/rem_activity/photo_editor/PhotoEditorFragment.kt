@@ -46,7 +46,7 @@ class PhotoEditorFragment() : Fragment() {
                 }
                 PhotoEditorViewModel.PhotoEditorViewAction.CloseFragment -> {
                     hideKeyboard()
-                    activity?.supportFragmentManager?.beginTransaction()?.remove(this)?.commit()
+                    activity?.supportFragmentManager?.popBackStack()
                 }
             }
         }
@@ -54,6 +54,7 @@ class PhotoEditorFragment() : Fragment() {
         delete_photo_btn.setOnClickListener {
             viewModel.onDeletePhotoInEditor()
         }
+
         save_photo_btn.setOnClickListener {
             viewModel.onSavePhotoInEditor(photo_title_edit_text.text.toString())
         }

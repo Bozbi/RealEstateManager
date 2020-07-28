@@ -19,7 +19,10 @@ class PropertyRepository private constructor() {
 
     suspend fun insertLocalProperty(property: Property) = propertyDao.insertProperty(property)
     fun getAllLocalProperties() = propertyDao.getAllProperties()
-    fun getPropertyById(propertyId: String) :LiveData<Property> {
+    fun getPropertyByIdLD(propertyId: String) :LiveData<Property> {
+        return propertyDao.getPropertyByIdLD(propertyId)
+    }
+    fun getPropertyById(propertyId: String):Property{
         return propertyDao.getPropertyById(propertyId)
     }
 
