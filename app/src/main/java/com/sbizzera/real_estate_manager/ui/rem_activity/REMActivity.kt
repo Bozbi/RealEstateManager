@@ -4,7 +4,9 @@ package com.sbizzera.real_estate_manager.ui.rem_activity
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
@@ -63,8 +65,18 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent {
                         MapFragment.newInstance()
                     ).addToBackStack(null).commit()
                 }
+                LaunchRationalPermissionDialog -> {
+                    AlertDialog.Builder(this).apply {
+                        setTitle("Map Authorisation")
+                        setMessage("LocationPermission is Mandatory to access Map")
+                    }.show()
+                }
             }
         }
+    }
+
+    override fun onRationalPermissionAsked() {
+        viewModel.onRationalPermissionAsked()
     }
 
     override fun onAttachFragment(fragment: Fragment) {
