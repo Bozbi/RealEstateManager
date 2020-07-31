@@ -80,6 +80,7 @@ class DetailsPropertyViewModel(
     }
 
 
+
     private fun createAvailabilityText(creationDate: String, soldDate: String): String {
         return if (soldDate.isNullOrEmpty()) {
             "available since $creationDate"
@@ -107,7 +108,8 @@ class DetailsPropertyViewModel(
     private fun createStaticMapsUri(propertyAddress: String, propertyCityCode: String, propertyCityName: String): String {
         var addressRequestString = "$propertyAddress $propertyCityCode $propertyCityName"
         addressRequestString = addressRequestString.replace("'", "%").replace(" ", "+")
-        return "https://maps.googleapis.com/maps/api/staticmap?center=$addressRequestString&markers=color:blue%7C$addressRequestString&zoom=19&size=640x640&key=${BuildConfig.MAPS_STATIC_API_KEY}"
+        return "https://maps.googleapis.com/maps/api/staticmap?center=$addressRequestString&markers=color:blue%7C$addressRequestString&zoom=19&size=640x64" +
+                "0&key=${BuildConfig.MAPS_STATIC_API_KEY}"
     }
 
 

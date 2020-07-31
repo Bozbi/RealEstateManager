@@ -3,10 +3,10 @@ package com.sbizzera.real_estate_manager.ui.rem_activity
 
 import android.os.Build
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
@@ -21,11 +21,14 @@ import com.sbizzera.real_estate_manager.ui.rem_activity.map_fragment.MapFragment
 import com.sbizzera.real_estate_manager.ui.rem_activity.photo_editor.PhotoEditorFragment
 import com.sbizzera.real_estate_manager.ui.rem_activity.photo_viewer_fragment.PhotoViewerFragment
 import com.sbizzera.real_estate_manager.utils.ViewModelFactory
+import kotlinx.android.synthetic.main.activity_r_e_m.*
 
 
 class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent {
 
     private lateinit var viewModel: REMActivityViewModel
+
+    private lateinit var mMenu :Menu
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -65,24 +68,35 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent {
                         MapFragment.newInstance()
                     ).addToBackStack(null).commit()
                 }
-                LaunchRationalPermissionDialog -> {
-                    AlertDialog.Builder(this).apply {
-                        setTitle("Map Authorisation")
-                        setMessage("LocationPermission is Mandatory to access Map")
-                    }.show()
-                }
             }
         }
+
+        setSupportActionBar(toolbar)
     }
 
-    override fun onRationalPermissionAsked() {
-        viewModel.onRationalPermissionAsked()
-    }
 
     override fun onAttachFragment(fragment: Fragment) {
         if (fragment is OnUserAskTransactionEventListenable) {
             fragment.setListener(this)
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.app_bar_menu,menu)
+        mMenu = menu
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.synchronise ->{
+                viewModel.syncLocalAndRemoteData()
+            }
+            R.id.disconnect->{
+                //TODO after google auth
+            }
+        }
+        return true
     }
 
 

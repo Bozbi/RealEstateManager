@@ -15,10 +15,7 @@ class FirebaseStorageRepository private constructor() {
 
     suspend fun uploadImage(uri: String) {
         var file = Uri.fromFile(File(uri))
-        println("debug : file exists? ${file}")
         val storageChild = storageRef.child("${file.lastPathSegment}")
-        storageChild.putFile(Uri.parse(uri)).await()
+        storageChild.putFile(file).await()
     }
-
-
 }

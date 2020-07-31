@@ -15,10 +15,7 @@ import com.sbizzera.real_estate_manager.data.property.PointOfInterest
 import com.sbizzera.real_estate_manager.data.property.Property
 import com.sbizzera.real_estate_manager.data.property.PropertyRepository
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyViewModel.EditPropertyViewAction.LaunchEditor
-import com.sbizzera.real_estate_manager.utils.CUSTOM_DATE_FORMATTER
-import com.sbizzera.real_estate_manager.utils.FileHelper
-import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
-import com.sbizzera.real_estate_manager.utils.toPhotoInEditUiState
+import com.sbizzera.real_estate_manager.utils.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
@@ -34,7 +31,8 @@ class EditPropertyViewModel(
     private val propertyRepository: PropertyRepository,
     private val fileHelper: FileHelper,
     private val currentPhotoRepository: CurrentEditedPhotoRepository,
-    private val app: Application
+    private val app: Application,
+    private val geocodeResolver: GeocodeResolver
 ) : ViewModel() {
 
     val editViewAction = SingleLiveEvent<EditPropertyViewAction>()
@@ -77,7 +75,6 @@ class EditPropertyViewModel(
             return
         }
         saveProperty()
-
     }
 
     private fun allInfoCorrect(): Boolean {
@@ -139,7 +136,6 @@ class EditPropertyViewModel(
     }
 
 
-
     private fun saveProperty() {
         val currentEditUiState = propertyInModificationRepository.propertyInModificationLD.value!!
         checkInsertOrDeletePhoto(currentEditUiState)
@@ -176,7 +172,7 @@ class EditPropertyViewModel(
 
     private fun fromEditUiStateToProperty(): Property {
         var currentPropertyToInsert = propertyInModificationRepository.propertyInModificationLD.value!!
-        val photoList = createPhotoList(propertyInModificationRepository.propertyInModificationLD.value!!.photoList)
+        val photoList = createPhotoList(currentPropertyToInsert.photoList)
         with(currentPropertyToInsert) {
             return Property(
                 propertyId,
@@ -194,9 +190,32 @@ class EditPropertyViewModel(
                 propertyBedroomCount?.toString()?.toIntOrNull() ?: 0,
                 propertyBathroomCount?.toString()?.toIntOrNull() ?: 0,
                 createPoiList(propertyPoiMap),
-                propertySoldDate?.toString()?:"",
-                LocalDateTime.now().format(CUSTOM_DATE_FORMATTER)
+                propertySoldDate?.toString() ?: "",
+                LocalDateTime.now().format(CUSTOM_DATE_FORMATTER),
+                getLatitudeOrLongitude(currentPropertyToInsert, GeocodeResolver.LatOrLng.LATITUDE),
+                getLatitudeOrLongitude(currentPropertyToInsert, GeocodeResolver.LatOrLng.LONGITUDE)
             )
+        }
+    }
+
+    private fun getLatitudeOrLongitude(currentPropertyToInsert: EditUiState, latOrLng: GeocodeResolver.LatOrLng): Double {
+        val address =
+            "${currentPropertyToInsert.propertyAddress} ${currentPropertyToInsert.propertyCityCode} ${currentPropertyToInsert.propertyCityName}"
+        return when (latOrLng) {
+            GeocodeResolver.LatOrLng.LATITUDE -> {
+                try {
+                    geocodeResolver.getLatitude(address)
+                } catch (e: Exception) {
+                    0.0
+                }
+            }
+            GeocodeResolver.LatOrLng.LONGITUDE -> {
+                try {
+                    geocodeResolver.getLongitude(address)
+                }catch (e:Exception){
+                    0.0
+                }
+            }
         }
     }
 
@@ -335,7 +354,6 @@ class EditPropertyViewModel(
         class MoveRecyclerToPosition(val position: Int) : EditPropertyViewAction()
         class DisplayDatePicker(val year: Int, val month: Int, val day: Int) : EditPropertyViewAction()
         object FillInError : EditPropertyViewAction()
-        object AddressError : EditPropertyViewAction()
         object CloseFragment : EditPropertyViewAction()
     }
 }

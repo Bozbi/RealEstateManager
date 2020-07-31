@@ -13,6 +13,9 @@ interface PropertyDao {
     @Query("SELECT * FROM properties")
     fun getAllProperties(): LiveData<List<Property>>
 
+    @Query("SELECT*FROM properties")
+    suspend fun getAllPropertiesAsync(): List<Property>
+
     @Insert(onConflict = REPLACE)
     suspend fun insertProperty(property: Property):Long
 
@@ -24,4 +27,6 @@ interface PropertyDao {
 
     @Query("SELECT * FROM properties WHERE propertyId LIKE :propertyId LIMIT 1")
     suspend fun getPropertyByIdAsync(propertyId: String): Property
+
+
 }

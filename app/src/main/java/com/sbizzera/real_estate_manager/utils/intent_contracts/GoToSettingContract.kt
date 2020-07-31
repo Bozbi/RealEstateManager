@@ -7,13 +7,13 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContract
 
-class GoToSettingContract() : ActivityResultContract<Unit, Boolean>() {
-    override fun createIntent(context: Context, input: Unit?): Intent {
+class GoToSettingContract() : ActivityResultContract<String, Boolean>() {
+    override fun createIntent(context: Context, input: String?): Intent {
         val uri = Uri.fromParts("package", context.packageName, null)
 
         return Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
             data = uri
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            resolveActivity(context.packageManager)
         }
     }
 

@@ -9,5 +9,4 @@ interface OnUserAskTransactionEvent {
     fun onPhotoEditorAsked()
     fun onPhotoViewerAsked(transitionView: View)
     fun onMapAsked()
-    fun onRationalPermissionAsked()
 }

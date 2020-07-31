@@ -19,6 +19,7 @@ class PropertyRepository private constructor() {
 
     suspend fun insertLocalProperty(property: Property) = propertyDao.insertProperty(property)
     fun getAllLocalProperties() = propertyDao.getAllProperties()
+    suspend fun getAllPropertiesAsync() = propertyDao.getAllPropertiesAsync()
     fun getPropertyByIdLD(propertyId: String) :LiveData<Property> {
         return propertyDao.getPropertyByIdLD(propertyId)
     }
@@ -31,6 +32,8 @@ class PropertyRepository private constructor() {
     suspend fun insertRemoteProperty(property: Property) {
         firestoreProperties.document(property.propertyId).set(property).await()
     }
+
+    suspend fun getAllRemoteProperties():List<Property> =firestoreProperties.get().await().toObjects(Property::class.java)
 
 }
 

@@ -1,9 +1,14 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 
-class REMActivityViewModel : ViewModel() {
+class REMActivityViewModel(
+    private val synchroniseDataHelper: SynchroniseDataHelper
+) : ViewModel() {
 
     val viewAction = SingleLiveEvent<ViewAction>()
 
@@ -24,8 +29,10 @@ class REMActivityViewModel : ViewModel() {
         viewAction.value = ViewAction.LaunchMap
     }
 
-    fun onRationalPermissionAsked() {
-        viewAction.value = ViewAction.LaunchRationalPermissionDialog
+    fun syncLocalAndRemoteData() {
+        viewModelScope.launch(IO) {
+            synchroniseDataHelper.synchroniseData()
+        }
     }
 
 
@@ -34,7 +41,6 @@ class REMActivityViewModel : ViewModel() {
         object LaunchDetails : ViewAction()
         object LaunchEditProperty : ViewAction()
         object LaunchMap : ViewAction()
-        object LaunchRationalPermissionDialog : ViewAction()
     }
 
 }
