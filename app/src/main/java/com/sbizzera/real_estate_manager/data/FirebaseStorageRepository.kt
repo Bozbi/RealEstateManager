@@ -18,4 +18,12 @@ class FirebaseStorageRepository private constructor() {
         val storageChild = storageRef.child("${file.lastPathSegment}")
         storageChild.putFile(file).await()
     }
+
+    suspend fun deleteImage(name: String) {
+        storageRef.child("$name.jpg").delete().await()
+    }
+
+    fun downloadImage(name: String,file:File) {
+        storageRef.child("$name.jpg").getFile(file)
+    }
 }

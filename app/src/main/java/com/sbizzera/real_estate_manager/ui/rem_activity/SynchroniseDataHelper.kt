@@ -35,15 +35,35 @@ class SynchroniseDataHelper(
                         .isAfter(LocalDateTime.parse(localPropertyToWorkOn[0].modificationDate))
                 if (isRemoteModificationDateMoreRecent) {
                     CoroutineScope(IO).launch {
+                        updateExistingLocalPropertyAndPhoto(localPropertyToWorkOn[0],remoteProperty)
                         propertyRepository.insertLocalProperty(remoteProperty)
                     }
                 }
             } else {
                 CoroutineScope(IO).launch {
+                    insertNewLocalPropertyAndPhoto(remoteProperty)
                     propertyRepository.insertLocalProperty(remoteProperty)
                 }
             }
         }
+    }
+
+    private fun insertNewLocalPropertyAndPhoto(remoteProperty: Property) {
+        CoroutineScope(IO).launch {
+            val photosIdListToAdd = mutableListOf<String>()
+            remoteProperty.photoList.forEach {
+                photosIdListToAdd.add(it.photoId)
+            }
+            photosIdListToAdd.forEach {name->
+                val file = fileHelper.createEmptyFileToReceiveRemoteImage(remoteProperty.propertyId,name)
+                firebaseStorageRepository.downloadImage(name,file)
+            }
+            propertyRepository.insertLocalProperty(remoteProperty)
+        }
+    }
+
+    private fun updateExistingLocalPropertyAndPhoto(localProperty: Property, remoteProperty: Property) {
+
     }
 
     //TODO idem up
@@ -57,38 +77,42 @@ class SynchroniseDataHelper(
                     LocalDateTime.parse(localProperty.modificationDate)
                         .isAfter(LocalDateTime.parse(remotePropertyToWorkOn[0].modificationDate))
                 if (isLocalModificationDateMoreRecent) {
-                    val photoIdListToRemove =
-                        getPhotoListToRemove(localProperty.photoList, remotePropertyToWorkOn[0].photoList)
-                    val photosIdListToAdd = getPhotoListToAdd(localProperty.photoList, remotePropertyToWorkOn[0].photoList)
-                    photoIdListToRemove.forEach {
-
-                    }
-                    photosIdListToAdd.forEach {
-                        CoroutineScope(IO).launch {
-                            firebaseStorageRepository.uploadImage(fileHelper.getUriFromFileName(it,localProperty.propertyId))
-                        }
-                    }
-                    CoroutineScope(IO).launch {
-                        propertyRepository.insertRemoteProperty(localProperty)
-                    }
+                    updateExistingRemotePropertyAndPhoto(localProperty, remotePropertyToWorkOn[0])
                 }
             } else {
-                val photoIdListToRemove =
-                    getPhotoListToRemove(localProperty.photoList, remotePropertyToWorkOn[0].photoList)
-                val photosIdListToAdd = getPhotoListToAdd(localProperty.photoList, remotePropertyToWorkOn[0].photoList)
-                photoIdListToRemove.forEach {
-
-                }
-                photosIdListToAdd.forEach {
-                    CoroutineScope(IO).launch {
-                        firebaseStorageRepository.uploadImage(fileHelper.getUriFromFileName(it,localProperty.propertyId))
-                    }
-                }
-                CoroutineScope(IO).launch {
-                    //Todo add same things than up or factorise
-                    propertyRepository.insertRemoteProperty(localProperty)
-                }
+                insertNewRemotePropertyAndPhoto(localProperty)
             }
+        }
+    }
+
+    private fun insertNewRemotePropertyAndPhoto(localProperty: Property) {
+        CoroutineScope(IO).launch {
+            val photosIdListToAdd = mutableListOf<String>()
+            localProperty.photoList.forEach {
+                photosIdListToAdd.add(it.photoId)
+            }
+            photosIdListToAdd.forEach {
+                firebaseStorageRepository.uploadImage(fileHelper.getUriFromFileName(it, localProperty.propertyId))
+            }
+            propertyRepository.insertRemoteProperty(localProperty)
+        }
+    }
+
+    private fun updateExistingRemotePropertyAndPhoto(
+        localProperty: Property,
+        remoteProperty: Property
+    ) {
+        CoroutineScope(IO).launch {
+            val photoIdListToRemove =
+                getPhotoListToRemove(localProperty.photoList, remoteProperty.photoList)
+            val photosIdListToAdd = getPhotoListToAdd(localProperty.photoList, remoteProperty.photoList)
+            photoIdListToRemove.forEach {
+                firebaseStorageRepository.deleteImage(it)
+            }
+            photosIdListToAdd.forEach {
+                firebaseStorageRepository.uploadImage(fileHelper.getUriFromFileName(it, localProperty.propertyId))
+            }
+            propertyRepository.insertRemoteProperty(localProperty)
         }
     }
 

@@ -100,6 +100,10 @@ class FileHelper private constructor() {
     fun deleteCache() {
         tempStorage.deleteRecursively()
     }
+
+    fun createEmptyFileToReceiveRemoteImage(propertyId: String,fileName: String) : File
+         = File("${appContext.filesDir}/$propertyId/$fileName.jpg")
+
 }
 
 fun ContentResolver.getFileName(fileUri: Uri): String {
