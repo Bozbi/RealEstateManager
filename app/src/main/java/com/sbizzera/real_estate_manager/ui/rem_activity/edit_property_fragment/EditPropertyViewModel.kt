@@ -154,7 +154,13 @@ class EditPropertyViewModel(
                 fileHelper.saveImageToPropertyFolder(it.photoUri, property.propertyId, it.photoId)
             }
         }
-        fileHelper.deleteOldPhotosFromPropertyDirectory(property)
+        val photoList = mutableListOf<Photo>()
+        property.photoList.forEach {
+            photoList.add(
+                Photo(it.photoId,it.photoTitle)
+            )
+        }
+        fileHelper.deleteOldPhotosFromPropertyDirectory(property.propertyId,photoList.toList())
         fileHelper.deleteCache()
     }
 

@@ -35,14 +35,13 @@ class SynchroniseDataHelper(
                         .isAfter(LocalDateTime.parse(localPropertyToWorkOn[0].modificationDate))
                 if (isRemoteModificationDateMoreRecent) {
                     CoroutineScope(IO).launch {
-                        updateExistingLocalPropertyAndPhoto(localPropertyToWorkOn[0],remoteProperty)
-                        propertyRepository.insertLocalProperty(remoteProperty)
+                        updateExistingLocalPropertyAndPhoto(localPropertyToWorkOn[0], remoteProperty)
+
                     }
                 }
             } else {
                 CoroutineScope(IO).launch {
                     insertNewLocalPropertyAndPhoto(remoteProperty)
-                    propertyRepository.insertLocalProperty(remoteProperty)
                 }
             }
         }
@@ -54,16 +53,24 @@ class SynchroniseDataHelper(
             remoteProperty.photoList.forEach {
                 photosIdListToAdd.add(it.photoId)
             }
-            photosIdListToAdd.forEach {name->
-                val file = fileHelper.createEmptyFileToReceiveRemoteImage(remoteProperty.propertyId,name)
-                firebaseStorageRepository.downloadImage(name,file)
+            photosIdListToAdd.forEach { name ->
+                val file = fileHelper.createEmptyFileToReceiveRemoteImage(remoteProperty.propertyId, name)
+                firebaseStorageRepository.downloadImage(name, file)
             }
             propertyRepository.insertLocalProperty(remoteProperty)
         }
     }
 
     private fun updateExistingLocalPropertyAndPhoto(localProperty: Property, remoteProperty: Property) {
-
+        CoroutineScope(IO).launch {
+            val photosIdListToAdd = getPhotoListToAdd(remoteProperty.photoList, localProperty.photoList)
+            photosIdListToAdd.forEach {name->
+                val file = fileHelper.createEmptyFileToReceiveRemoteImage(remoteProperty.propertyId, name)
+                firebaseStorageRepository.downloadImage(name, file)
+            }
+            propertyRepository.insertLocalProperty(remoteProperty)
+            fileHelper.deleteOldPhotosFromPropertyDirectory(localProperty.propertyId,localProperty.photoList)
+        }
     }
 
     //TODO idem up

@@ -6,8 +6,8 @@ import android.provider.OpenableColumns
 import androidx.core.content.FileProvider
 import com.sbizzera.real_estate_manager.App
 import com.sbizzera.real_estate_manager.R
+import com.sbizzera.real_estate_manager.data.photo.Photo
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditUiState
-import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.PhotoOnEdit
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -72,8 +72,7 @@ class FileHelper private constructor() {
         return Uri.fromFile(newFile).toString()
     }
 
-    fun fileExistsInPropertyFolder(photoId:String,propertyId:String): Boolean {
-
+    fun fileExistsInPropertyFolder(photoId: String, propertyId: String): Boolean {
         var file = File("${appContext.filesDir}/$propertyId/$photoId.jpg")
         return file.exists()
     }
@@ -83,12 +82,12 @@ class FileHelper private constructor() {
         return "${appContext.filesDir}/$propertyId/$fileName.jpg"
     }
 
-    fun deleteOldPhotosFromPropertyDirectory(property: EditUiState) {
-        val dir = File("${appContext.filesDir}/${property.propertyId}")
+    fun deleteOldPhotosFromPropertyDirectory(propertyId: String,photoList:List<Photo>) {
+        val dir = File("${appContext.filesDir}/${propertyId}")
         val files = dir.listFiles()
         files?.forEach { file ->
             val name = file.name.replace(".jpg", "")
-            val size = property.photoList.filter { photo ->
+            val size = photoList.filter { photo ->
                 photo.photoId == name
             }.size
             if (size == 0) {
@@ -101,8 +100,13 @@ class FileHelper private constructor() {
         tempStorage.deleteRecursively()
     }
 
-    fun createEmptyFileToReceiveRemoteImage(propertyId: String,fileName: String) : File
-         = File("${appContext.filesDir}/$propertyId/$fileName.jpg")
+    fun createEmptyFileToReceiveRemoteImage(propertyId: String, fileName: String): File {
+        val fileDir = File("${appContext.filesDir}/$propertyId")
+        if (!fileDir.exists()) {
+            fileDir.mkdir()
+        }
+        return File("${appContext.filesDir}/$propertyId/$fileName.jpg")
+    }
 
 }
 
