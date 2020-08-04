@@ -101,6 +101,7 @@ class FileHelper private constructor() {
     }
 
     fun createEmptyFileToReceiveRemoteImage(propertyId: String, fileName: String): File {
+
         val fileDir = File("${appContext.filesDir}/$propertyId")
         if (!fileDir.exists()) {
             fileDir.mkdir()

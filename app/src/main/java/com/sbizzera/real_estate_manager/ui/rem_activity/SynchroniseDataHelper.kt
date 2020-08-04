@@ -73,7 +73,7 @@ class SynchroniseDataHelper(
         }
     }
 
-    //TODO idem up
+    //TODO idem up (why not a suspend function)
     private fun updateRemoteProperties(remoteProperties: List<Property>, localProperties: List<Property>) {
         localProperties.forEach { localProperty ->
             val remotePropertyToWorkOn = remoteProperties.filter { remoteProperty ->

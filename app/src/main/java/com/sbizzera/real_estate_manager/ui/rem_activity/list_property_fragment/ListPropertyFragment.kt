@@ -75,6 +75,10 @@ class ListPropertyFragment : Fragment(), OnPropertyClickEvent, OnUserAskTransact
         add_property_fab.setOnClickListener {
             viewModel.addPropertyClicked()
         }
+
+        filter_txt.setOnClickListener {
+            FilterDialog.newInstance().show(activity?.supportFragmentManager!!,null)
+        }
     }
 
     override fun onPropertyItemClick(propertyId: String) {

@@ -9,6 +9,7 @@ import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragmen
 import com.sbizzera.real_estate_manager.ui.rem_activity.REMActivityViewModel
 import com.sbizzera.real_estate_manager.ui.rem_activity.SynchroniseDataHelper
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyViewModel
+import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.FilterRepository
 import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel
 import com.sbizzera.real_estate_manager.ui.rem_activity.map_fragment.MapViewModel
 import com.sbizzera.real_estate_manager.ui.rem_activity.map_fragment.MarkerUseCase
@@ -34,7 +35,8 @@ object ViewModelFactory : ViewModelProvider.Factory {
             return ListPropertyViewModel(
                 CurrentPropertyIdRepository.instance,
                 PropertyRepository.instance,
-                FileHelper.instance
+                FileHelper.instance,
+                FilterRepository.instance
             ) as T
         }
         if (modelClass.isAssignableFrom(EditPropertyViewModel::class.java)) {

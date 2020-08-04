@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
+import com.google.firebase.auth.FirebaseAuth
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEvent
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEventListenable
@@ -21,6 +22,7 @@ import com.sbizzera.real_estate_manager.ui.rem_activity.map_fragment.MapFragment
 import com.sbizzera.real_estate_manager.ui.rem_activity.photo_editor.PhotoEditorFragment
 import com.sbizzera.real_estate_manager.ui.rem_activity.photo_viewer_fragment.PhotoViewerFragment
 import com.sbizzera.real_estate_manager.utils.ViewModelFactory
+import com.sbizzera.real_estate_manager.utils.intent_contracts.AuthenticationContract
 import kotlinx.android.synthetic.main.activity_r_e_m.*
 
 
@@ -28,13 +30,14 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent {
 
     private lateinit var viewModel: REMActivityViewModel
 
-    private lateinit var mMenu :Menu
+    private lateinit var mMenu: Menu
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_r_e_m)
+
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction().replace(
@@ -82,18 +85,18 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.app_bar_menu,menu)
+        menuInflater.inflate(R.menu.app_bar_menu, menu)
         mMenu = menu
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.synchronise ->{
+        when (item.itemId) {
+            R.id.synchronise -> {
                 viewModel.syncLocalAndRemoteData()
             }
-            R.id.disconnect->{
-                //TODO after google auth
+            R.id.disconnect -> {
+                FirebaseAuth.getInstance().signOut()
             }
         }
         return true
@@ -134,5 +137,13 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent {
 
     override fun onModifyPropertyAsked() {
         viewModel.onAddOrModifyPropertyAsked()
+    }
+
+    private fun checkAuthenticatedUser() {
+        if (FirebaseAuth.getInstance().currentUser == null) {
+            registerForActivityResult(AuthenticationContract()) {}.launch(null)
+        }else{
+            println("debug : Your're signed in")
+        }
     }
 }
