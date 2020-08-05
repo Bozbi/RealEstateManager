@@ -1,19 +1,25 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment
 
-import android.view.View
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.sbizzera.real_estate_manager.data.CurrentPropertyIdRepository
 import com.sbizzera.real_estate_manager.data.property.PointOfInterest
 import com.sbizzera.real_estate_manager.data.property.Property
 import com.sbizzera.real_estate_manager.data.property.PropertyRepository
+import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel.FilterDialogViewAction.CreationDateRangeClicked
+import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel.FilterDialogViewAction.SoldDateRangeClicked
 import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel.ListPropertyViewAction.AddPropertyClicked
 import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel.ListPropertyViewAction.DetailsPropertyClicked
+import com.sbizzera.real_estate_manager.utils.CUSTOM_DATE_FORMATTER
 import com.sbizzera.real_estate_manager.utils.FileHelper
 import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
+import org.threeten.bp.Instant
 import org.threeten.bp.LocalDate
-import org.threeten.bp.Year
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.ZoneOffset
+import kotlin.collections.set
 
 
 class ListPropertyViewModel(
@@ -23,18 +29,126 @@ class ListPropertyViewModel(
     private val filterRepository: FilterRepository
 ) : ViewModel() {
 
-    val listUiState: LiveData<ListUiState>
+    val listUiStateLD = MediatorLiveData<ListUiState>()
     val listViewAction = SingleLiveEvent<ListPropertyViewAction>()
     val filterViewAction = SingleLiveEvent<FilterDialogViewAction>()
     val filterUiState: LiveData<FilterUiState>
 
     init {
-        listUiState = Transformations.map(propertyRepository.getAllLocalProperties()) {
-            ListUiState(fromPropertiesToListUiProperties(it))
+        val allPropertiesLD = propertyRepository.getAllLocalProperties()
+        val propertyFilterLD = filterRepository.filterLiveData
+        listUiStateLD.addSource(allPropertiesLD) { allProperties ->
+            combineSources(allProperties, propertyFilterLD.value)
         }
+
+        listUiStateLD.addSource(filterRepository.filterLiveData) { propertyFilter ->
+            combineSources(allPropertiesLD.value, propertyFilter)
+        }
+
         filterUiState = Transformations.map(filterRepository.filterLiveData) { filters ->
             fromPropertyFilterToFilterUiState(filters)
         }
+    }
+
+    private fun combineSources(allProperties: List<Property>?, propertyFilter: PropertyFilter?) {
+        if (allProperties == null || propertyFilter == null) {
+            return
+        }
+        val listOfFilteredProperties = mutableListOf<Property>()
+
+        allProperties.forEach { property ->
+            val doesPropertyMatchFilters = doesPropertyMatchFilers(property, propertyFilter)
+
+            if (doesPropertyMatchFilters) {
+                listOfFilteredProperties.add(property)
+            }
+        }
+
+        val listUiStateToReturn =
+            ListUiState(
+                fromPropertiesToListUiProperties(listOfFilteredProperties)
+            )
+        listUiStateLD.value = listUiStateToReturn
+    }
+
+    private fun doesPropertyMatchFilers(property: Property, propertyFilter: PropertyFilter): Boolean {
+        if (
+            !availabilityDateMatchesFilter(property.creationDate, propertyFilter.createDateRange) ||
+            !soldDateMatchesFilters(property.soldDate, propertyFilter.soldDateRange) ||
+            !priceMatchesFilters(property.price, propertyFilter.priceRange) ||
+            !surfaceMatchesFilters(property.propertySurface, propertyFilter.surfaceRange) ||
+            !roomCountMatchesFilters(property.propertyRooms, propertyFilter.roomRange) ||
+            !poiMapMatchesFilters(property.propertyPoiList, propertyFilter.poiMap)
+        ) {
+            return false
+        }
+        return true
+    }
+
+    private fun poiMapMatchesFilters(
+        propertyPoiList: List<PointOfInterest>,
+        poiMap: Map<PointOfInterest, Boolean>
+    ): Boolean {
+        poiMap.filter { poiInMapFilter ->
+            poiInMapFilter.value
+        }.forEach { poiWantedInFilter ->
+            if (!propertyPoiList.contains(poiWantedInFilter.key)) {
+                return false
+            }
+        }
+        return true
+    }
+
+    private fun roomCountMatchesFilters(propertyRooms: Int, roomRange: IntRange?) =
+        roomRange == null || propertyRooms in roomRange || (propertyRooms > 10 && roomRange.last == 10)
+
+
+    private fun surfaceMatchesFilters(propertySurface: Int, surfaceRange: IntRange?) =
+        surfaceRange == null || propertySurface in surfaceRange || (propertySurface > 200 && surfaceRange.last == 200)
+
+    private fun priceMatchesFilters(price: Int, priceRange: IntRange?) =
+        priceRange == null || price in priceRange || (price > 3000000 && priceRange.last == 3000000)
+
+    private fun soldDateMatchesFilters(soldDate: String, soldDateRange: LongRange?): Boolean {
+        if (soldDateRange == null) {
+            return true
+        }
+        if (soldDate.isEmpty()) {
+            return false
+        }
+        val soldDateLocalDate = LocalDate.parse(soldDate, CUSTOM_DATE_FORMATTER)
+        val rangeBeginLocalDate =
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(soldDateRange.first), ZoneOffset.UTC).toLocalDate()
+        val rangeEndLocalDate =
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(soldDateRange.last), ZoneOffset.UTC).toLocalDate()
+        if (soldDateLocalDate.isEqual(rangeBeginLocalDate) ||
+            soldDateLocalDate.isEqual(rangeEndLocalDate) ||
+            (soldDateLocalDate.isAfter(rangeBeginLocalDate) && soldDateLocalDate.isBefore(rangeEndLocalDate))
+        ){
+            return true
+        }
+        return false
+    }
+
+    private fun availabilityDateMatchesFilter(creationDate: String, creationDateRange: LongRange?): Boolean {
+        if (creationDateRange == null) {
+            return true
+        }
+        if (creationDate.isEmpty()) {
+            return false
+        }
+        val creationDateLocalDate = LocalDate.parse(creationDate, CUSTOM_DATE_FORMATTER)
+        val rangeBeginLocalDate =
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(creationDateRange.first), ZoneOffset.UTC).toLocalDate()
+        val rangeEndLocalDate =
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(creationDateRange.last), ZoneOffset.UTC).toLocalDate()
+        if (creationDateLocalDate.isEqual(rangeBeginLocalDate) ||
+            creationDateLocalDate.isEqual(rangeEndLocalDate) ||
+            (creationDateLocalDate.isAfter(rangeBeginLocalDate) && creationDateLocalDate.isBefore(rangeEndLocalDate))
+        ){
+            return true
+        }
+        return false
     }
 
     private fun fromPropertyFilterToFilterUiState(filters: PropertyFilter): FilterUiState {
@@ -45,6 +159,8 @@ class ListPropertyViewModel(
         val roomMin = if (filters.roomRange == null) 0 else filters.roomRange.first
         val roomMax = if (filters.roomRange == null) 10 else filters.roomRange.last
         val poiMap = filters.poiMap
+        val creationDateRangeText = createDateRangeText(filters.createDateRange)
+        val soldDateRangeText = soldDateRangeText(filters.soldDateRange)
 
         return FilterUiState(
             priceMin.toFloat(),
@@ -54,20 +170,31 @@ class ListPropertyViewModel(
             roomMin.toFloat(),
             roomMax.toFloat(),
             poiMap,
-            filters.availableSince ?: "all properties",
-            if (filters.availableSince == null) View.INVISIBLE else View.VISIBLE,
-            filters.soldSince ?: "all properties",
-            if (filters.soldSince == null) View.INVISIBLE else View.VISIBLE
+            creationDateRangeText,
+            soldDateRangeText
         )
     }
 
-
-    private fun createPoiValuesMap(poiList: List<PointOfInterest>): Map<String, Boolean> {
-        val map = mutableMapOf<String, Boolean>()
-        PointOfInterest.values().forEach {
-            map[it.label] = poiList.contains(PointOfInterest.valueOf(it.name))
+    private fun soldDateRangeText(soldDateRange: LongRange?): String {
+        if (soldDateRange == null) {
+            return ""
         }
-        return map
+        val rangeBeginString =
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(soldDateRange.first), ZoneOffset.UTC).format(CUSTOM_DATE_FORMATTER)
+        val rangeEndString =
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(soldDateRange.last), ZoneOffset.UTC).format(CUSTOM_DATE_FORMATTER)
+        return "$rangeBeginString and $rangeEndString"
+    }
+
+    private fun createDateRangeText(createDateRange: LongRange?): String {
+        if (createDateRange == null) {
+            return ""
+        }
+        val rangeBeginString = LocalDateTime.ofInstant(Instant.ofEpochMilli(createDateRange.first), ZoneOffset.UTC)
+            .format(CUSTOM_DATE_FORMATTER)
+        val rangeEndString =
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(createDateRange.last), ZoneOffset.UTC).format(CUSTOM_DATE_FORMATTER)
+        return "$rangeBeginString and $rangeEndString"
     }
 
     fun addPropertyClicked() {
@@ -110,7 +237,7 @@ class ListPropertyViewModel(
 
     fun onRoomRangeFilterChange(minRoom: Float, maxRoom: Float) {
         filterRepository.filterLiveData.value = filterRepository.filterLiveData.value?.copy(
-            surfaceRange = IntRange(minRoom.toInt(), maxRoom.toInt())
+            roomRange = IntRange(minRoom.toInt(), maxRoom.toInt())
         )
     }
 
@@ -123,12 +250,39 @@ class ListPropertyViewModel(
     }
 
     fun onAvailableSinceDateClick() {
-
+        filterViewAction.value = CreationDateRangeClicked
     }
 
     fun onSoldSinceDateClick() {
-        val date = LocalDate.now()
-        filterViewAction.value= FilterDialogViewAction.SoldDateClicked(date.year,date.monthValue,date.dayOfMonth)
+        filterViewAction.value = SoldDateRangeClicked
+    }
+
+    fun onCreationDateRangeChange(beginRange: Long, endRange: Long) {
+        filterRepository.filterLiveData.value = filterRepository.filterLiveData.value!!.copy(
+            createDateRange = LongRange(beginRange, endRange)
+        )
+    }
+
+    fun onSoldDateChange(beginRange: Long, endRange: Long) {
+        filterRepository.filterLiveData.value = filterRepository.filterLiveData.value!!.copy(
+            soldDateRange = LongRange(beginRange, endRange)
+        )
+    }
+
+    fun onAvailableDateCleared() {
+        filterRepository.filterLiveData.value = filterRepository.filterLiveData.value!!.copy(
+            createDateRange = null
+        )
+    }
+
+    fun onSoldSinceDateCleared() {
+        filterRepository.filterLiveData.value = filterRepository.filterLiveData.value!!.copy(
+            soldDateRange = null
+        )
+    }
+
+    fun resetFilters() {
+        filterRepository.filterLiveData.value = PropertyFilter()
     }
 
 
@@ -137,10 +291,11 @@ class ListPropertyViewModel(
         object DetailsPropertyClicked : ListPropertyViewAction()
     }
 
-    sealed class FilterDialogViewAction{
-        class SoldDateClicked(val year: Int, val month : Int , val day : Int, val tag: String = "soldDate") : FilterDialogViewAction()
-        class AvailableDateClicked(val year: Int, val month : Int , val day : Int, val tag: String = "availableDate") : FilterDialogViewAction()
+    sealed class FilterDialogViewAction {
+        object SoldDateRangeClicked : FilterDialogViewAction()
+        object CreationDateRangeClicked : FilterDialogViewAction()
     }
+
 }
 
 data class ListUiState(
@@ -164,7 +319,5 @@ data class FilterUiState(
     val roomMax: Float,
     val poiMap: Map<PointOfInterest, Boolean>,
     val availableAfter: String,
-    val clearAvailableSinceImageVisibility: Int = View.INVISIBLE,
-    val soldAfter: String,
-    val clearSoldSinceImageVisibility: Int = View.INVISIBLE
+    val soldAfter: String
 )

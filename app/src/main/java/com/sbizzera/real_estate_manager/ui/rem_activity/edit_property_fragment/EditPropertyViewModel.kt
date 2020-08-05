@@ -157,10 +157,10 @@ class EditPropertyViewModel(
         val photoList = mutableListOf<Photo>()
         property.photoList.forEach {
             photoList.add(
-                Photo(it.photoId,it.photoTitle)
+                Photo(it.photoId, it.photoTitle)
             )
         }
-        fileHelper.deleteOldPhotosFromPropertyDirectory(property.propertyId,photoList.toList())
+        fileHelper.deleteOldPhotosFromPropertyDirectory(property.propertyId, photoList.toList())
         fileHelper.deleteCache()
     }
 
@@ -195,7 +195,7 @@ class EditPropertyViewModel(
                 propertyRoomCount?.toString()?.toIntOrNull() ?: 0,
                 propertyBedroomCount?.toString()?.toIntOrNull() ?: 0,
                 propertyBathroomCount?.toString()?.toIntOrNull() ?: 0,
-                createPoiList(propertyPoiMap),
+                this@EditPropertyViewModel.createPoiList(propertyPoiMap),
                 propertySoldDate?.toString() ?: "",
                 LocalDateTime.now().format(CUSTOM_DATE_FORMATTER),
                 getLatitudeOrLongitude(currentPropertyToInsert, GeocodeResolver.LatOrLng.LATITUDE),
@@ -218,7 +218,7 @@ class EditPropertyViewModel(
             GeocodeResolver.LatOrLng.LONGITUDE -> {
                 try {
                     geocodeResolver.getLongitude(address)
-                }catch (e:Exception){
+                } catch (e: Exception) {
                     0.0
                 }
             }
@@ -253,20 +253,22 @@ class EditPropertyViewModel(
 
     private fun createPoiMap(
         poiList: List<PointOfInterest>
-    ): MutableMap<String, Boolean> {
-        val propertyPoiMap = mutableMapOf<String, Boolean>()
+    ): MutableMap<PointOfInterest, Boolean> {
+        val propertyPoiMap = mutableMapOf<PointOfInterest, Boolean>()
         poiList.forEach {
-            propertyPoiMap[it.label] = true
+            propertyPoiMap[it] = true
         }
         return propertyPoiMap
     }
 
     private fun createPoiList(
-        poiMap: Map<String, Boolean>
+        poiMap: Map<PointOfInterest, Boolean>
     ): List<PointOfInterest> {
         val poiListToReturn = mutableListOf<PointOfInterest>()
-        for (entry in poiMap) {
-            poiListToReturn.add(PointOfInterest.valueOf(entry.key.toUpperCase()))
+        poiMap.forEach { entry ->
+            if (entry.value) {
+                poiListToReturn.add(entry.key)
+            }
         }
 
         return poiListToReturn
@@ -335,10 +337,10 @@ class EditPropertyViewModel(
             propertyInModificationRepository.propertyInModificationLD.value?.copy(propertyBathroomCount = bathroomCount)
     }
 
-    fun onChipChange(tag: String, isChecked: Boolean) {
+    fun onChipChange(name: String, isChecked: Boolean) {
         val initialPointOfInterestMap =
             propertyInModificationRepository.propertyInModificationLD.value?.propertyPoiMap ?: mutableMapOf()
-        initialPointOfInterestMap[tag] = isChecked
+        initialPointOfInterestMap[PointOfInterest.valueOf(name)] = isChecked
         propertyInModificationRepository.propertyInModificationLD.value =
             propertyInModificationRepository.propertyInModificationLD.value?.copy(propertyPoiMap = initialPointOfInterestMap)
     }
@@ -388,7 +390,7 @@ data class EditUiState(
     val propertyBedroomCount: CharSequence? = null,
     val propertyBathroomCount: CharSequence? = null,
     val propertySoldDate: CharSequence? = null,
-    val propertyPoiMap: MutableMap<String, Boolean> = mutableMapOf()
+    val propertyPoiMap: MutableMap<PointOfInterest, Boolean> = mutableMapOf()
 )
 
 data class PhotoOnEdit(

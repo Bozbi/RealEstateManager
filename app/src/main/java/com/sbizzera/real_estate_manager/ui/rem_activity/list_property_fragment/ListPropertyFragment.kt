@@ -52,10 +52,10 @@ class ListPropertyFragment : Fragment(), OnPropertyClickEvent, OnUserAskTransact
         }
 
 
-        viewModel = ViewModelProvider(this, ViewModelFactory)
+        viewModel = ViewModelProvider(requireActivity(), ViewModelFactory)
             .get(ListPropertyViewModel::class.java)
 
-        viewModel.listUiState.observe(viewLifecycleOwner) { model ->
+        viewModel.listUiStateLD.observe(viewLifecycleOwner) { model ->
             with(recyclerViewAdapter) {
                 list = model.listPropertyItems
                 notifyDataSetChanged()

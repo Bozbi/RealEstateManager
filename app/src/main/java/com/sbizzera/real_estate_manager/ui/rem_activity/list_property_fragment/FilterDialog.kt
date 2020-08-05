@@ -1,22 +1,24 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment
 
-import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.DatePicker
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.slider.RangeSlider
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.data.property.PointOfInterest
+import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel.FilterDialogViewAction.CreationDateRangeClicked
+import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel.FilterDialogViewAction.SoldDateRangeClicked
 import com.sbizzera.real_estate_manager.utils.ViewModelFactory
 import com.sbizzera.real_estate_manager.utils.custom_views.MyCustomChip
 import kotlinx.android.synthetic.main.dialog_filter.*
 
-class FilterDialog : DialogFragment(),DatePickerDialog.OnDateSetListener {
+
+class FilterDialog : DialogFragment() {
     companion object {
         fun newInstance() = FilterDialog()
     }
@@ -31,7 +33,7 @@ class FilterDialog : DialogFragment(),DatePickerDialog.OnDateSetListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dialogViewModel = ViewModelProvider(this, ViewModelFactory).get(ListPropertyViewModel::class.java)
+        dialogViewModel = ViewModelProvider(requireActivity(), ViewModelFactory).get(ListPropertyViewModel::class.java)
 
         price_range_slider.addOnSliderTouchListener(object : RangeSlider.OnSliderTouchListener {
             override fun onStartTrackingTouch(slider: RangeSlider) {}
@@ -60,23 +62,40 @@ class FilterDialog : DialogFragment(),DatePickerDialog.OnDateSetListener {
             updateUiState(it)
         }
 
-        dialogViewModel.filterViewAction.observe(viewLifecycleOwner){action->
-            when(action){
-                is ListPropertyViewModel.FilterDialogViewAction.SoldDateClicked->{
-                    val datePicker =
-                        DatePickerDialog(requireContext(), this, action.year, action.month, action.day).
-                    datePicker.show()
+        dialogViewModel.filterViewAction.observe(viewLifecycleOwner) { action ->
+            when (action) {
+                is SoldDateRangeClicked -> {
+                    val builder = MaterialDatePicker.Builder.dateRangePicker()
+                    val datePicker = builder.build()
+                    datePicker.addOnPositiveButtonClickListener { range ->
+                        dialogViewModel.onSoldDateChange(range.first!!, range.second!!)
+                    }
+                    datePicker.show(activity?.supportFragmentManager!!, null)
                 }
-                is ListPropertyViewModel.FilterDialogViewAction.AvailableDateClicked ->{
-                    //TODO later
+                is CreationDateRangeClicked -> {
+                    val builder = MaterialDatePicker.Builder.dateRangePicker()
+                    val datePicker = builder.build()
+                    datePicker.addOnPositiveButtonClickListener { range ->
+                        dialogViewModel.onCreationDateRangeChange(range.first!!, range.second!!)
+                    }
+                    datePicker.show(activity?.supportFragmentManager!!, null)
                 }
             }
         }
         available_since_txt.setOnClickListener {
             dialogViewModel.onAvailableSinceDateClick()
         }
+        available_since_layout.setEndIconOnClickListener {
+            dialogViewModel.onAvailableDateCleared()
+        }
         sold_since_txt.setOnClickListener {
             dialogViewModel.onSoldSinceDateClick()
+        }
+        sold_since_layout.setEndIconOnClickListener {
+            dialogViewModel.onSoldSinceDateCleared()
+        }
+        reset_btn.setOnClickListener {
+            dialogViewModel.resetFilters()
         }
 
     }
@@ -97,10 +116,8 @@ class FilterDialog : DialogFragment(),DatePickerDialog.OnDateSetListener {
         filterUiState.poiMap.forEach {
             chip_group.findViewWithTag<MyCustomChip>(it.key.name).updateIfDifferent(it.value)
         }
-        available_since_txt.text = filterUiState.availableAfter
-        availability_since_clear_img.visibility = filterUiState.clearAvailableSinceImageVisibility
-        sold_since_txt.text = filterUiState.soldAfter
-        sold_since_clear_img.visibility = filterUiState.clearSoldSinceImageVisibility
+        available_since_txt.setText(filterUiState.availableAfter)
+        sold_since_txt.setText(filterUiState.soldAfter)
 
     }
 
@@ -114,14 +131,10 @@ class FilterDialog : DialogFragment(),DatePickerDialog.OnDateSetListener {
             chipToAdd.isFocusable = true
             chipToAdd.tag = it.name
             chipToAdd.setOnCheckedChangeListener { chip, _ ->
-                dialogViewModel.onChipCheckedChange(it.name,chip.isChecked)
+                dialogViewModel.onChipCheckedChange(it.name, chip.isChecked)
             }
             chip_group.addView(chipToAdd)
         }
-    }
-
-    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
-        //TODO This has to be down
     }
 }
 

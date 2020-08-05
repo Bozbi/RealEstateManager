@@ -199,9 +199,9 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
             chipToAdd.isCheckable = true
             chipToAdd.isClickable = true
             chipToAdd.isFocusable = true
-            chipToAdd.tag = it.label
+            chipToAdd.tag = it.name
             chipToAdd.setOnCheckedChangeListener { chip, _ ->
-                viewModel.onChipChange(chip.tag.toString(), chip.isChecked)
+                viewModel.onChipChange(it.name, chip.isChecked)
             }
             chip_group.addView(chipToAdd)
         }
@@ -233,7 +233,7 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
         property_bathroom_count_edt.updateIfDifferent(uiState.propertyBathroomCount)
         property_sold_date_edt.updateIfDifferent(uiState.propertySoldDate)
         uiState.propertyPoiMap.forEach {
-            chip_group.findViewWithTag<MyCustomChip>(it.key).updateIfDifferent(it.value)
+            chip_group.findViewWithTag<MyCustomChip>(it.key.name).updateIfDifferent(it.value)
         }
     }
 

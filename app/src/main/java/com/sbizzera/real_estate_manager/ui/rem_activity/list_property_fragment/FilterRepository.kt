@@ -14,8 +14,8 @@ class FilterRepository private constructor() {
 data class PropertyFilter(
     val surfaceRange: IntRange? = null,
     val poiMap: Map<PointOfInterest, Boolean> = createPoiMap(),
-    val availableSince: String? = null,
-    val soldSince: String? = null,
+    val createDateRange: LongRange? = null,
+    val soldDateRange: LongRange? = null,
     val priceRange: IntRange? = null,
     val roomRange: IntRange? = null
 )
