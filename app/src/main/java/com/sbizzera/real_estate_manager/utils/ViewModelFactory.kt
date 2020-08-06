@@ -21,7 +21,7 @@ object ViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(REMActivityViewModel::class.java)) {
             return REMActivityViewModel(SynchroniseDataHelper(FirebaseStorageRepository.instance,
-                FileHelper.instance,PropertyRepository.instance)) as T
+                FileHelper.instance,PropertyRepository.instance),App.instance) as T
         }
         if (modelClass.isAssignableFrom(DetailsPropertyViewModel::class.java)) {
             return DetailsPropertyViewModel(

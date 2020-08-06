@@ -2,15 +2,20 @@ package com.sbizzera.real_estate_manager.ui.rem_activity
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sbizzera.real_estate_manager.App
+import com.sbizzera.real_estate_manager.R
+
 import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 
 class REMActivityViewModel(
-    private val synchroniseDataHelper: SynchroniseDataHelper
+    private val synchroniseDataHelper: SynchroniseDataHelper,
+    private val appContext: App
 ) : ViewModel() {
 
     val viewAction = SingleLiveEvent<ViewAction>()
+    var tabletModeOn = false
 
 
     fun onPhotoEditorAsked() {
@@ -35,12 +40,20 @@ class REMActivityViewModel(
         }
     }
 
+    fun checkPhoneConfiguration() {
+        tabletModeOn = appContext.resources.getBoolean(R.bool.tablet_mode_on)
+    }
+
+    fun launchListFragment() {
+        viewAction.value = ViewAction.LaunchListFragment
+    }
 
     sealed class ViewAction {
         object LaunchPhotoEditor : ViewAction()
         object LaunchDetails : ViewAction()
         object LaunchEditProperty : ViewAction()
         object LaunchMap : ViewAction()
+        object LaunchListFragment : ViewAction()
     }
 
 }

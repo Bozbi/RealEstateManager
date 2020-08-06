@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import com.google.firebase.auth.FirebaseAuth
@@ -33,47 +34,121 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent {
     private lateinit var mMenu: Menu
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_r_e_m)
 
-
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction().replace(
-                R.id.container1,
-                ListPropertyFragment.newInstance()
-            ).commit()
-        }
-
         viewModel = ViewModelProvider(this, ViewModelFactory).get(REMActivityViewModel::class.java)
+        viewModel.checkPhoneConfiguration()
         viewModel.viewAction.observe(this) { action ->
+//            when (action) {
+//                is LaunchListFragment -> {
+//                    supportFragmentManager.popBackStackImmediate(
+//                        ListPropertyFragment::class.java.simpleName,
+//                        FragmentManager.POP_BACK_STACK_INCLUSIVE
+//                    )
+//                    supportFragmentManager.beginTransaction()
+//                        .replace(action.container.resource, ListPropertyFragment.newInstance())
+//                        .addToBackStack(ListPropertyFragment::class.java.simpleName)
+//                        .commit()
+//                }
+//                is LaunchPhotoEditor -> {
+//                    supportFragmentManager.popBackStackImmediate(
+//                        PhotoEditorFragment::class.java.simpleName,
+//                        FragmentManager.POP_BACK_STACK_INCLUSIVE
+//                    )
+//                    supportFragmentManager.beginTransaction()
+//                        .replace(action.container.resource, PhotoEditorFragment.newInstance())
+//                        .addToBackStack(PhotoEditorFragment::class.java.simpleName).commit()
+//                }
+//                is LaunchDetails -> {
+//                    supportFragmentManager.popBackStackImmediate(
+//                        DetailsPropertyFragment::class.java.simpleName,
+//                        FragmentManager.POP_BACK_STACK_INCLUSIVE
+//                    )
+//                    supportFragmentManager.beginTransaction().replace(
+//                        action.container.resource,
+//                        DetailsPropertyFragment.newInstance()
+//                    ).addToBackStack(DetailsPropertyFragment::class.java.simpleName).commit()
+//                }
+//                is LaunchEditProperty -> {
+//                    supportFragmentManager.popBackStackImmediate(
+//                        EditPropertyFragment::class.java.simpleName,
+//                        FragmentManager.POP_BACK_STACK_INCLUSIVE
+//                    )
+//                    supportFragmentManager.beginTransaction().replace(
+//                        action.container.resource,
+//                        EditPropertyFragment.newInstance()
+//                    ).addToBackStack(EditPropertyFragment::class.java.simpleName).commit()
+//                }
+//                is LaunchMap -> {
+//                    supportFragmentManager.popBackStackImmediate(
+//                        MapFragment::class.java.simpleName,
+//                        FragmentManager.POP_BACK_STACK_INCLUSIVE
+//                    )
+//                    supportFragmentManager
+//                        .beginTransaction().replace(
+//                        action.container.resource,
+//                        MapFragment.newInstance()
+//                    ).addToBackStack(MapFragment::class.java.simpleName).commit()
+//                }
+//            }
             when (action) {
-                LaunchPhotoEditor -> {
-                    supportFragmentManager.beginTransaction().replace(R.id.container1, PhotoEditorFragment.newInstance())
-                        .addToBackStack(null).commit()
+                is LaunchListFragment -> {
+                    supportFragmentManager.popBackStackImmediate(
+                        ListPropertyFragment::class.java.simpleName,
+                        FragmentManager.POP_BACK_STACK_INCLUSIVE
+                    )
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.list_container, ListPropertyFragment.newInstance())
+                        .addToBackStack(ListPropertyFragment::class.java.simpleName)
+                        .commit()
                 }
-                LaunchDetails -> {
+                is LaunchPhotoEditor -> {
+                    supportFragmentManager.popBackStackImmediate(
+                        PhotoEditorFragment::class.java.simpleName,
+                        FragmentManager.POP_BACK_STACK_INCLUSIVE
+                    )
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.details_container, PhotoEditorFragment.newInstance())
+                        .addToBackStack(PhotoEditorFragment::class.java.simpleName).commit()
+                }
+                is LaunchDetails -> {
+                    supportFragmentManager.popBackStackImmediate(
+                        DetailsPropertyFragment::class.java.simpleName,
+                        FragmentManager.POP_BACK_STACK_INCLUSIVE
+                    )
                     supportFragmentManager.beginTransaction().replace(
-                        R.id.container1,
+                        R.id.details_container,
                         DetailsPropertyFragment.newInstance()
-                    ).addToBackStack(null).commit()
+                    ).addToBackStack(DetailsPropertyFragment::class.java.simpleName).commit()
                 }
-                LaunchEditProperty -> {
+                is LaunchEditProperty -> {
+                    supportFragmentManager.popBackStackImmediate(
+                        EditPropertyFragment::class.java.simpleName,
+                        FragmentManager.POP_BACK_STACK_INCLUSIVE
+                    )
                     supportFragmentManager.beginTransaction().replace(
-                        R.id.container1,
+                        R.id.details_container,
                         EditPropertyFragment.newInstance()
-                    ).addToBackStack(null).commit()
+                    ).addToBackStack(EditPropertyFragment::class.java.simpleName).commit()
                 }
-                LaunchMap -> {
-                    supportFragmentManager.beginTransaction().replace(
-                        R.id.container1,
-                        MapFragment.newInstance()
-                    ).addToBackStack(null).commit()
+                is LaunchMap -> {
+                    supportFragmentManager.popBackStackImmediate(
+                        MapFragment::class.java.simpleName,
+                        FragmentManager.POP_BACK_STACK_INCLUSIVE
+                    )
+                    supportFragmentManager
+                        .beginTransaction().replace(
+                            R.id.details_container,
+                            MapFragment.newInstance()
+                        ).addToBackStack(MapFragment::class.java.simpleName).commit()
                 }
             }
         }
 
+        if (savedInstanceState == null) {
+            viewModel.launchListFragment()
+        }
         setSupportActionBar(toolbar)
     }
 
@@ -116,6 +191,11 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent {
     }
 
     override fun onPhotoViewerAsked(transitionView: View) {
+        //TODO Pass throught Viewmodel
+        supportFragmentManager.popBackStackImmediate(
+            PhotoViewerFragment::class.java.simpleName,
+            FragmentManager.POP_BACK_STACK_INCLUSIVE
+        )
         supportFragmentManager.beginTransaction()
             .setReorderingAllowed(true).apply {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -123,11 +203,11 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent {
                 }
             }
             .replace(
-                R.id.container1,
+                R.id.details_container,
                 PhotoViewerFragment.newInstance(),
                 null
             )
-            .addToBackStack(null)
+            .addToBackStack(PhotoViewerFragment::class.java.simpleName)
             .commit()
     }
 
@@ -142,8 +222,9 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent {
     private fun checkAuthenticatedUser() {
         if (FirebaseAuth.getInstance().currentUser == null) {
             registerForActivityResult(AuthenticationContract()) {}.launch(null)
-        }else{
+        } else {
             println("debug : Your're signed in")
         }
     }
+
 }
