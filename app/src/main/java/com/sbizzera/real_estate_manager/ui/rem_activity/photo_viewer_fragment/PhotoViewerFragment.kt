@@ -63,6 +63,10 @@ class PhotoViewerFragment : Fragment(), PhotoViewerRecyclerAdapter.OnViewHolderB
             }
         }
 
+        viewModel.photoList.observe(viewLifecycleOwner){photoList->
+            updateUi(photoList)
+        }
+
         photoViewerAdapter = PhotoViewerRecyclerAdapter()
         photoViewerAdapter.setListener(this)
         recycler_view.adapter = photoViewerAdapter
@@ -91,8 +95,6 @@ class PhotoViewerFragment : Fragment(), PhotoViewerRecyclerAdapter.OnViewHolderB
                 }
             }
         })
-
-        updateUi(viewModel.photoList)
 
         postponeEnterTransition()
 

@@ -4,5 +4,4 @@ import android.view.View
 
 interface OnPhotoActionListener {
     fun onPhotoClick(position : Int)
-    fun onPhotoClickForTransition(position: Int, transitionView : View)
 }

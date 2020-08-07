@@ -27,8 +27,7 @@ abstract class AppLocalDatabase : RoomDatabase() {
             return Room.databaseBuilder(
                 context,
                 AppLocalDatabase::class.java,
-                DATABASE_NAME
-            ).allowMainThreadQueries()//TODO suspend fun in PhotoViewer when getting property
+                DATABASE_NAME)
                 .build()
         }
     }

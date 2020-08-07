@@ -48,9 +48,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBar"
         app:layout_constraintWidth_percent="0.3">
-
-
     </FrameLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

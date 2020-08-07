@@ -23,7 +23,7 @@ class PropertyRepository private constructor() {
     fun getPropertyByIdLD(propertyId: String) :LiveData<Property> {
         return propertyDao.getPropertyByIdLD(propertyId)
     }
-    fun getPropertyById(propertyId: String):Property{
+    suspend fun getPropertyById(propertyId: String):Property{
         return propertyDao.getPropertyById(propertyId)
     }
 

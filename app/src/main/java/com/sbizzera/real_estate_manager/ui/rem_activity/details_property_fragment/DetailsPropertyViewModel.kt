@@ -15,12 +15,12 @@ import com.sbizzera.real_estate_manager.utils.FileHelper
 import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
 
 
-
 class DetailsPropertyViewModel(
     private val propertyRepository: PropertyRepository,
-   currentPropertyIdRepository: CurrentPropertyIdRepository,
+    private val currentPropertyIdRepository: CurrentPropertyIdRepository,
     private val currentPhotoPositionRepo: CurrentPhotoPositionRepo,
     private val fileHelper: FileHelper
+
 ) : ViewModel() {
 
     val detailsUiStateLD: LiveData<DetailsUiState>
@@ -30,7 +30,7 @@ class DetailsPropertyViewModel(
     init {
         detailsUiStateLD =
             Transformations.switchMap(currentPropertyIdRepository.currentPropertyIdLiveData) { currentPropertyId ->
-                val propertyLiveData = propertyRepository.getPropertyByIdLD(currentPropertyId)
+                val propertyLiveData  : LiveData<Property> = propertyRepository.getPropertyByIdLD(currentPropertyId)
                 Transformations.map(propertyLiveData) { property ->
                     fromPropertyToDetailUiState(property)
                 }
@@ -43,24 +43,36 @@ class DetailsPropertyViewModel(
     //  MODEL CONVERTERS
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private fun fromPropertyToDetailUiState(property: Property): DetailsUiState {
-        with(property) {
-            return DetailsUiState(
-                propertyTitle,
-                "$${price}",
-                "- $propertyType -",
-                createAvailabilityText(creationDate, soldDate),
-                fromPropertyPhotoListToDetailsPhotoList(photoList, propertyId),
-                propertySurface.toString(),
-                propertyRooms.toString(),
-                propertyBedRooms.toString(),
-                propertyBathRooms.toString(),
-                propertyDescription,
-                createAddressText(propertyAddress, propertyCityCode, propertyCityName),
-                createPoiText(propertyPoiList),
-                createStaticMapsUri(propertyAddress, propertyCityCode, propertyCityName)
-            )
+    private fun fromPropertyToDetailUiState(property: Property?): DetailsUiState {
+        if (property != null) {
+            with(property) {
+                return DetailsUiState(
+                    propertyTitle,
+                    "$${price}",
+                    "- $propertyType -",
+                    createAvailabilityText(creationDate, soldDate),
+                    fromPropertyPhotoListToDetailsPhotoList(photoList, propertyId),
+                    propertySurface.toString(),
+                    propertyRooms.toString(),
+                    propertyBedRooms.toString(),
+                    propertyBathRooms.toString(),
+                    propertyDescription,
+                    createAddressText(propertyAddress, propertyCityCode, propertyCityName),
+                    createPoiText(propertyPoiList),
+                    createStaticMapsUri(propertyAddress, propertyCityCode, propertyCityName),
+                    createAgentText(estateAgent)
+                )
+            }
+        }else{
+            return DetailsUiState()
         }
+    }
+
+    private fun createAgentText(estateAgent: String?): String {
+        if (estateAgent == null) {
+            return ""
+        }
+        return "added by $estateAgent"
     }
 
     private fun fromPropertyPhotoListToDetailsPhotoList(
@@ -78,7 +90,6 @@ class DetailsPropertyViewModel(
         }
         return photoListToReturn
     }
-
 
 
     private fun createAvailabilityText(creationDate: String, soldDate: String): String {
@@ -126,18 +137,20 @@ class DetailsPropertyViewModel(
     }
 
     fun onViewHolderBound(position: Int) {
-        if(position == currentPhotoPositionRepo.currentPhotoPosition){
+        if (position == currentPhotoPositionRepo.currentPhotoPosition) {
             detailsViewAction.value = DetailsViewAction.ViewHolderReady
         }
     }
 
-    fun getCurrentPhotoPosition():Int = currentPhotoPositionRepo.currentPhotoPosition
+    fun getCurrentPhotoPosition(): Int = currentPhotoPositionRepo.currentPhotoPosition
 
     fun checkScrollNecessity(firstCompletelyVisibleItemPosition: Int, lastCompletelyVisibleItemPosition: Int) {
-        if (currentPhotoPositionRepo.currentPhotoPosition !in firstCompletelyVisibleItemPosition..lastCompletelyVisibleItemPosition){
+        if (currentPhotoPositionRepo.currentPhotoPosition !in firstCompletelyVisibleItemPosition..lastCompletelyVisibleItemPosition) {
             detailsViewAction.value = DetailsViewAction.ScrollToPosition(currentPhotoPositionRepo.currentPhotoPosition)
         }
     }
+
+
 
 
     sealed class DetailsViewAction() {
@@ -149,19 +162,20 @@ class DetailsPropertyViewModel(
 
 
 data class DetailsUiState(
-    val title: String,
-    val price: String,
-    val type: String,
-    val availableOrSoldSinceText: String,
-    val listPropertyPhoto: List<DetailsPhotoUiState>,
-    val surface: String,
+    val title: String ="",
+    val price: String ="",
+    val type: String = "",
+    val availableOrSoldSinceText: String ="",
+    val listPropertyPhoto: List<DetailsPhotoUiState> = listOf(),
+    val surface: String = "",
     val roomsCount: String = "0",
     val bedRoomsCount: String = "0",
     val bathroomsCount: String = "0",
-    val description: String,
-    val addressText: String,
+    val description: String = "",
+    val addressText: String = "",
     val poiText: String = "no points of interest nearby",
-    val staticMapUri: String
+    val staticMapUri: String = "",
+    val agentText: String = ""
 )
 
 data class DetailsPhotoUiState(

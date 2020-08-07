@@ -26,23 +26,28 @@ import java.util.*
 import kotlin.collections.set
 
 class EditPropertyViewModel(
-    private val currentPropertyIdRepository: CurrentPropertyIdRepository,
+    currentPropertyIdRepository: CurrentPropertyIdRepository,
     private val propertyInModificationRepository: PropertyInModificationRepository,
     private val propertyRepository: PropertyRepository,
     private val fileHelper: FileHelper,
     private val currentPhotoRepository: CurrentEditedPhotoRepository,
     private val app: Application,
-    private val geocodeResolver: GeocodeResolver
+    private val geocodeResolver: GeocodeResolver,
+    private val sharedPreferencesRepo: SharedPreferencesRepo
 ) : ViewModel() {
 
     val editViewAction = SingleLiveEvent<EditPropertyViewAction>()
+    val editEvent = SingleLiveEvent<EditPropertyEvent>()
     val editUiStateLD: LiveData<EditUiState>
+    private lateinit var initialProperty: Property
+
 
     init {
         editUiStateLD =
             Transformations.switchMap(currentPropertyIdRepository.currentPropertyIdLiveData) { propertyId ->
                 if (propertyId != null) {
                     Transformations.switchMap(propertyRepository.getPropertyByIdLD(propertyId)) { property ->
+                        initialProperty = property
                         propertyInModificationRepository.propertyInModificationLD.value =
                             fromPropertyToEditUiState(property, fileHelper)
                         propertyInModificationRepository.propertyInModificationLD
@@ -74,7 +79,16 @@ class EditPropertyViewModel(
             editViewAction.value = EditPropertyViewAction.FillInError
             return
         }
+        if (propertyHasNotChanged()) {
+            editViewAction.value = EditPropertyViewAction.CloseFragment
+            return
+        }
         saveProperty()
+    }
+
+    private fun propertyHasNotChanged(): Boolean {
+        val propertyModified = fromEditUiStateToProperty()
+        return propertyModified.hasNotChanged(initialProperty)
     }
 
     private fun allInfoCorrect(): Boolean {
@@ -87,6 +101,7 @@ class EditPropertyViewModel(
             propertyAddressError = null,
             propertyCityCodeError = null,
             propertyCityNameError = null,
+
             propertyPriceError = null,
             propertyTypeError = null,
             propertySurfaceError = null
@@ -141,9 +156,14 @@ class EditPropertyViewModel(
         checkInsertOrDeletePhoto(currentEditUiState)
         val propertyToInsert = fromEditUiStateToProperty()
         viewModelScope.launch(IO) {
-            propertyRepository.insertLocalProperty(propertyToInsert)
+            val inserted = propertyRepository.insertLocalProperty(propertyToInsert)
             withContext(Main) {
+                println("debug : value returned from room ${inserted}")
                 editViewAction.value = EditPropertyViewAction.CloseFragment
+                if (inserted.toInt() != -1) {
+                    editEvent.value = EditPropertyEvent.PropertySaved
+                }
+                editEvent.value
             }
         }
     }
@@ -197,9 +217,10 @@ class EditPropertyViewModel(
                 propertyBathroomCount?.toString()?.toIntOrNull() ?: 0,
                 this@EditPropertyViewModel.createPoiList(propertyPoiMap),
                 propertySoldDate?.toString() ?: "",
-                LocalDateTime.now().format(CUSTOM_DATE_FORMATTER),
+                propertyCreationDate ?: LocalDateTime.now().format(CUSTOM_DATE_FORMATTER),
                 getLatitudeOrLongitude(currentPropertyToInsert, GeocodeResolver.LatOrLng.LATITUDE),
-                getLatitudeOrLongitude(currentPropertyToInsert, GeocodeResolver.LatOrLng.LONGITUDE)
+                getLatitudeOrLongitude(currentPropertyToInsert, GeocodeResolver.LatOrLng.LONGITUDE),
+                sharedPreferencesRepo.getUserName()
             )
         }
     }
@@ -246,7 +267,8 @@ class EditPropertyViewModel(
                 propertyBedroomCount = propertyBedRooms.toString(),
                 propertyBathroomCount = propertyBathRooms.toString(),
                 propertySoldDate = soldDate,
-                propertyPoiMap = createPoiMap(propertyPoiList)
+                propertyPoiMap = createPoiMap(propertyPoiList),
+                propertyAgent = estateAgent
             )
         }
     }
@@ -364,6 +386,10 @@ class EditPropertyViewModel(
         object FillInError : EditPropertyViewAction()
         object CloseFragment : EditPropertyViewAction()
     }
+
+    sealed class EditPropertyEvent {
+        object PropertySaved : EditPropertyEvent()
+    }
 }
 
 data class EditUiState(
@@ -390,7 +416,9 @@ data class EditUiState(
     val propertyBedroomCount: CharSequence? = null,
     val propertyBathroomCount: CharSequence? = null,
     val propertySoldDate: CharSequence? = null,
-    val propertyPoiMap: MutableMap<PointOfInterest, Boolean> = mutableMapOf()
+    val propertyPoiMap: MutableMap<PointOfInterest, Boolean> = mutableMapOf(),
+    val propertyCreationDate: String? = null,
+    val propertyAgent: String? = null
 )
 
 data class PhotoOnEdit(
@@ -398,5 +426,9 @@ data class PhotoOnEdit(
     val photoTitle: String = "",
     val photoUri: String
 )
+
+interface OnPropertySavedListener {
+    fun onPropertySaved()
+}
 
 

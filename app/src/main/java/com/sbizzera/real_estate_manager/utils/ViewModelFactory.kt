@@ -21,7 +21,7 @@ object ViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(REMActivityViewModel::class.java)) {
             return REMActivityViewModel(SynchroniseDataHelper(FirebaseStorageRepository.instance,
-                FileHelper.instance,PropertyRepository.instance),App.instance) as T
+                FileHelper.instance,PropertyRepository.instance),App.instance, SharedPreferencesRepo.instance) as T
         }
         if (modelClass.isAssignableFrom(DetailsPropertyViewModel::class.java)) {
             return DetailsPropertyViewModel(
@@ -36,7 +36,8 @@ object ViewModelFactory : ViewModelProvider.Factory {
                 CurrentPropertyIdRepository.instance,
                 PropertyRepository.instance,
                 FileHelper.instance,
-                FilterRepository.instance
+                FilterRepository.instance,
+                App.instance
             ) as T
         }
         if (modelClass.isAssignableFrom(EditPropertyViewModel::class.java)) {
@@ -47,8 +48,8 @@ object ViewModelFactory : ViewModelProvider.Factory {
                 FileHelper.instance,
                 CurrentEditedPhotoRepository.instance,
                 App.instance,
-                GeocodeResolver()
-            ) as T
+                GeocodeResolver(),
+                SharedPreferencesRepo.instance) as T
         }
         if (modelClass.isAssignableFrom(PhotoEditorViewModel::class.java)) {
             return PhotoEditorViewModel(

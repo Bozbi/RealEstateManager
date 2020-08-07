@@ -5,6 +5,7 @@ import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.SharedElementCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -13,13 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.sbizzera.real_estate_manager.R
-import com.sbizzera.real_estate_manager.events.OnPhotoActionListener
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEvent
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEventListenable
 import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyViewModel.DetailsViewAction.ModifyPropertyClicked
 import com.sbizzera.real_estate_manager.utils.ViewModelFactory
 import kotlinx.android.synthetic.main.fragment_details_property.*
-import java.util.concurrent.TimeUnit
 
 class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,DetailsPropertyPhotoAdapter.OnPhotoClickForTransitionListener, DetailsPropertyPhotoAdapter.OnViewHolderBoundListener {
 
@@ -72,7 +71,7 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
                 is DetailsPropertyViewModel.DetailsViewAction.ScrollToPosition -> detailsLayoutManager.scrollToPosition(action.position)
             }
         }
-        modify_txt.setOnClickListener {
+        modify_btn.setOnClickListener {
             viewModelDetails.modifyPropertyClicked()
         }
         postponeEnterTransition()
@@ -109,6 +108,7 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
         address_txt.text = model.addressText
         poi_txt.text = model.poiText
         Glide.with(map_img).load(model.staticMapUri).into(map_img)
+        added_by_txt.text = model.agentText
     }
 
 
@@ -125,5 +125,16 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
         viewModelDetails.onViewHolderBound(position)
     }
 
+    override fun onResume() {
+        super.onResume()
+        (activity as AppCompatActivity).supportActionBar?.setDisplayShowHomeEnabled(true)
+        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        (activity as AppCompatActivity).supportActionBar?.setDisplayShowHomeEnabled(false)
+        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
+    }
 
 }

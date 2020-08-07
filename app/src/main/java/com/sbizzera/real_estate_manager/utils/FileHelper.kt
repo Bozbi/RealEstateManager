@@ -7,7 +7,6 @@ import androidx.core.content.FileProvider
 import com.sbizzera.real_estate_manager.App
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.data.photo.Photo
-import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditUiState
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -73,12 +72,11 @@ class FileHelper private constructor() {
     }
 
     fun fileExistsInPropertyFolder(photoId: String, propertyId: String): Boolean {
-        var file = File("${appContext.filesDir}/$propertyId/$photoId.jpg")
+        val file = File("${appContext.filesDir}/$propertyId/$photoId.jpg")
         return file.exists()
     }
 
     fun getUriFromFileName(fileName: String, propertyId: String): String {
-        //TODO do the same with all list?
         return "${appContext.filesDir}/$propertyId/$fileName.jpg"
     }
 

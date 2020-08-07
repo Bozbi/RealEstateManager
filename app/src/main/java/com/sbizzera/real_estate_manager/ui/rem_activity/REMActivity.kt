@@ -10,27 +10,30 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
-import com.google.firebase.auth.FirebaseAuth
+import com.google.android.material.snackbar.Snackbar
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEvent
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEventListenable
 import com.sbizzera.real_estate_manager.ui.rem_activity.REMActivityViewModel.ViewAction.*
 import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyFragment
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyFragment
+import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.OnPropertySavedListener
 import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyFragment
 import com.sbizzera.real_estate_manager.ui.rem_activity.map_fragment.MapFragment
 import com.sbizzera.real_estate_manager.ui.rem_activity.photo_editor.PhotoEditorFragment
 import com.sbizzera.real_estate_manager.ui.rem_activity.photo_viewer_fragment.PhotoViewerFragment
 import com.sbizzera.real_estate_manager.utils.ViewModelFactory
-import com.sbizzera.real_estate_manager.utils.intent_contracts.AuthenticationContract
 import kotlinx.android.synthetic.main.activity_r_e_m.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
-class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent {
+class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent,OnPropertySavedListener {
 
     private lateinit var viewModel: REMActivityViewModel
-
     private lateinit var mMenu: Menu
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,72 +41,10 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent {
         setContentView(R.layout.activity_r_e_m)
 
         viewModel = ViewModelProvider(this, ViewModelFactory).get(REMActivityViewModel::class.java)
-        viewModel.checkPhoneConfiguration()
         viewModel.viewAction.observe(this) { action ->
-//            when (action) {
-//                is LaunchListFragment -> {
-//                    supportFragmentManager.popBackStackImmediate(
-//                        ListPropertyFragment::class.java.simpleName,
-//                        FragmentManager.POP_BACK_STACK_INCLUSIVE
-//                    )
-//                    supportFragmentManager.beginTransaction()
-//                        .replace(action.container.resource, ListPropertyFragment.newInstance())
-//                        .addToBackStack(ListPropertyFragment::class.java.simpleName)
-//                        .commit()
-//                }
-//                is LaunchPhotoEditor -> {
-//                    supportFragmentManager.popBackStackImmediate(
-//                        PhotoEditorFragment::class.java.simpleName,
-//                        FragmentManager.POP_BACK_STACK_INCLUSIVE
-//                    )
-//                    supportFragmentManager.beginTransaction()
-//                        .replace(action.container.resource, PhotoEditorFragment.newInstance())
-//                        .addToBackStack(PhotoEditorFragment::class.java.simpleName).commit()
-//                }
-//                is LaunchDetails -> {
-//                    supportFragmentManager.popBackStackImmediate(
-//                        DetailsPropertyFragment::class.java.simpleName,
-//                        FragmentManager.POP_BACK_STACK_INCLUSIVE
-//                    )
-//                    supportFragmentManager.beginTransaction().replace(
-//                        action.container.resource,
-//                        DetailsPropertyFragment.newInstance()
-//                    ).addToBackStack(DetailsPropertyFragment::class.java.simpleName).commit()
-//                }
-//                is LaunchEditProperty -> {
-//                    supportFragmentManager.popBackStackImmediate(
-//                        EditPropertyFragment::class.java.simpleName,
-//                        FragmentManager.POP_BACK_STACK_INCLUSIVE
-//                    )
-//                    supportFragmentManager.beginTransaction().replace(
-//                        action.container.resource,
-//                        EditPropertyFragment.newInstance()
-//                    ).addToBackStack(EditPropertyFragment::class.java.simpleName).commit()
-//                }
-//                is LaunchMap -> {
-//                    supportFragmentManager.popBackStackImmediate(
-//                        MapFragment::class.java.simpleName,
-//                        FragmentManager.POP_BACK_STACK_INCLUSIVE
-//                    )
-//                    supportFragmentManager
-//                        .beginTransaction().replace(
-//                        action.container.resource,
-//                        MapFragment.newInstance()
-//                    ).addToBackStack(MapFragment::class.java.simpleName).commit()
-//                }
-//            }
             when (action) {
-                is LaunchListFragment -> {
-                    supportFragmentManager.popBackStackImmediate(
-                        ListPropertyFragment::class.java.simpleName,
-                        FragmentManager.POP_BACK_STACK_INCLUSIVE
-                    )
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.list_container, ListPropertyFragment.newInstance())
-                        .addToBackStack(ListPropertyFragment::class.java.simpleName)
-                        .commit()
-                }
-                is LaunchPhotoEditor -> {
+
+                LaunchPhotoEditor -> {
                     supportFragmentManager.popBackStackImmediate(
                         PhotoEditorFragment::class.java.simpleName,
                         FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -112,7 +53,7 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent {
                         .replace(R.id.details_container, PhotoEditorFragment.newInstance())
                         .addToBackStack(PhotoEditorFragment::class.java.simpleName).commit()
                 }
-                is LaunchDetails -> {
+                LaunchDetails -> {
                     supportFragmentManager.popBackStackImmediate(
                         DetailsPropertyFragment::class.java.simpleName,
                         FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -127,12 +68,13 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent {
                         EditPropertyFragment::class.java.simpleName,
                         FragmentManager.POP_BACK_STACK_INCLUSIVE
                     )
+
                     supportFragmentManager.beginTransaction().replace(
                         R.id.details_container,
                         EditPropertyFragment.newInstance()
                     ).addToBackStack(EditPropertyFragment::class.java.simpleName).commit()
                 }
-                is LaunchMap -> {
+                LaunchMap -> {
                     supportFragmentManager.popBackStackImmediate(
                         MapFragment::class.java.simpleName,
                         FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -143,19 +85,75 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent {
                             MapFragment.newInstance()
                         ).addToBackStack(MapFragment::class.java.simpleName).commit()
                 }
+                is LaunchPhotoViewer -> {
+
+                    supportFragmentManager.popBackStackImmediate(
+                        PhotoViewerFragment::class.java.simpleName,
+                        FragmentManager.POP_BACK_STACK_INCLUSIVE
+                    )
+
+                    supportFragmentManager
+                        .beginTransaction()
+                        .setReorderingAllowed(true).apply {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                addSharedElement(action.transitionView, action.transitionView.transitionName)
+                            }
+                        }
+                        .replace(
+                            R.id.details_container,
+                            PhotoViewerFragment.newInstance()
+                        )
+                        .addToBackStack(PhotoViewerFragment::class.java.simpleName)
+                        .commit()
+                }
+                ShowChooseUserDialog -> {
+                    val dialog = ChooseUserMaterialDialog()
+                    dialog.setListener(object : ChooseUserMaterialDialog.DialogDismissListener {
+                        override fun onDialogDismiss(userName: String) {
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                viewModel.setUserNameInSharedPrefs(userName)
+                                withContext(Dispatchers.Main) {
+                                    viewModel.checkUserIsLogged()
+                                }
+                            }
+                        }
+                    })
+                    dialog.show(supportFragmentManager, null)
+                }
             }
         }
 
         if (savedInstanceState == null) {
-            viewModel.launchListFragment()
+            supportFragmentManager.popBackStackImmediate(
+                ListPropertyFragment::class.java.simpleName,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE
+            )
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.list_container, ListPropertyFragment.newInstance())
+                .commit()
+
         }
         setSupportActionBar(toolbar)
+        toolbar.setNavigationOnClickListener {
+            supportFragmentManager.popBackStack()
+        }
+
+        viewModel.checkUserIsLogged()
     }
+
+    override fun onNavigateUp(): Boolean {
+        supportFragmentManager.popBackStack()
+        return super.onNavigateUp()
+    }
+
 
 
     override fun onAttachFragment(fragment: Fragment) {
         if (fragment is OnUserAskTransactionEventListenable) {
             fragment.setListener(this)
+        }
+        if (fragment is EditPropertyFragment){
+            fragment.setOnPropertySavedListener(this)
         }
     }
 
@@ -171,12 +169,17 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent {
                 viewModel.syncLocalAndRemoteData()
             }
             R.id.disconnect -> {
-                FirebaseAuth.getInstance().signOut()
+                lifecycleScope.launch(Dispatchers.IO) {
+                    viewModel.logOut()
+                    withContext(Dispatchers.Main){
+                        viewModel.checkUserIsLogged()
+                    }
+
+                }
             }
         }
         return true
     }
-
 
     override fun onPropertyDetailsAsked() {
         viewModel.onPropertyDetailsAsked()
@@ -191,24 +194,7 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent {
     }
 
     override fun onPhotoViewerAsked(transitionView: View) {
-        //TODO Pass throught Viewmodel
-        supportFragmentManager.popBackStackImmediate(
-            PhotoViewerFragment::class.java.simpleName,
-            FragmentManager.POP_BACK_STACK_INCLUSIVE
-        )
-        supportFragmentManager.beginTransaction()
-            .setReorderingAllowed(true).apply {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    addSharedElement(transitionView, transitionView.transitionName)
-                }
-            }
-            .replace(
-                R.id.details_container,
-                PhotoViewerFragment.newInstance(),
-                null
-            )
-            .addToBackStack(PhotoViewerFragment::class.java.simpleName)
-            .commit()
+        viewModel.onPhotoViewerAsked(transitionView)
     }
 
     override fun onMapAsked() {
@@ -219,12 +205,10 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent {
         viewModel.onAddOrModifyPropertyAsked()
     }
 
-    private fun checkAuthenticatedUser() {
-        if (FirebaseAuth.getInstance().currentUser == null) {
-            registerForActivityResult(AuthenticationContract()) {}.launch(null)
-        } else {
-            println("debug : Your're signed in")
-        }
+    override fun onPropertySaved() {
+        val contextView = findViewById<View>(R.id.details_container)
+        Snackbar.make(contextView,"Property has been saved",Snackbar.LENGTH_LONG).show()
     }
+
 
 }

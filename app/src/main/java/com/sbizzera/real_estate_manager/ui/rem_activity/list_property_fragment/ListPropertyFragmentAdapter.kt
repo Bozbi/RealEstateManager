@@ -3,6 +3,8 @@ package com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.sbizzera.real_estate_manager.R
@@ -38,6 +40,7 @@ class ListPropertyFragmentAdapter : RecyclerView.Adapter<ListPropertyFragmentAda
                 setOnClickListener {
                     onPropertyClickListener.onPropertyItemClick(propertyModel.id)
                 }
+                list_item_container.setBackgroundColor(propertyModel.backGroundColor as Int)
             }
         }
     }

@@ -41,6 +41,7 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
     private lateinit var recyclerViewAdapter: EditPropertyPhotoRecyclerAdapter
     private lateinit var mLayoutManager: LinearLayoutManager
     private lateinit var onUserAskTransactionEventListener: OnUserAskTransactionEvent
+    private lateinit var onPropertySavedListener: OnPropertySavedListener
 
 
     companion object {
@@ -57,6 +58,13 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
         viewModel.editUiStateLD.observe(viewLifecycleOwner) { model ->
 
             updateUi(model)
+        }
+        viewModel.editEvent.observe(viewLifecycleOwner){
+            when(it){
+                EditPropertyViewModel.EditPropertyEvent.PropertySaved -> {
+                    onPropertySavedListener.onPropertySaved()
+                }
+            }
         }
         viewModel.editViewAction.observe(viewLifecycleOwner) { viewAction ->
             when (viewAction) {
@@ -87,6 +95,7 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
                     "Insert at least one photo and fill correctly the form",
                     Snackbar.LENGTH_LONG
                 ).show()
+
                 CloseFragment -> {
                     activity?.supportFragmentManager?.popBackStack()
                 }
@@ -237,13 +246,8 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
         }
     }
 
-
     override fun onPhotoClick(position: Int) {
         viewModel.editPhotoClicked(position)
-    }
-
-    override fun onPhotoClickForTransition(position: Int, transitionView: View) {
-       // TODO("Not yet implemented")
     }
 
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
@@ -252,6 +256,10 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
 
     override fun setListener(listener: OnUserAskTransactionEvent) {
         onUserAskTransactionEventListener = listener
+    }
+
+    fun setOnPropertySavedListener(onPropertySavedListener: OnPropertySavedListener) {
+        this.onPropertySavedListener = onPropertySavedListener
     }
 
 }

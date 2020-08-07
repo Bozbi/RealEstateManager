@@ -1,21 +1,22 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity
 
+import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sbizzera.real_estate_manager.App
-import com.sbizzera.real_estate_manager.R
-
+import com.sbizzera.real_estate_manager.utils.SharedPreferencesRepo
 import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import java.util.*
 
 class REMActivityViewModel(
     private val synchroniseDataHelper: SynchroniseDataHelper,
-    private val appContext: App
+    private val appContext: App,
+    private val sharedPreferencesRepo: SharedPreferencesRepo
 ) : ViewModel() {
 
     val viewAction = SingleLiveEvent<ViewAction>()
-    var tabletModeOn = false
 
 
     fun onPhotoEditorAsked() {
@@ -40,12 +41,30 @@ class REMActivityViewModel(
         }
     }
 
-    fun checkPhoneConfiguration() {
-        tabletModeOn = appContext.resources.getBoolean(R.bool.tablet_mode_on)
+    fun onPhotoViewerAsked(transitionView: View) {
+        viewAction.value = ViewAction.LaunchPhotoViewer(transitionView)
     }
 
-    fun launchListFragment() {
-        viewAction.value = ViewAction.LaunchListFragment
+    fun checkUserIsLogged() {
+        val userName = sharedPreferencesRepo.getUserName()
+        if (userName == null) {
+            viewAction.value = ViewAction.ShowChooseUserDialog
+        }
+    }
+
+    fun setUserNameInSharedPrefs(userName: String) {
+        if (userName.isNotEmpty()) {
+            val userNameNormalised = userName.apply {
+                trim { it == ' ' }
+                toUpperCase(Locale.getDefault())
+            }
+
+            sharedPreferencesRepo.insertUserName(userNameNormalised)
+        }
+    }
+
+    fun logOut() {
+        sharedPreferencesRepo.insertUserName(null)
     }
 
     sealed class ViewAction {
@@ -53,7 +72,8 @@ class REMActivityViewModel(
         object LaunchDetails : ViewAction()
         object LaunchEditProperty : ViewAction()
         object LaunchMap : ViewAction()
-        object LaunchListFragment : ViewAction()
+        class LaunchPhotoViewer(val transitionView: View) : ViewAction()
+        object ShowChooseUserDialog : ViewAction()
     }
 
 }

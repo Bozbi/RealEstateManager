@@ -1,9 +1,13 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment
 
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import com.sbizzera.real_estate_manager.App
+import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.data.CurrentPropertyIdRepository
 import com.sbizzera.real_estate_manager.data.property.PointOfInterest
 import com.sbizzera.real_estate_manager.data.property.Property
@@ -26,7 +30,8 @@ class ListPropertyViewModel(
     private val currentPropertyRepository: CurrentPropertyIdRepository,
     propertyRepository: PropertyRepository,
     private val fileHelper: FileHelper,
-    private val filterRepository: FilterRepository
+    private val filterRepository: FilterRepository,
+    private val appContext : App
 ) : ViewModel() {
 
     val listUiStateLD = MediatorLiveData<ListUiState>()
@@ -37,12 +42,16 @@ class ListPropertyViewModel(
     init {
         val allPropertiesLD = propertyRepository.getAllLocalProperties()
         val propertyFilterLD = filterRepository.filterLiveData
+        val currentPropertyIdLD = currentPropertyRepository.currentPropertyIdLiveData
         listUiStateLD.addSource(allPropertiesLD) { allProperties ->
-            combineSources(allProperties, propertyFilterLD.value)
+            combineSources(allProperties, propertyFilterLD.value,currentPropertyIdLD.value)
         }
 
         listUiStateLD.addSource(filterRepository.filterLiveData) { propertyFilter ->
-            combineSources(allPropertiesLD.value, propertyFilter)
+            combineSources(allPropertiesLD.value, propertyFilter,currentPropertyIdLD.value)
+        }
+        listUiStateLD.addSource(currentPropertyIdLD){currentPropertyRepositoryId->
+            combineSources(allPropertiesLD.value,propertyFilterLD.value,currentPropertyRepositoryId)
         }
 
         filterUiState = Transformations.map(filterRepository.filterLiveData) { filters ->
@@ -50,7 +59,7 @@ class ListPropertyViewModel(
         }
     }
 
-    private fun combineSources(allProperties: List<Property>?, propertyFilter: PropertyFilter?) {
+    private fun combineSources(allProperties: List<Property>?, propertyFilter: PropertyFilter?,currentPropertyId: String?) {
         if (allProperties == null || propertyFilter == null) {
             return
         }
@@ -66,7 +75,7 @@ class ListPropertyViewModel(
 
         val listUiStateToReturn =
             ListUiState(
-                fromPropertiesToListUiProperties(listOfFilteredProperties)
+                fromPropertiesToListUiProperties(listOfFilteredProperties,currentPropertyId)
             )
         listUiStateLD.value = listUiStateToReturn
     }
@@ -207,20 +216,30 @@ class ListPropertyViewModel(
         listViewAction.value = DetailsPropertyClicked
     }
 
-    private fun fromPropertiesToListUiProperties(properties: List<Property>): List<ListPropertyItemUiState> {
+    private fun fromPropertiesToListUiProperties(properties: List<Property>,currentPropertyId: String?): List<ListPropertyItemUiState> {
         val uiPropertyList = mutableListOf<ListPropertyItemUiState>()
         properties.forEach {
             val uri = fileHelper.getUriFromFileName(it.photoList[0].photoId, it.propertyId)
+            val colorRes = getBackgroundColor(it.propertyId,currentPropertyId)
             val propertyToAdd = ListPropertyItemUiState(
                 id = it.propertyId,
                 title = it.propertyTitle,
                 photoUri = uri,
                 price = "$${it.price}",
-                type = it.propertyType
+                type = it.propertyType,
+                backGroundColor = colorRes
             )
             uiPropertyList.add(propertyToAdd)
         }
         return uiPropertyList
+    }
+
+    private fun getBackgroundColor(propertyId: String,currentPropertyId: String?): Int {
+        if(currentPropertyId==null || propertyId != currentPropertyId){
+            return ContextCompat.getColor(appContext,android.R.color.white)
+        }else{
+            return ContextCompat.getColor(appContext,R.color.colorAccent)
+        }
     }
 
     fun onPriceRangeFilterChange(minPrice: Float, maxPrice: Float) {
@@ -307,7 +326,9 @@ data class ListPropertyItemUiState(
     val title: String,
     val photoUri: String,
     val price: String,
-    val type: String
+    val type: String,
+    @ColorRes
+    val backGroundColor : Int
 )
 
 data class FilterUiState(

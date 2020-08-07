@@ -23,7 +23,7 @@ interface PropertyDao {
     fun getPropertyByIdLD(propertyId: String): LiveData<Property>
 
     @Query("SELECT * FROM properties WHERE propertyId LIKE :propertyId LIMIT 1")
-    fun getPropertyById(propertyId: String): Property
+    suspend fun getPropertyById(propertyId: String): Property
 
     @Query("SELECT * FROM properties WHERE propertyId LIKE :propertyId LIMIT 1")
     suspend fun getPropertyByIdAsync(propertyId: String): Property

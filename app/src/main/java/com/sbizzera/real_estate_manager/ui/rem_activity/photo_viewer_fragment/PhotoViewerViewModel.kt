@@ -1,6 +1,9 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.photo_viewer_fragment
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.sbizzera.real_estate_manager.data.CurrentPhotoPositionRepo
 import com.sbizzera.real_estate_manager.data.CurrentPropertyIdRepository
 import com.sbizzera.real_estate_manager.data.photo.Photo
@@ -8,6 +11,10 @@ import com.sbizzera.real_estate_manager.data.property.Property
 import com.sbizzera.real_estate_manager.data.property.PropertyRepository
 import com.sbizzera.real_estate_manager.utils.FileHelper
 import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PhotoViewerViewModel(
     currentPropertyIdRepository: CurrentPropertyIdRepository,
@@ -15,38 +22,44 @@ class PhotoViewerViewModel(
     private val currentPhotoPositionRepo: CurrentPhotoPositionRepo,
     private val fileHelper: FileHelper
 ) : ViewModel() {
-    var photoList = listOf<PhotoInViewer>()
+
+//    var photoList = listOf<PhotoInViewer>()
+    var photoList = MutableLiveData<List<PhotoInViewer>>()
     val photoViewerViewAction = SingleLiveEvent<PhotoViewerViewAction>()
 
     init {
         val id = currentPropertyIdRepository.currentPropertyIdLiveData.value
         if (id != null) {
-            val property = propertyRepository.getPropertyById(id)
-            photoList = fromListPhotoToListPhotoInViewer(property)
+            viewModelScope.launch(IO) {
+                val property = propertyRepository.getPropertyById(id)
+                withContext(Main) {
+                    photoList.value = fromListPhotoToListPhotoInViewer(property)
+                }
+            }
         }
     }
 
-    fun getCurrentPhotoPosition()= currentPhotoPositionRepo.currentPhotoPosition
+    fun getCurrentPhotoPosition() = currentPhotoPositionRepo.currentPhotoPosition
 
     private fun fromListPhotoToListPhotoInViewer(property: Property): List<PhotoInViewer> {
         val listToReturn = mutableListOf<PhotoInViewer>()
         property.photoList.forEach {
-            val photoInViewer = fromPhotoToPhotoInViewer(it,property.propertyId)
+            val photoInViewer = fromPhotoToPhotoInViewer(it, property.propertyId)
             listToReturn.add(photoInViewer)
         }
         return listToReturn
     }
 
-    private fun fromPhotoToPhotoInViewer(photo: Photo,propertyId: String): PhotoInViewer {
+    private fun fromPhotoToPhotoInViewer(photo: Photo, propertyId: String): PhotoInViewer {
         return PhotoInViewer(
-            fileHelper.getUriFromFileName(photo.photoId,propertyId),
+            fileHelper.getUriFromFileName(photo.photoId, propertyId),
             photo.title
         )
     }
 
     fun onViewHolderBound(position: Int) {
-        if(position == currentPhotoPositionRepo.currentPhotoPosition){
-            photoViewerViewAction.value= PhotoViewerViewAction.ViewHolderReady
+        if (position == currentPhotoPositionRepo.currentPhotoPosition) {
+            photoViewerViewAction.value = PhotoViewerViewAction.ViewHolderReady
         }
     }
 
@@ -54,12 +67,12 @@ class PhotoViewerViewModel(
         currentPhotoPositionRepo.currentPhotoPosition = currentPhotoPosition
     }
 
-    sealed class PhotoViewerViewAction{
-        object  ViewHolderReady :  PhotoViewerViewAction()
+    sealed class PhotoViewerViewAction {
+        object ViewHolderReady : PhotoViewerViewAction()
     }
 }
 
 data class PhotoInViewer(
     val uri: String,
-    val title : String
+    val title: String
 )
