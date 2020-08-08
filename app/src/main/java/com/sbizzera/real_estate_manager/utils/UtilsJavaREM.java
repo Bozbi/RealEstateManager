@@ -11,7 +11,7 @@ import java.util.Date;
  * Created by Philippe on 21/02/2018.
  */
 
-public class Utils {
+public class UtilsJavaREM {
 
     /**
      * Conversion d'un prix d'un bien immobilier (Dollars vers Euros)

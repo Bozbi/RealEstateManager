@@ -18,11 +18,13 @@ import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.L
 import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel.ListPropertyViewAction.DetailsPropertyClicked
 import com.sbizzera.real_estate_manager.utils.CUSTOM_DATE_FORMATTER
 import com.sbizzera.real_estate_manager.utils.FileHelper
+import com.sbizzera.real_estate_manager.utils.PropertyComparator
 import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
+import java.util.*
 import kotlin.collections.set
 
 
@@ -64,6 +66,8 @@ class ListPropertyViewModel(
             return
         }
         val listOfFilteredProperties = mutableListOf<Property>()
+
+        Collections.sort(allProperties,PropertyComparator())
 
         allProperties.forEach { property ->
             val doesPropertyMatchFilters = doesPropertyMatchFilers(property, propertyFilter)

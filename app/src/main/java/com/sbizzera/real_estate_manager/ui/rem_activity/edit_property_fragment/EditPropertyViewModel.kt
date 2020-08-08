@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
+import org.threeten.bp.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.set
 
@@ -53,6 +54,7 @@ class EditPropertyViewModel(
                         propertyInModificationRepository.propertyInModificationLD
                     }
                 } else {
+                    initialProperty = Property()
                     propertyInModificationRepository.propertyInModificationLD.value = EditUiState()
                     propertyInModificationRepository.propertyInModificationLD
                 }
@@ -217,7 +219,7 @@ class EditPropertyViewModel(
                 propertyBathroomCount?.toString()?.toIntOrNull() ?: 0,
                 this@EditPropertyViewModel.createPoiList(propertyPoiMap),
                 propertySoldDate?.toString() ?: "",
-                propertyCreationDate ?: LocalDateTime.now().format(CUSTOM_DATE_FORMATTER),
+                propertyCreationDate ?: LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
                 getLatitudeOrLongitude(currentPropertyToInsert, GeocodeResolver.LatOrLng.LATITUDE),
                 getLatitudeOrLongitude(currentPropertyToInsert, GeocodeResolver.LatOrLng.LONGITUDE),
                 sharedPreferencesRepo.getUserName()
@@ -268,7 +270,8 @@ class EditPropertyViewModel(
                 propertyBathroomCount = propertyBathRooms.toString(),
                 propertySoldDate = soldDate,
                 propertyPoiMap = createPoiMap(propertyPoiList),
-                propertyAgent = estateAgent
+                propertyAgent = estateAgent,
+                propertyCreationDate = creationDate
             )
         }
     }
