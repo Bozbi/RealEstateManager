@@ -37,13 +37,12 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
         returnTransition = TransitionInflater.from(context).inflateTransition(R.transition.details_to_photo_viewer_exit)
     }
 
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_details_property, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModelDetails = ViewModelProvider(requireActivity(), ViewModelFactory).get(DetailsPropertyViewModel::class.java)
+        viewModelDetails = ViewModelProvider(this, ViewModelFactory).get(DetailsPropertyViewModel::class.java)
         recyclerAdapter.setListener(this,this)
         recycler_view.adapter = recyclerAdapter
 
@@ -124,17 +123,4 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
     override fun onViewHolderBound(position: Int) {
         viewModelDetails.onViewHolderBound(position)
     }
-
-    override fun onResume() {
-        super.onResume()
-        (activity as AppCompatActivity).supportActionBar?.setDisplayShowHomeEnabled(true)
-        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        (activity as AppCompatActivity).supportActionBar?.setDisplayShowHomeEnabled(false)
-        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
-    }
-
 }

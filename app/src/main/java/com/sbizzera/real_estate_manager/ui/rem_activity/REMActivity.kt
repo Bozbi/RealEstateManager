@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent,OnPropertySavedListener {
+class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySavedListener {
 
     private lateinit var viewModel: REMActivityViewModel
     private lateinit var mMenu: Menu
@@ -54,13 +54,18 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent,OnPropertySav
                         .addToBackStack(PhotoEditorFragment::class.java.simpleName).commit()
                 }
                 LaunchDetails -> {
+                    supportActionBar?.let {
+                        it.setDisplayHomeAsUpEnabled(true)
+                        it.setDisplayShowHomeEnabled(true)
+                    }
                     supportFragmentManager.popBackStackImmediate(
                         DetailsPropertyFragment::class.java.simpleName,
                         FragmentManager.POP_BACK_STACK_INCLUSIVE
                     )
                     supportFragmentManager.beginTransaction().replace(
                         R.id.details_container,
-                        DetailsPropertyFragment.newInstance()
+                        DetailsPropertyFragment.newInstance(),
+                        DetailsPropertyFragment::class.java.simpleName
                     ).addToBackStack(DetailsPropertyFragment::class.java.simpleName).commit()
                 }
                 is LaunchEditProperty -> {
@@ -135,16 +140,12 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent,OnPropertySav
         }
         setSupportActionBar(toolbar)
         toolbar.setNavigationOnClickListener {
-            supportFragmentManager.popBackStack()
+            onBackPressed()
         }
 
         viewModel.checkUserIsLogged()
     }
 
-    override fun onNavigateUp(): Boolean {
-        supportFragmentManager.popBackStack()
-        return super.onNavigateUp()
-    }
 
 
 
@@ -152,7 +153,7 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent,OnPropertySav
         if (fragment is OnUserAskTransactionEventListenable) {
             fragment.setListener(this)
         }
-        if (fragment is EditPropertyFragment){
+        if (fragment is EditPropertyFragment) {
             fragment.setOnPropertySavedListener(this)
         }
     }
@@ -171,7 +172,7 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent,OnPropertySav
             R.id.disconnect -> {
                 lifecycleScope.launch(Dispatchers.IO) {
                     viewModel.logOut()
-                    withContext(Dispatchers.Main){
+                    withContext(Dispatchers.Main) {
                         viewModel.checkUserIsLogged()
                     }
 
@@ -207,7 +208,27 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent,OnPropertySav
 
     override fun onPropertySaved() {
         val contextView = findViewById<View>(R.id.details_container)
-        Snackbar.make(contextView,"Property has been saved",Snackbar.LENGTH_LONG).show()
+        Snackbar.make(contextView, "Property has been saved", Snackbar.LENGTH_LONG).show()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        checkBackIconDisplay()
+    }
+
+    private fun checkBackIconDisplay() {
+        //TODO pass this threw viewModel check new insertion
+        val backStackList = mutableListOf<String>()
+        for(i in 0 until supportFragmentManager.backStackEntryCount){
+            backStackList.add(supportFragmentManager.getBackStackEntryAt(i).name!!)
+        }
+        if(!backStackList.contains(DetailsPropertyFragment::class.java.simpleName)){
+            viewModel.clearCurrentPropertyId()
+            supportActionBar?.let {
+                it.setDisplayShowHomeEnabled(false)
+                it.setDisplayHomeAsUpEnabled(false)
+            }
+        }
     }
 
 

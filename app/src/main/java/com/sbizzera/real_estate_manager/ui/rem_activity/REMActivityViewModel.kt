@@ -4,6 +4,7 @@ import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sbizzera.real_estate_manager.App
+import com.sbizzera.real_estate_manager.data.CurrentPropertyIdRepository
 import com.sbizzera.real_estate_manager.utils.SharedPreferencesRepo
 import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers.IO
@@ -13,7 +14,8 @@ import java.util.*
 class REMActivityViewModel(
     private val synchroniseDataHelper: SynchroniseDataHelper,
     private val appContext: App,
-    private val sharedPreferencesRepo: SharedPreferencesRepo
+    private val sharedPreferencesRepo: SharedPreferencesRepo,
+    private val currentPropertyIdRepository: CurrentPropertyIdRepository
 ) : ViewModel() {
 
     val viewAction = SingleLiveEvent<ViewAction>()
@@ -65,6 +67,10 @@ class REMActivityViewModel(
 
     fun logOut() {
         sharedPreferencesRepo.insertUserName(null)
+    }
+
+    fun clearCurrentPropertyId() {
+        currentPropertyIdRepository.currentPropertyIdLiveData.value = null
     }
 
     sealed class ViewAction {

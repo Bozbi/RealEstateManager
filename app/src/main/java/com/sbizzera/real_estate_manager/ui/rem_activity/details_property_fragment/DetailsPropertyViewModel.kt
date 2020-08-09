@@ -1,6 +1,7 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.sbizzera.real_estate_manager.BuildConfig
@@ -28,20 +29,23 @@ class DetailsPropertyViewModel(
 
 
     init {
-        detailsUiStateLD =
-            Transformations.switchMap(currentPropertyIdRepository.currentPropertyIdLiveData) { currentPropertyId ->
-                val propertyLiveData  : LiveData<Property> = propertyRepository.getPropertyByIdLD(currentPropertyId)
-                Transformations.map(propertyLiveData) { property ->
-                    fromPropertyToDetailUiState(property)
-                }
+        val currentPropertyId = currentPropertyIdRepository.currentPropertyIdLiveData.value
+        if (currentPropertyId != null) {
+            val propertyLiveData: LiveData<Property> = propertyRepository.getPropertyByIdLD(currentPropertyId)
+            detailsUiStateLD = Transformations.map(propertyLiveData) { property ->
+                fromPropertyToDetailUiState(property)
             }
+        } else {
+            detailsUiStateLD = MutableLiveData(fromPropertyToDetailUiState(Property()))
+        }
+
 
     }
 
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //  MODEL CONVERTERS
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  MODEL CONVERTERS
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private fun fromPropertyToDetailUiState(property: Property?): DetailsUiState {
         if (property != null) {
@@ -63,7 +67,7 @@ class DetailsPropertyViewModel(
                     createAgentText(estateAgent)
                 )
             }
-        }else{
+        } else {
             return DetailsUiState()
         }
     }
@@ -124,9 +128,9 @@ class DetailsPropertyViewModel(
     }
 
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //  DetailsFragment Methods
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  DetailsFragment Methods
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     fun modifyPropertyClicked() {
         detailsViewAction.value = ModifyPropertyClicked
@@ -151,8 +155,6 @@ class DetailsPropertyViewModel(
     }
 
 
-
-
     sealed class DetailsViewAction() {
         object ModifyPropertyClicked : DetailsViewAction()
         object ViewHolderReady : DetailsViewAction()
@@ -162,10 +164,10 @@ class DetailsPropertyViewModel(
 
 
 data class DetailsUiState(
-    val title: String ="",
-    val price: String ="",
+    val title: String = "",
+    val price: String = "",
     val type: String = "",
-    val availableOrSoldSinceText: String ="",
+    val availableOrSoldSinceText: String = "",
     val listPropertyPhoto: List<DetailsPhotoUiState> = listOf(),
     val surface: String = "",
     val roomsCount: String = "0",
