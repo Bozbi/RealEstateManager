@@ -6,7 +6,6 @@ import androidx.room.TypeConverters
 import com.sbizzera.real_estate_manager.data.photo.Photo
 import com.sbizzera.real_estate_manager.data.utils.Converters
 
-
 @Entity(tableName = "properties")
 data class Property(
     @PrimaryKey

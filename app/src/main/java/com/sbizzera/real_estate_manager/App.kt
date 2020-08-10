@@ -15,8 +15,6 @@ class App : MultiDexApplication() {
         super.onCreate()
         INSTANCE = this
         AndroidThreeTen.init(this)
-
-        // Launching Periodic Sync Worker
         val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
         val work = PeriodicWorkRequestBuilder<SyncDataWorker>(1,TimeUnit.DAYS).setConstraints(constraints).build()
         val workManager = WorkManager.getInstance(this)

@@ -46,7 +46,7 @@ class ListPropertyFragment : Fragment(), OnPropertyClickEvent, OnUserAskTransact
         list_property_recycler.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = recyclerViewAdapter
-            var itemDecoration = DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL)
+            val itemDecoration = DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL)
             getDrawable(this.context, R.drawable.divider)?.let { itemDecoration.setDrawable(it) }
             addItemDecoration(itemDecoration)
         }

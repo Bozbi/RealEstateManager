@@ -1,7 +1,6 @@
 package com.sbizzera.real_estate_manager.data
 
 import android.location.Location
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.sbizzera.real_estate_manager.App
 import kotlinx.coroutines.tasks.await

@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
 
-
 @Dao
 interface PropertyDao {
 
@@ -27,6 +26,5 @@ interface PropertyDao {
 
     @Query("SELECT * FROM properties WHERE propertyId LIKE :propertyId LIMIT 1")
     suspend fun getPropertyByIdAsync(propertyId: String): Property
-
 
 }

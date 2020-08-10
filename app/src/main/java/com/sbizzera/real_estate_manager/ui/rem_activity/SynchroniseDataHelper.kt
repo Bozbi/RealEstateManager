@@ -7,7 +7,9 @@ import com.sbizzera.real_estate_manager.data.property.PropertyRepository
 import com.sbizzera.real_estate_manager.utils.FileHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDateTime
 
 class SynchroniseDataHelper(
@@ -57,19 +59,23 @@ class SynchroniseDataHelper(
                 val file = fileHelper.createEmptyFileToReceiveRemoteImage(remoteProperty.propertyId, name)
                 firebaseStorageRepository.downloadImage(name, file)
             }
-            propertyRepository.insertLocalProperty(remoteProperty)
+            withContext(Main) {
+                propertyRepository.insertLocalProperty(remoteProperty)
+            }
         }
     }
 
     private fun updateExistingLocalPropertyAndPhoto(localProperty: Property, remoteProperty: Property) {
         CoroutineScope(IO).launch {
             val photosIdListToAdd = getPhotoListToAdd(remoteProperty.photoList, localProperty.photoList)
-            photosIdListToAdd.forEach {name->
+            photosIdListToAdd.forEach { name ->
                 val file = fileHelper.createEmptyFileToReceiveRemoteImage(remoteProperty.propertyId, name)
                 firebaseStorageRepository.downloadImage(name, file)
             }
-            propertyRepository.insertLocalProperty(remoteProperty)
-            fileHelper.deleteOldPhotosFromPropertyDirectory(localProperty.propertyId,localProperty.photoList)
+            withContext(Main) {
+                propertyRepository.insertLocalProperty(remoteProperty)
+            }
+            fileHelper.deleteOldPhotosFromPropertyDirectory(localProperty.propertyId, localProperty.photoList)
         }
     }
 

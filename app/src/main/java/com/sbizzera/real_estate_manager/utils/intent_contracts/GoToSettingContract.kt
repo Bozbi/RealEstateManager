@@ -7,7 +7,7 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContract
 
-class GoToSettingContract() : ActivityResultContract<String, Boolean>() {
+class GoToSettingContract : ActivityResultContract<String, Boolean>() {
     override fun createIntent(context: Context, input: String?): Intent {
         val uri = Uri.fromParts("package", context.packageName, null)
 

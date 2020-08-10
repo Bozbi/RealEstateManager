@@ -27,9 +27,9 @@ class MapViewModel(
     val mapViewAction = SingleLiveEvent<MapViewAction>()
     private lateinit var mapMarkers: List<CustomMapMarkers>
     private lateinit var locationToFocus: Location
-    var mapIsReady = false
-    var markersReady = false
-    var locationIsReasy = false
+    private var mapIsReady = false
+    private var markersReady = false
+    private var locationIsReady = false
 
     init {
         viewModelScope.launch(IO) {
@@ -46,7 +46,7 @@ class MapViewModel(
                 val userLocation = userLocationRepo.getCurrentLocation()
                 withContext(Main) {
                     locationToFocus = userLocation
-                    locationIsReasy = true
+                    locationIsReady = true
                     shouldDisplay()
                 }
             } else {
@@ -55,7 +55,7 @@ class MapViewModel(
                     locationToFocus = Location("")
                     locationToFocus.latitude = property.latitude
                     locationToFocus.longitude = property.longitude
-                    locationIsReasy = true
+                    locationIsReady = true
                     shouldDisplay()
                 }
             }
@@ -91,7 +91,7 @@ class MapViewModel(
     }
 
     private fun shouldDisplay() {
-        if(mapIsReady&&markersReady&&locationIsReasy){
+        if(mapIsReady&&markersReady&&locationIsReady){
             mapViewAction.value = MapViewAction.MapIsReady(mapMarkers,locationToFocus)
         }
     }

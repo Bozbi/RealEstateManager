@@ -125,6 +125,12 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
                     })
                     dialog.show(supportFragmentManager, null)
                 }
+                HideBackButton -> {
+                    supportActionBar?.let {
+                        it.setDisplayShowHomeEnabled(false)
+                        it.setDisplayHomeAsUpEnabled(false)
+                    }
+                }
             }
         }
 
@@ -208,7 +214,7 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
 
     override fun onPropertySaved() {
         val contextView = findViewById<View>(R.id.details_container)
-        Snackbar.make(contextView, "Property has been saved", Snackbar.LENGTH_LONG).show()
+        Snackbar.make(contextView, "Property has been saved in your hardware. Synchronise to push it to other agents", Snackbar.LENGTH_LONG).show()
     }
 
     override fun onBackPressed() {
@@ -217,19 +223,11 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
     }
 
     private fun checkBackIconDisplay() {
-        //TODO pass this threw viewModel check new insertion
         val backStackList = mutableListOf<String>()
         for(i in 0 until supportFragmentManager.backStackEntryCount){
             backStackList.add(supportFragmentManager.getBackStackEntryAt(i).name!!)
         }
-        if(!backStackList.contains(DetailsPropertyFragment::class.java.simpleName)){
-            viewModel.clearCurrentPropertyId()
-            supportActionBar?.let {
-                it.setDisplayShowHomeEnabled(false)
-                it.setDisplayHomeAsUpEnabled(false)
-            }
-        }
+        viewModel.shouldDisplayBackIconAndClearCurrentPropertyRepo(backStackList)
     }
-
 
 }

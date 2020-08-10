@@ -5,7 +5,6 @@ import android.text.TextWatcher
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 
-
 class MyCustomAutocompleteTextView : AppCompatAutoCompleteTextView{
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)

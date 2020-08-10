@@ -59,8 +59,8 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
 
             updateUi(model)
         }
-        viewModel.editEvent.observe(viewLifecycleOwner){
-            when(it){
+        viewModel.editEvent.observe(viewLifecycleOwner) {
+            when (it) {
                 EditPropertyViewModel.EditPropertyEvent.PropertySaved -> {
                     onPropertySavedListener.onPropertySaved()
                 }
@@ -144,16 +144,18 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
             viewModel.onDescriptionChange(text.toString())
         }
 
-        property_address_edt.doOnTextChanged { text, _, _, _ ->
-            viewModel.onAddressChange(text.toString())
+
+        property_address_edt.afterTextChangedDelayed { address->
+            viewModel.onAddressChange(address)
         }
 
-        property_city_code_edt.doOnTextChanged { text, _, _, _ ->
-            viewModel.onCityCodeChange(text.toString())
+        property_city_code_edt.afterTextChangedDelayed {cityCode->
+            viewModel.onCityCodeChange(cityCode)
+
         }
 
-        property_city_name_edt.doOnTextChanged { text, _, _, _ ->
-            viewModel.onCityNameChange(text.toString())
+        property_city_name_edt.afterTextChangedDelayed {cityName->
+            viewModel.onCityNameChange(cityName)
         }
 
         property_price_edt.doOnTextChanged { text, _, _, _ ->

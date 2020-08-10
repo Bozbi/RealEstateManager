@@ -239,10 +239,10 @@ class ListPropertyViewModel(
     }
 
     private fun getBackgroundColor(propertyId: String,currentPropertyId: String?): Int {
-        if(currentPropertyId==null || propertyId != currentPropertyId){
-            return ContextCompat.getColor(appContext,android.R.color.white)
+        return if(currentPropertyId==null || propertyId != currentPropertyId){
+            ContextCompat.getColor(appContext,android.R.color.white)
         }else{
-            return ContextCompat.getColor(appContext,R.color.colorAccent)
+            ContextCompat.getColor(appContext,R.color.colorAccent)
         }
     }
 

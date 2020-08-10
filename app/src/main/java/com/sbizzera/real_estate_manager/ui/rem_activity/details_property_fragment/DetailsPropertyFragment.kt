@@ -5,7 +5,6 @@ import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.SharedElementCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -46,7 +45,7 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
         recyclerAdapter.setListener(this,this)
         recycler_view.adapter = recyclerAdapter
 
-        detailsLayoutManager = object : LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false){
+        detailsLayoutManager = object : LinearLayoutManager(requireContext(), HORIZONTAL, false){
             override fun onLayoutCompleted(state: RecyclerView.State?) {
                 super.onLayoutCompleted(state)
                 viewModelDetails.checkScrollNecessity(

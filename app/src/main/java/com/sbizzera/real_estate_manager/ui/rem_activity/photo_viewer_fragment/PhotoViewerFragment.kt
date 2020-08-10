@@ -20,7 +20,6 @@ import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.utils.ViewModelFactory
 import kotlinx.android.synthetic.main.fragment_photo_viewer.*
 
-
 class PhotoViewerFragment : Fragment(), PhotoViewerRecyclerAdapter.OnViewHolderBound {
 
     private lateinit var viewModel: PhotoViewerViewModel

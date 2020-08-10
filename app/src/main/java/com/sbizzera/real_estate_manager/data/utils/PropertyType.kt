@@ -8,7 +8,7 @@ enum class PropertyType (val typeName : String){
 }
 
 fun getTypeNameList():List<String>{
-    var listToReturn = mutableListOf<String>()
+    val listToReturn = mutableListOf<String>()
     PropertyType.values().forEach {
         listToReturn.add(it.typeName)
     }

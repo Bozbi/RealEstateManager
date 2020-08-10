@@ -11,10 +11,10 @@ class FirebaseStorageRepository private constructor() {
         val instance: FirebaseStorageRepository by lazy { FirebaseStorageRepository() }
     }
 
-    val storageRef = FirebaseStorage.getInstance().reference
+    private val storageRef = FirebaseStorage.getInstance().reference
 
     suspend fun uploadImage(uri: String) {
-        var file = Uri.fromFile(File(uri))
+        val file = Uri.fromFile(File(uri))
         val storageChild = storageRef.child("${file.lastPathSegment}")
         storageChild.putFile(file).await()
     }

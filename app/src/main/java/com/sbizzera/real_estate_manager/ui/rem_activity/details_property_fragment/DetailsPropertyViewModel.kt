@@ -17,8 +17,8 @@ import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
 
 
 class DetailsPropertyViewModel(
-    private val propertyRepository: PropertyRepository,
-    private val currentPropertyIdRepository: CurrentPropertyIdRepository,
+    propertyRepository: PropertyRepository,
+    currentPropertyIdRepository: CurrentPropertyIdRepository,
     private val currentPhotoPositionRepo: CurrentPhotoPositionRepo,
     private val fileHelper: FileHelper
 
@@ -30,13 +30,13 @@ class DetailsPropertyViewModel(
 
     init {
         val currentPropertyId = currentPropertyIdRepository.currentPropertyIdLiveData.value
-        if (currentPropertyId != null) {
+        detailsUiStateLD = if (currentPropertyId != null) {
             val propertyLiveData: LiveData<Property> = propertyRepository.getPropertyByIdLD(currentPropertyId)
-            detailsUiStateLD = Transformations.map(propertyLiveData) { property ->
+            Transformations.map(propertyLiveData) { property ->
                 fromPropertyToDetailUiState(property)
             }
         } else {
-            detailsUiStateLD = MutableLiveData(fromPropertyToDetailUiState(Property()))
+            MutableLiveData(fromPropertyToDetailUiState(Property()))
         }
 
 
@@ -97,7 +97,7 @@ class DetailsPropertyViewModel(
 
 
     private fun createAvailabilityText(creationDate: String, soldDate: String): String {
-        return if (soldDate.isNullOrEmpty()) {
+        return if (soldDate.isEmpty()) {
             "available since $creationDate"
         } else {
             "sold on $soldDate"
@@ -155,7 +155,7 @@ class DetailsPropertyViewModel(
     }
 
 
-    sealed class DetailsViewAction() {
+    sealed class DetailsViewAction {
         object ModifyPropertyClicked : DetailsViewAction()
         object ViewHolderReady : DetailsViewAction()
         class ScrollToPosition(val position: Int) : DetailsViewAction()

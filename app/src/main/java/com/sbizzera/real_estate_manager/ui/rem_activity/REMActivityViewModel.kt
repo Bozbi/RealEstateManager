@@ -3,8 +3,8 @@ package com.sbizzera.real_estate_manager.ui.rem_activity
 import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sbizzera.real_estate_manager.App
 import com.sbizzera.real_estate_manager.data.CurrentPropertyIdRepository
+import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyFragment
 import com.sbizzera.real_estate_manager.utils.SharedPreferencesRepo
 import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers.IO
@@ -13,7 +13,6 @@ import java.util.*
 
 class REMActivityViewModel(
     private val synchroniseDataHelper: SynchroniseDataHelper,
-    private val appContext: App,
     private val sharedPreferencesRepo: SharedPreferencesRepo,
     private val currentPropertyIdRepository: CurrentPropertyIdRepository
 ) : ViewModel() {
@@ -69,8 +68,15 @@ class REMActivityViewModel(
         sharedPreferencesRepo.insertUserName(null)
     }
 
-    fun clearCurrentPropertyId() {
+    private fun clearCurrentPropertyId() {
         currentPropertyIdRepository.currentPropertyIdLiveData.value = null
+    }
+
+    fun shouldDisplayBackIconAndClearCurrentPropertyRepo(backStackList: MutableList<String>) {
+        if(!backStackList.contains(DetailsPropertyFragment::class.java.simpleName)){
+            clearCurrentPropertyId()
+            viewAction.value = ViewAction.HideBackButton
+        }
     }
 
     sealed class ViewAction {
@@ -80,6 +86,7 @@ class REMActivityViewModel(
         object LaunchMap : ViewAction()
         class LaunchPhotoViewer(val transitionView: View) : ViewAction()
         object ShowChooseUserDialog : ViewAction()
+        object HideBackButton : ViewAction()
     }
 
 }

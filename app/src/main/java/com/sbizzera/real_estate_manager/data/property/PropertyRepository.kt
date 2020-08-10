@@ -16,18 +16,19 @@ class PropertyRepository private constructor() {
         val instance: PropertyRepository by lazy { PropertyRepository() }
     }
 
-
     suspend fun insertLocalProperty(property: Property) = propertyDao.insertProperty(property)
+
     fun getAllLocalProperties() = propertyDao.getAllProperties()
+
     suspend fun getAllPropertiesAsync() = propertyDao.getAllPropertiesAsync()
+
     fun getPropertyByIdLD(propertyId: String) :LiveData<Property> {
         return propertyDao.getPropertyByIdLD(propertyId)
     }
+
     suspend fun getPropertyById(propertyId: String):Property{
         return propertyDao.getPropertyById(propertyId)
     }
-
-
 
     suspend fun insertRemoteProperty(property: Property) {
         firestoreProperties.document(property.propertyId).set(property).await()

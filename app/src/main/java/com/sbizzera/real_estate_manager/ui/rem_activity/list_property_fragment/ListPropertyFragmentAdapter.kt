@@ -3,8 +3,7 @@ package com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.ColorRes
-import androidx.core.content.ContextCompat
+
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.sbizzera.real_estate_manager.R
@@ -12,6 +11,7 @@ import com.sbizzera.real_estate_manager.events.OnPropertyClickEvent
 import com.sbizzera.real_estate_manager.events.OnPropertyClickEventListenable
 import kotlinx.android.synthetic.main.list_property_item_view.view.*
 
+@Suppress("USELESS_CAST")
 class ListPropertyFragmentAdapter : RecyclerView.Adapter<ListPropertyFragmentAdapter.ViewHolder>(),OnPropertyClickEventListenable {
 
     lateinit var onPropertyClickListener: OnPropertyClickEvent
@@ -27,7 +27,6 @@ class ListPropertyFragmentAdapter : RecyclerView.Adapter<ListPropertyFragmentAda
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(position)
     }
-
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(position: Int) {

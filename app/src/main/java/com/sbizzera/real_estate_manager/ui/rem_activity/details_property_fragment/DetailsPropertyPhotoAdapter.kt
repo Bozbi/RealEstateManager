@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.photo_in_detail_item.view.*
 
 class DetailsPropertyPhotoAdapter : RecyclerView.Adapter<DetailsPhotoViewHolder>() {
 
-    private lateinit var onPhotoClickForTransitionlistener: OnPhotoClickForTransitionListener
+    private lateinit var onPhotoClickForTransitionListener: OnPhotoClickForTransitionListener
     private lateinit var onViewHolderBoundListener: OnViewHolderBoundListener
     private var photoList: List<DetailsPhotoUiState> = listOf()
 
@@ -37,7 +37,7 @@ class DetailsPropertyPhotoAdapter : RecyclerView.Adapter<DetailsPhotoViewHolder>
         onPhotoClickForTransitionListener: OnPhotoClickForTransitionListener,
         onViewHolderBoundListener: OnViewHolderBoundListener
     ) {
-        this.onPhotoClickForTransitionlistener = onPhotoClickForTransitionListener
+        this.onPhotoClickForTransitionListener = onPhotoClickForTransitionListener
         this.onViewHolderBoundListener = onViewHolderBoundListener
     }
 
@@ -75,7 +75,7 @@ class DetailsPropertyPhotoAdapter : RecyclerView.Adapter<DetailsPhotoViewHolder>
                     photo_img.transitionName = "transition$position"
                 }
                 photo_img.setOnClickListener {
-                    onPhotoClickForTransitionlistener.onPhotoClickedForTransition(adapterPosition, it)
+                    onPhotoClickForTransitionListener.onPhotoClickedForTransition(adapterPosition, it)
                 }
             }
         }

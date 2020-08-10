@@ -1,5 +1,6 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.view.View
 import androidx.lifecycle.LiveData
@@ -160,7 +161,6 @@ class EditPropertyViewModel(
         viewModelScope.launch(IO) {
             val inserted = propertyRepository.insertLocalProperty(propertyToInsert)
             withContext(Main) {
-                println("debug : value returned from room ${inserted}")
                 editViewAction.value = EditPropertyViewAction.CloseFragment
                 if (inserted.toInt() != -1) {
                     editEvent.value = EditPropertyEvent.PropertySaved
@@ -198,8 +198,9 @@ class EditPropertyViewModel(
         editViewAction.value = LaunchEditor
     }
 
+    @SuppressLint("DefaultLocale")
     private fun fromEditUiStateToProperty(): Property {
-        var currentPropertyToInsert = propertyInModificationRepository.propertyInModificationLD.value!!
+        val currentPropertyToInsert = propertyInModificationRepository.propertyInModificationLD.value!!
         val photoList = createPhotoList(currentPropertyToInsert.photoList)
         with(currentPropertyToInsert) {
             return Property(
@@ -220,8 +221,8 @@ class EditPropertyViewModel(
                 this@EditPropertyViewModel.createPoiList(propertyPoiMap),
                 propertySoldDate?.toString() ?: "",
                 propertyCreationDate ?: LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
-                getLatitudeOrLongitude(currentPropertyToInsert, GeocodeResolver.LatOrLng.LATITUDE),
-                getLatitudeOrLongitude(currentPropertyToInsert, GeocodeResolver.LatOrLng.LONGITUDE),
+                propertyLat,
+                propertyLng,
                 sharedPreferencesRepo.getUserName()
             )
         }
@@ -271,7 +272,9 @@ class EditPropertyViewModel(
                 propertySoldDate = soldDate,
                 propertyPoiMap = createPoiMap(propertyPoiList),
                 propertyAgent = estateAgent,
-                propertyCreationDate = creationDate
+                propertyCreationDate = creationDate,
+                propertyLat = latitude,
+                propertyLng = longitude
             )
         }
     }
@@ -320,16 +323,35 @@ class EditPropertyViewModel(
     fun onAddressChange(address: String) {
         propertyInModificationRepository.propertyInModificationLD.value =
             propertyInModificationRepository.propertyInModificationLD.value?.copy(propertyAddress = address)
+        fetchNewLatLng()
     }
 
     fun onCityCodeChange(cityCode: String) {
+        fetchNewLatLng()
         propertyInModificationRepository.propertyInModificationLD.value =
             propertyInModificationRepository.propertyInModificationLD.value?.copy(propertyCityCode = cityCode)
     }
 
     fun onCityNameChange(cityName: String) {
+        fetchNewLatLng()
         propertyInModificationRepository.propertyInModificationLD.value =
             propertyInModificationRepository.propertyInModificationLD.value?.copy(propertyCityName = cityName)
+    }
+
+    private fun fetchNewLatLng() {
+        val currentPropertyToInsert = propertyInModificationRepository.propertyInModificationLD.value!!
+        viewModelScope.launch(IO) {
+            val newLat = getLatitudeOrLongitude(currentPropertyToInsert, GeocodeResolver.LatOrLng.LATITUDE)
+            val newLng = getLatitudeOrLongitude(currentPropertyToInsert, GeocodeResolver.LatOrLng.LONGITUDE)
+            withContext(Main) {
+                propertyInModificationRepository.propertyInModificationLD.value =
+                    propertyInModificationRepository.propertyInModificationLD.value
+                        ?.copy(
+                            propertyLat = newLat,
+                            propertyLng = newLng
+                        )
+            }
+        }
     }
 
     fun onPriceChange(price: String) {
@@ -421,7 +443,9 @@ data class EditUiState(
     val propertySoldDate: CharSequence? = null,
     val propertyPoiMap: MutableMap<PointOfInterest, Boolean> = mutableMapOf(),
     val propertyCreationDate: String? = null,
-    val propertyAgent: String? = null
+    val propertyAgent: String? = null,
+    val propertyLat: Double = 0.0,
+    val propertyLng: Double = 0.0
 )
 
 data class PhotoOnEdit(

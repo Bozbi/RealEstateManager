@@ -2,6 +2,7 @@
   <dictionary name="bozbi">
     <words>
       <w>firestore</w>
+      <w>gson</w>
       <w>kotlinx</w>
     </words>
   </dictionary>

@@ -32,7 +32,7 @@ class PhotoViewerRecyclerAdapter : RecyclerView.Adapter<PhotoViewerRecyclerAdapt
         holder.bind(position)
     }
 
-    fun setListener(onViewHolderBoundListener: PhotoViewerRecyclerAdapter.OnViewHolderBound){
+    fun setListener(onViewHolderBoundListener: OnViewHolderBound){
         this.onViewHolderBoundListener = onViewHolderBoundListener
     }
 

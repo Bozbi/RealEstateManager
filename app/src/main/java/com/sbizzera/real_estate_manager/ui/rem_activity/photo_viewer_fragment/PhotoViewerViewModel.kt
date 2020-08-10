@@ -1,6 +1,5 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.photo_viewer_fragment
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,7 +22,6 @@ class PhotoViewerViewModel(
     private val fileHelper: FileHelper
 ) : ViewModel() {
 
-//    var photoList = listOf<PhotoInViewer>()
     var photoList = MutableLiveData<List<PhotoInViewer>>()
     val photoViewerViewAction = SingleLiveEvent<PhotoViewerViewAction>()
 

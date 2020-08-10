@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.fragment_photo_editor.*
 import kotlinx.android.synthetic.main.fragment_photo_editor.view.*
 
 
-class PhotoEditorFragment() : Fragment() {
+class PhotoEditorFragment : Fragment() {
 
     private lateinit var viewModel: PhotoEditorViewModel
 
