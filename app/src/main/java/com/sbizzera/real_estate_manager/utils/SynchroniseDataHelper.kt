@@ -1,15 +1,9 @@
-package com.sbizzera.real_estate_manager.ui.rem_activity
+package com.sbizzera.real_estate_manager.utils
 
-import android.content.BroadcastReceiver
-import android.content.Intent
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.work.impl.utils.ForceStopRunnable
-import com.sbizzera.real_estate_manager.App
 import com.sbizzera.real_estate_manager.data.FirebaseStorageRepository
 import com.sbizzera.real_estate_manager.data.photo.Photo
 import com.sbizzera.real_estate_manager.data.property.Property
 import com.sbizzera.real_estate_manager.data.property.PropertyRepository
-import com.sbizzera.real_estate_manager.utils.FileHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main

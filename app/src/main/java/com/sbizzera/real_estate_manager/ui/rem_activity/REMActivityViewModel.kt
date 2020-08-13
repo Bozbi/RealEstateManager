@@ -8,6 +8,7 @@ import com.sbizzera.real_estate_manager.data.CurrentPropertyIdRepository
 import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyFragment
 import com.sbizzera.real_estate_manager.utils.SharedPreferencesRepo
 import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
+import com.sbizzera.real_estate_manager.utils.SynchroniseDataHelper
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
