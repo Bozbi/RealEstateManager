@@ -5,7 +5,7 @@ import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.P
 
 class CurrentEditedPhotoRepository {
 
-    val currentPhotoLD = MutableLiveData<PhotoOnEdit>()
+    val currentPhotoLD = MutableLiveData<Pair<PhotoOnEdit,Int?>>()
 
     companion object {
         val instance: CurrentEditedPhotoRepository by lazy {

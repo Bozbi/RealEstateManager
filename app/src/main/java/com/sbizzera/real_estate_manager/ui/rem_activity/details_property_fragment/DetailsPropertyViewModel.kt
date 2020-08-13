@@ -12,8 +12,11 @@ import com.sbizzera.real_estate_manager.data.property.PointOfInterest
 import com.sbizzera.real_estate_manager.data.property.Property
 import com.sbizzera.real_estate_manager.data.property.PropertyRepository
 import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyViewModel.DetailsViewAction.ModifyPropertyClicked
+import com.sbizzera.real_estate_manager.utils.CUSTOM_DATE_FORMATTER
 import com.sbizzera.real_estate_manager.utils.FileHelper
 import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
+import org.threeten.bp.format.DateTimeFormatter
+import java.time.LocalDateTime
 
 
 class DetailsPropertyViewModel(
@@ -98,7 +101,9 @@ class DetailsPropertyViewModel(
 
     private fun createAvailabilityText(creationDate: String, soldDate: String): String {
         return if (soldDate.isEmpty()) {
-            "available since $creationDate"
+            val date = org.threeten.bp.LocalDateTime.parse(creationDate, DateTimeFormatter.ISO_DATE_TIME)
+            val stringDate = date.format(CUSTOM_DATE_FORMATTER)
+            "available since $stringDate"
         } else {
             "sold on $soldDate"
         }

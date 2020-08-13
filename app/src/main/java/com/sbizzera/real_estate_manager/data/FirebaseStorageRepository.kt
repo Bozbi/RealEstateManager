@@ -1,7 +1,9 @@
 package com.sbizzera.real_estate_manager.data
 
 import android.net.Uri
+import com.bumptech.glide.Glide
 import com.google.firebase.storage.FirebaseStorage
+import com.sbizzera.real_estate_manager.App
 import kotlinx.coroutines.tasks.await
 import java.io.File
 
@@ -24,6 +26,8 @@ class FirebaseStorageRepository private constructor() {
     }
 
     fun downloadImage(name: String,file:File) {
-        storageRef.child("$name.jpg").getFile(file)
+        storageRef.child("$name.jpg").getFile(file).addOnCompleteListener {
+            println("debug : img download completed")
+        }
     }
 }

@@ -1,6 +1,8 @@
 package com.sbizzera.real_estate_manager.utils
 
 import android.content.ContentResolver
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.core.content.FileProvider
@@ -63,11 +65,22 @@ class FileHelper private constructor() {
                 appContext.contentResolver.getFileName(Uri.parse(path))
             )
         }
+
+        val bmpOptions = BitmapFactory.Options()
+        var bitmap = BitmapFactory.decodeFile(fileToCopy.absolutePath, bmpOptions)
+
         val fileDir = File("${appContext.filesDir}/$propertyId")
         fileDir.mkdir()
         val newFileName = "${photoId}.jpg"
         val newFile = File(fileDir, newFileName)
-        fileToCopy.copyTo(newFile, true)
+
+
+        val fOut = FileOutputStream(newFile)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, fOut)
+        fOut.close()
+        fOut.flush()
+
+
         return Uri.fromFile(newFile).toString()
     }
 
@@ -80,7 +93,7 @@ class FileHelper private constructor() {
         return "${appContext.filesDir}/$propertyId/$fileName.jpg"
     }
 
-    fun deleteOldPhotosFromPropertyDirectory(propertyId: String,photoList:List<Photo>) {
+    fun deleteOldPhotosFromPropertyDirectory(propertyId: String, photoList: List<Photo>) {
         val dir = File("${appContext.filesDir}/${propertyId}")
         val files = dir.listFiles()
         files?.forEach { file ->

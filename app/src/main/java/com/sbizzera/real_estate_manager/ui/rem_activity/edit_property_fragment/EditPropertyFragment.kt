@@ -2,6 +2,7 @@ package com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment
 
 import android.app.DatePickerDialog
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,8 +30,6 @@ import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEventListenab
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyViewModel.EditPropertyViewAction.*
 import com.sbizzera.real_estate_manager.utils.ViewModelFactory
 import com.sbizzera.real_estate_manager.utils.custom_views.MyCustomChip
-import com.sbizzera.real_estate_manager.utils.intent_contracts.TakePictureContract
-import com.sbizzera.real_estate_manager.utils.intent_contracts.TakePictureFromGalleryContract
 import kotlinx.android.synthetic.main.fragment_edit_property.*
 
 class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransactionEventListenable,
@@ -68,37 +67,42 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
         }
         viewModel.editViewAction.observe(viewLifecycleOwner) { viewAction ->
             when (viewAction) {
+
                 is TakePhotoFromCamera -> {
-                    registerForActivityResult(
-                        TakePictureContract(fileHelper = viewAction.fileHelper)
-                    ) {
-                        it?.let { launchEditorWithUriReceived(it) }
-                    }.launch(null)
+                    onUserAskTransactionEventListener.onCameraAsked(viewAction.tempPhotoUri)
                 }
 
                 is TakePhotoFromGallery -> {
-                    registerForActivityResult(
-                        TakePictureFromGalleryContract(fileHelper = viewAction.fileHelper)
-                    ) {
-                        it?.let { launchEditorWithUriReceived(it) }
-                    }.launch(null)
+                    onUserAskTransactionEventListener.onGalleryAsked()
                 }
+
                 LaunchEditor -> onUserAskTransactionEventListener.onPhotoEditorAsked()
-                is MoveRecyclerToPosition -> mLayoutManager.scrollToPosition(viewAction.position)
+
+                is MoveRecyclerToPosition -> {
+                    mLayoutManager.scrollToPosition(viewAction.position)
+                }
+
                 is DisplayDatePicker -> {
                     val datePicker =
                         DatePickerDialog(requireContext(), this, viewAction.year, viewAction.month, viewAction.day)
                     datePicker.show()
                 }
+
                 FillInError -> Snackbar.make(
                     property_title_edt,
-                    "Insert at least one photo and fill correctly the form",
+                    "Fill all necessary fields",
                     Snackbar.LENGTH_LONG
                 ).show()
 
                 CloseFragment -> {
                     activity?.supportFragmentManager?.popBackStack()
                 }
+
+                NoPhotoError -> Snackbar.make(
+                    property_title_edt,
+                    "Insert at least one photo",
+                    Snackbar.LENGTH_LONG
+                ).show()
             }
         }
 
@@ -118,6 +122,7 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
         recyclerView = property_photos_recycler_view.apply {
             layoutManager = mLayoutManager
             adapter = recyclerViewAdapter
+            isNestedScrollingEnabled = false
         }
 
         recyclerViewAdapter.setListener(this)
@@ -145,16 +150,16 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
         }
 
 
-        property_address_edt.afterTextChangedDelayed { address->
+        property_address_edt.afterTextChangedDelayed { address ->
             viewModel.onAddressChange(address)
         }
 
-        property_city_code_edt.afterTextChangedDelayed {cityCode->
+        property_city_code_edt.afterTextChangedDelayed { cityCode ->
             viewModel.onCityCodeChange(cityCode)
 
         }
 
-        property_city_name_edt.afterTextChangedDelayed {cityName->
+        property_city_name_edt.afterTextChangedDelayed { cityName ->
             viewModel.onCityNameChange(cityName)
         }
 
@@ -196,11 +201,12 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
         save_property_btn.setOnClickListener {
             viewModel.savePropertyClicked()
         }
+
+        property_sold_date_layout.setEndIconOnClickListener {
+            viewModel.onClearSoldDate()
+        }
     }
 
-    private fun launchEditorWithUriReceived(it: String) {
-        viewModel.onPhotoSelected(it)
-    }
 
     private fun addChips() {
         PointOfInterest.values().forEach {
@@ -242,7 +248,7 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
         property_room_count_edt.updateIfDifferent(uiState.propertyRoomCount)
         property_bedroom_count_edt.updateIfDifferent(uiState.propertyBedroomCount)
         property_bathroom_count_edt.updateIfDifferent(uiState.propertyBathroomCount)
-        property_sold_date_edt.updateIfDifferent(uiState.propertySoldDate)
+        property_sold_date_edt.setText(uiState.propertySoldDate)
         uiState.propertyPoiMap.forEach {
             chip_group.findViewWithTag<MyCustomChip>(it.key.name).updateIfDifferent(it.value)
         }
@@ -262,6 +268,22 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
 
     fun setOnPropertySavedListener(onPropertySavedListener: OnPropertySavedListener) {
         this.onPropertySavedListener = onPropertySavedListener
+    }
+
+    override fun onResume() {
+        super.onResume()
+        recyclerViewAdapter.notifyDataSetChanged()
+        viewModel.moveToPosition()
+    }
+
+    fun onResultFromCamera() {
+        viewModel.onResultFromCamera()
+    }
+
+    fun onResultFromGallery(tempPhotoUri: Uri?) {
+        tempPhotoUri?.let {
+            viewModel.onResultFromGallery(it)
+        }
     }
 
 }

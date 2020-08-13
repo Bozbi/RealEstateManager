@@ -25,12 +25,12 @@
 
         <ImageView
             android:id="@+id/add_photo_img"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintHeight_percent="0.25"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@id/property_photos_recycler_view"
+            app:layout_constraintBottom_toBottomOf="@id/property_photos_recycler_view"
             android:visibility="visible"
             android:src="@drawable/ic_add_a_photo"
             android:tint="@color/colorPrimaryDark"
@@ -304,18 +304,20 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="8dp"
-            android:clickable="true"
-            android:focusable="true"
             android:hint="Sold on"
-            android:inputType="none"
+            android:layout_marginHorizontal="8dp"
             app:layout_constraintLeft_toLeftOf="parent"
+            app:startIconDrawable="@drawable/ic_calendar"
+            app:endIconDrawable="@drawable/ic_close_rounded"
+            app:endIconMode="clear_text"
             app:layout_constraintTop_toBottomOf="@+id/chip_group">
 
-            <com.sbizzera.real_estate_manager.utils.custom_views.MyCustomEditText
+
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/property_sold_date_edt"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:inputType="date"
                 android:focusable="false"
                 android:clickable="false"
                 />

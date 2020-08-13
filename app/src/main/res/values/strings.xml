@@ -9,4 +9,10 @@
     <string name="property_price_error">Price must be correctly filled</string>
     <string name="property_type_error">Type must be correctly filled</string>
     <string name="property_surface_error">Surface must be correctly filled</string>
+    <string name="image_content_description">image</string>
+    <string name="modify_property_btn_text">modify property</string>
+    <string name="surface_text">Surface</string>
+    <string name="rooms_text">Rooms</string>
+    <string name="bedrooms_txt">Bedrooms</string>
+    <string name="bathrooms_txt">Bathrooms</string>
 </resources>

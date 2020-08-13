@@ -78,7 +78,7 @@
             android:inputType="text"
             android:id="@+id/photo_title_edit_text"
             android:layout_width="match_parent"
-            android:maxLength="25"
+            android:maxLength="22"
             android:layout_height="match_parent" />
 
     </com.google.android.material.textfield.TextInputLayout>

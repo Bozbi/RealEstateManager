@@ -56,6 +56,7 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
             }
         }
         recycler_view.layoutManager = detailsLayoutManager
+        recycler_view.isNestedScrollingEnabled = false
 
         viewModelDetails.detailsUiStateLD.observe(viewLifecycleOwner) { model ->
             updateUi(model)

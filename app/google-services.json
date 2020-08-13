@@ -1,42 +1,34 @@
 {
   "project_info": {
-    "project_number": "593476662945",
-    "firebase_url": "https://real-estate-manager-cb5c3.firebaseio.com",
-    "project_id": "real-estate-manager-cb5c3",
-    "storage_bucket": "real-estate-manager-cb5c3.appspot.com"
+    "project_number": "795592986110",
+    "firebase_url": "https://realestatemanager-282607.firebaseio.com",
+    "project_id": "realestatemanager-282607",
+    "storage_bucket": "realestatemanager-282607.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:593476662945:android:17950ba7443916b8b522e0",
+        "mobilesdk_app_id": "1:795592986110:android:0df7ea0b5bc26cd08e04af",
         "android_client_info": {
           "package_name": "com.sbizzera.real_estate_manager"
         }
       },
       "oauth_client": [
         {
-          "client_id": "593476662945-cmqvcqian0shfj3rgd4jiiu4kqjc6jpv.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.sbizzera.real_estate_manager",
-            "certificate_hash": "426d7c931c15e217d37abefda2d95d51916c9853"
-          }
-        },
-        {
-          "client_id": "593476662945-ub8kimappnhml7u94d89fcmtu1utqbkg.apps.googleusercontent.com",
+          "client_id": "795592986110-p5vca7vnnm06pfc23ga022h97t0d8mbo.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCNjmq1ByEQ_TzDLu20Yf-SF-Wa7kqo1ZE"
+          "current_key": "AIzaSyBmCY_w3jCFT4__AQ99Ay7JBf_3wbHXBWY"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "593476662945-ub8kimappnhml7u94d89fcmtu1utqbkg.apps.googleusercontent.com",
+              "client_id": "795592986110-p5vca7vnnm06pfc23ga022h97t0d8mbo.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

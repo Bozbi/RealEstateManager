@@ -1,5 +1,8 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -79,6 +82,18 @@ class ListPropertyFragment : Fragment(), OnPropertyClickEvent, OnUserAskTransact
         filter_txt.setOnClickListener {
             FilterDialog.newInstance().show(activity?.supportFragmentManager!!,null)
         }
+
+        val receiver = object :BroadcastReceiver(){
+            override fun onReceive(context: Context?, intent: Intent?) {
+                println("debug : received")
+            }
+        }
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+
     }
 
     override fun onPropertyItemClick(propertyId: String) {

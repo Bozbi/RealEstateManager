@@ -1,16 +1,21 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity
 
 
+import android.app.Activity
+import android.content.ClipData
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import com.google.android.material.snackbar.Snackbar
 import com.sbizzera.real_estate_manager.R
@@ -26,15 +31,17 @@ import com.sbizzera.real_estate_manager.ui.rem_activity.photo_editor.PhotoEditor
 import com.sbizzera.real_estate_manager.ui.rem_activity.photo_viewer_fragment.PhotoViewerFragment
 import com.sbizzera.real_estate_manager.utils.ViewModelFactory
 import kotlinx.android.synthetic.main.activity_r_e_m.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySavedListener {
 
+    private val CAMERA_INTENT_REQUEST_CODE = 123
+    private val GALLERY_INTENT_REQUEST_CODE = 124
+
     private lateinit var viewModel: REMActivityViewModel
     private lateinit var mMenu: Menu
+
+    var mContract: ActivityResultContract<Uri, Boolean>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,7 +83,8 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
 
                     supportFragmentManager.beginTransaction().replace(
                         R.id.details_container,
-                        EditPropertyFragment.newInstance()
+                        EditPropertyFragment.newInstance(),
+                        EditPropertyFragment::class.java.simpleName
                     ).addToBackStack(EditPropertyFragment::class.java.simpleName).commit()
                 }
                 LaunchMap -> {
@@ -113,16 +121,6 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
                 }
                 ShowChooseUserDialog -> {
                     val dialog = ChooseUserMaterialDialog()
-                    dialog.setListener(object : ChooseUserMaterialDialog.DialogDismissListener {
-                        override fun onDialogDismiss(userName: String) {
-                            lifecycleScope.launch(Dispatchers.IO) {
-                                viewModel.setUserNameInSharedPrefs(userName)
-                                withContext(Dispatchers.Main) {
-                                    viewModel.checkUserIsLogged()
-                                }
-                            }
-                        }
-                    })
                     dialog.show(supportFragmentManager, null)
                 }
                 HideBackButton -> {
@@ -130,6 +128,14 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
                         it.setDisplayShowHomeEnabled(false)
                         it.setDisplayHomeAsUpEnabled(false)
                     }
+                }
+                LaunchSync -> {
+                    sync_background.visibility = View.VISIBLE
+                    sync_progress.visibility = View.VISIBLE
+                }
+                SyncEnd -> {
+                    sync_background.visibility = View.GONE
+                    sync_progress.visibility = View.GONE
                 }
             }
         }
@@ -149,10 +155,7 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
             onBackPressed()
         }
 
-        viewModel.checkUserIsLogged()
     }
-
-
 
 
     override fun onAttachFragment(fragment: Fragment) {
@@ -176,13 +179,7 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
                 viewModel.syncLocalAndRemoteData()
             }
             R.id.disconnect -> {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    viewModel.logOut()
-                    withContext(Dispatchers.Main) {
-                        viewModel.checkUserIsLogged()
-                    }
-
-                }
+                viewModel.logOut()
             }
         }
         return true
@@ -214,7 +211,11 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
 
     override fun onPropertySaved() {
         val contextView = findViewById<View>(R.id.details_container)
-        Snackbar.make(contextView, "Property has been saved in your hardware. Synchronise to push it to other agents", Snackbar.LENGTH_LONG).show()
+        Snackbar.make(
+            contextView,
+            "Property has been saved in your hardware. Synchronise to push it to other agents",
+            Snackbar.LENGTH_LONG
+        ).show()
     }
 
     override fun onBackPressed() {
@@ -224,10 +225,41 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
 
     private fun checkBackIconDisplay() {
         val backStackList = mutableListOf<String>()
-        for(i in 0 until supportFragmentManager.backStackEntryCount){
+        for (i in 0 until supportFragmentManager.backStackEntryCount) {
             backStackList.add(supportFragmentManager.getBackStackEntryAt(i).name!!)
         }
         viewModel.shouldDisplayBackIconAndClearCurrentPropertyRepo(backStackList)
+    }
+
+    override fun onCameraAsked(tempPhotoUri: Uri) {
+        val takePictureIntent2 = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        takePictureIntent2.resolveActivity(packageManager)
+        takePictureIntent2.putExtra(MediaStore.EXTRA_OUTPUT, tempPhotoUri)
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
+            takePictureIntent2.clipData = ClipData.newRawUri("", tempPhotoUri)
+            takePictureIntent2.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        //TODO RegisterForActivityResult issue. no other way to get result
+        startActivityForResult(takePictureIntent2, CAMERA_INTENT_REQUEST_CODE)
+
+    }
+
+    override fun onGalleryAsked() {
+        startActivityForResult(Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI),GALLERY_INTENT_REQUEST_CODE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+        if (requestCode == CAMERA_INTENT_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                (supportFragmentManager.fragments.filter { it.tag == EditPropertyFragment::class.java.simpleName }[0] as EditPropertyFragment).onResultFromCamera()
+            }
+        }
+        if (requestCode == GALLERY_INTENT_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                (supportFragmentManager.fragments.filter { it.tag == EditPropertyFragment::class.java.simpleName }[0] as EditPropertyFragment).onResultFromGallery(intent?.data)
+            }
+        }
     }
 
 }

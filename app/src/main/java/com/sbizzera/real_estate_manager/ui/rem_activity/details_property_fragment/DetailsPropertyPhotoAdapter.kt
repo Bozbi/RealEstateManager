@@ -13,7 +13,10 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyPhotoAdapter.DetailsPhotoViewHolder
+import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.photo_in_detail_item.view.*
+import java.lang.Exception
 
 class DetailsPropertyPhotoAdapter : RecyclerView.Adapter<DetailsPhotoViewHolder>() {
 
@@ -48,28 +51,16 @@ class DetailsPropertyPhotoAdapter : RecyclerView.Adapter<DetailsPhotoViewHolder>
     inner class DetailsPhotoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(position: Int) {
             with(itemView) {
-                Glide.with(this).load(photoList[position].photoUri).listener(object : RequestListener<Drawable> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
+                Picasso.get().load("file://${photoList[position].photoUri}").into(photo_img,object : Callback{
+                    override fun onSuccess() {
                         onViewHolderBoundListener.onViewHolderBound(position)
-                        return false
                     }
 
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
+                    override fun onError(e: Exception?) {
                         onViewHolderBoundListener.onViewHolderBound(position)
-                        return false
                     }
-                }).into(photo_img)
+
+                })
                 photo_title_txt.text = photoList[position].photoTitle
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     photo_img.transitionName = "transition$position"

@@ -24,6 +24,7 @@ import org.threeten.bp.Instant
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
+import org.threeten.bp.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.set
 
@@ -129,7 +130,7 @@ class ListPropertyViewModel(
         if (soldDate.isEmpty()) {
             return false
         }
-        val soldDateLocalDate = LocalDate.parse(soldDate, CUSTOM_DATE_FORMATTER)
+        val soldDateLocalDate = LocalDate.parse(soldDate, DateTimeFormatter.ISO_DATE_TIME)
         val rangeBeginLocalDate =
             LocalDateTime.ofInstant(Instant.ofEpochMilli(soldDateRange.first), ZoneOffset.UTC).toLocalDate()
         val rangeEndLocalDate =
@@ -150,7 +151,7 @@ class ListPropertyViewModel(
         if (creationDate.isEmpty()) {
             return false
         }
-        val creationDateLocalDate = LocalDate.parse(creationDate, CUSTOM_DATE_FORMATTER)
+        val creationDateLocalDate = LocalDate.parse(creationDate, DateTimeFormatter.ISO_DATE_TIME)
         val rangeBeginLocalDate =
             LocalDateTime.ofInstant(Instant.ofEpochMilli(creationDateRange.first), ZoneOffset.UTC).toLocalDate()
         val rangeEndLocalDate =

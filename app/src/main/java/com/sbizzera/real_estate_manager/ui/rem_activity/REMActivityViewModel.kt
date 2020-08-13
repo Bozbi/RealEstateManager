@@ -1,6 +1,7 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity
 
 import android.view.View
+import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sbizzera.real_estate_manager.data.CurrentPropertyIdRepository
@@ -8,7 +9,9 @@ import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragmen
 import com.sbizzera.real_estate_manager.utils.SharedPreferencesRepo
 import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class REMActivityViewModel(
@@ -18,7 +21,11 @@ class REMActivityViewModel(
 ) : ViewModel() {
 
     val viewAction = SingleLiveEvent<ViewAction>()
+    private lateinit var activityResultLauncher: ActivityResultLauncher<String>
 
+    init {
+        checkUserIsLogged()
+    }
 
     fun onPhotoEditorAsked() {
         viewAction.value = ViewAction.LaunchPhotoEditor
@@ -37,8 +44,12 @@ class REMActivityViewModel(
     }
 
     fun syncLocalAndRemoteData() {
+        viewAction.value = ViewAction.LaunchSync
         viewModelScope.launch(IO) {
             synchroniseDataHelper.synchroniseData()
+            withContext(Main) {
+                viewAction.value = ViewAction.SyncEnd
+            }
         }
     }
 
@@ -46,7 +57,7 @@ class REMActivityViewModel(
         viewAction.value = ViewAction.LaunchPhotoViewer(transitionView)
     }
 
-    fun checkUserIsLogged() {
+    private fun checkUserIsLogged() {
         val userName = sharedPreferencesRepo.getUserName()
         if (userName == null) {
             viewAction.value = ViewAction.ShowChooseUserDialog
@@ -59,13 +70,20 @@ class REMActivityViewModel(
                 trim { it == ' ' }
                 toUpperCase(Locale.getDefault())
             }
-
-            sharedPreferencesRepo.insertUserName(userNameNormalised)
+            viewModelScope.launch(IO) {
+               sharedPreferencesRepo.insertUserName(userNameNormalised)
+                withContext(Main) {
+                    checkUserIsLogged()
+                }
+            }
+        }else{
+            checkUserIsLogged()
         }
     }
 
     fun logOut() {
         sharedPreferencesRepo.insertUserName(null)
+        checkUserIsLogged()
     }
 
     private fun clearCurrentPropertyId() {
@@ -73,11 +91,13 @@ class REMActivityViewModel(
     }
 
     fun shouldDisplayBackIconAndClearCurrentPropertyRepo(backStackList: MutableList<String>) {
-        if(!backStackList.contains(DetailsPropertyFragment::class.java.simpleName)){
+        if (!backStackList.contains(DetailsPropertyFragment::class.java.simpleName)) {
             clearCurrentPropertyId()
             viewAction.value = ViewAction.HideBackButton
         }
     }
+
+
 
     sealed class ViewAction {
         object LaunchPhotoEditor : ViewAction()
@@ -87,6 +107,8 @@ class REMActivityViewModel(
         class LaunchPhotoViewer(val transitionView: View) : ViewAction()
         object ShowChooseUserDialog : ViewAction()
         object HideBackButton : ViewAction()
+        object LaunchSync : ViewAction()
+        object SyncEnd : ViewAction()
     }
 
 }

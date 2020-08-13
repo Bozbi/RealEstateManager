@@ -1,5 +1,10 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity
 
+import android.content.BroadcastReceiver
+import android.content.Intent
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.work.impl.utils.ForceStopRunnable
+import com.sbizzera.real_estate_manager.App
 import com.sbizzera.real_estate_manager.data.FirebaseStorageRepository
 import com.sbizzera.real_estate_manager.data.photo.Photo
 import com.sbizzera.real_estate_manager.data.property.Property
@@ -38,7 +43,6 @@ class SynchroniseDataHelper(
                 if (isRemoteModificationDateMoreRecent) {
                     CoroutineScope(IO).launch {
                         updateExistingLocalPropertyAndPhoto(localPropertyToWorkOn[0], remoteProperty)
-
                     }
                 }
             } else {

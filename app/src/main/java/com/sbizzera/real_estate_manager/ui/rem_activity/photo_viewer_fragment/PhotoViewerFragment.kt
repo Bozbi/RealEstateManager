@@ -62,9 +62,6 @@ class PhotoViewerFragment : Fragment(), PhotoViewerRecyclerAdapter.OnViewHolderB
             }
         }
 
-        viewModel.photoList.observe(viewLifecycleOwner){photoList->
-            updateUi(photoList)
-        }
 
         photoViewerAdapter = PhotoViewerRecyclerAdapter()
         photoViewerAdapter.setListener(this)
@@ -78,8 +75,6 @@ class PhotoViewerFragment : Fragment(), PhotoViewerRecyclerAdapter.OnViewHolderB
             LinearLayoutManager.HORIZONTAL,
             false
         )
-        photoViewerLayoutManager.scrollToPosition(viewModel.getCurrentPhotoPosition())
-
         recycler_view.layoutManager = photoViewerLayoutManager
 
         recycler_view.addOnScrollListener(object :RecyclerView.OnScrollListener(){
@@ -107,6 +102,12 @@ class PhotoViewerFragment : Fragment(), PhotoViewerRecyclerAdapter.OnViewHolderB
                 }
             }
         })
+
+        viewModel.photoList.observe(viewLifecycleOwner){photoList->
+            updateUi(photoList)
+            photoViewerLayoutManager.scrollToPosition(viewModel.getCurrentPhotoPosition())
+        }
+
     }
 
     private fun updateUi(photoList: List<PhotoInViewer>) {

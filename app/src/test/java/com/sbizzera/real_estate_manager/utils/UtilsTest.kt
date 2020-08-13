@@ -13,7 +13,6 @@ import org.threeten.bp.LocalDate
 @PrepareForTest(Utils::class, LocalDate::class)
 class UtilsTest {
 
-
     private lateinit var utils: Utils
 
     @Before

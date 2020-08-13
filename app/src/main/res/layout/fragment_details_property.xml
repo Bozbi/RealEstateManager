@@ -10,72 +10,70 @@
     android:focusable="true"
     tools:context=".ui.rem_activity.details_property_fragment.DetailsPropertyFragment">
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="@dimen/dp_16"
+        >
 
-
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/title_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Maison Charentaise"
+            tools:text="Maison Charentaise"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
-
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/type_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=" - Maison - "
-            android:textColor="@color/colorPrimary"
-            app:layout_constraintTop_toBottomOf="@id/price_txt"
+            tools:text=" - Maison - "
+            android:textSize="14sp"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="italic"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:textStyle="italic"
-            />
+            app:layout_constraintTop_toBottomOf="@id/price_txt" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/price_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="$350,00000"
+            tools:text="$350,00000"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="18sp"
-            app:layout_constraintTop_toBottomOf="@+id/title_txt"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/title_txt"
 
             />
 
         <ImageView
+            android:contentDescription="@string/image_content_description"
             android:id="@+id/date_icon"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:src="@drawable/ic_calendar"
             android:tint="@color/colorPrimaryDark"
             app:layout_constraintEnd_toStartOf="@+id/availability_txt"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/type_txt" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/availability_txt"
             android:layout_width="wrap_content"
-            app:layout_constrainedWidth="true"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="available since 15/08/45"
-            android:textColor="@color/colorPrimary"
-            android:textSize="12sp"
+           tools:text="available since 15/08/45"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@id/date_icon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/date_icon"
@@ -85,102 +83,111 @@
             android:id="@+id/recycler_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginVertical="16dp"
-            app:layout_constraintHeight_percent="0.20"
-            app:layout_constraintLeft_toLeftOf="@id/surface_label"
-            app:layout_constraintRight_toRightOf="@id/bathroom_label"
+            android:layout_marginTop="@dimen/dp_16"
+            app:layout_constraintHeight_percent="0.22"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/date_icon"
             tools:showIn="@layout/list_property_item_view" />
 
-
         <ImageView
+            android:contentDescription="@string/image_content_description"
             android:id="@+id/surface_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:rotation="90"
             android:src="@drawable/ic_surface"
             android:tint="@color/colorPrimaryDark"
+            app:layout_constraintEnd_toStartOf="@id/surface_txt"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="@id/surface_label"
-            app:layout_constraintTop_toBottomOf="@id/surface_label"
+            app:layout_constraintTop_toBottomOf="@id/surface_label" />
 
-            />
-
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/surface_label"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Surface"
+            android:gravity="center"
+            android:text="@string/surface_text"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="12sp"
+            android:textSize="14sp"
             app:layout_constraintEnd_toStartOf="@+id/room_label"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/recycler_view" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/surface_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:text="90m2"
+            tools:text="90m2"
             android:textColor="@color/colorPrimary"
-            android:textSize="12sp"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@id/surface_icon"
+            app:layout_constraintEnd_toEndOf="@id/surface_label"
             app:layout_constraintStart_toEndOf="@id/surface_icon"
             app:layout_constraintTop_toTopOf="@id/surface_icon" />
 
         <ImageView
+            android:contentDescription="@string/image_content_description"
             android:id="@+id/room_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_home"
             android:tint="@color/colorPrimaryDark"
+            app:layout_constraintEnd_toStartOf="@id/room_txt"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="@+id/room_label"
             app:layout_constraintTop_toBottomOf="@id/room_label" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/room_label"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Rooms"
+            android:gravity="center"
+            android:text="@string/rooms_text"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="12sp"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@+id/surface_label"
             app:layout_constraintEnd_toStartOf="@+id/bedroom_label"
             app:layout_constraintStart_toEndOf="@+id/surface_label"
-            app:layout_constraintTop_toTopOf="@+id/surface_label"
+            app:layout_constraintTop_toTopOf="@+id/surface_label" />
 
-            />
-
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/room_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:text="8"
+            tools:text="8"
             android:textColor="@color/colorPrimary"
-            android:textSize="12sp"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@id/room_icon"
+            app:layout_constraintEnd_toEndOf="@id/room_label"
             app:layout_constraintStart_toEndOf="@id/room_icon"
             app:layout_constraintTop_toTopOf="@id/room_icon" />
 
         <ImageView
+            android:contentDescription="@string/image_content_description"
             android:id="@+id/bedroom_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_bed"
             android:tint="@color/colorPrimaryDark"
+            app:layout_constraintEnd_toStartOf="@id/bedroom_txt"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="@+id/bedroom_label"
             app:layout_constraintTop_toBottomOf="@id/bedroom_label" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/bedroom_label"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Bedrooms"
+            android:gravity="center"
+            android:text="@string/bedrooms_txt"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="12sp"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@+id/surface_label"
             app:layout_constraintEnd_toStartOf="@+id/bathroom_label"
             app:layout_constraintStart_toEndOf="@+id/room_label"
@@ -188,34 +195,39 @@
 
             />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/bedroom_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:text="4"
+            tools:text="4"
             android:textColor="@color/colorPrimary"
-            android:textSize="12sp"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@id/bedroom_icon"
+            app:layout_constraintEnd_toEndOf="@id/bedroom_label"
             app:layout_constraintStart_toEndOf="@id/bedroom_icon"
             app:layout_constraintTop_toTopOf="@id/bedroom_icon" />
 
         <ImageView
+            android:contentDescription="@string/image_content_description"
             android:id="@+id/bathroom_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_bath"
             android:tint="@color/colorPrimaryDark"
+            app:layout_constraintEnd_toStartOf="@id/bathroom_txt"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="@+id/bathroom_label"
             app:layout_constraintTop_toBottomOf="@id/bathroom_label" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/bathroom_label"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Bathrooms"
+            android:gravity="center"
+            android:text="@string/bathrooms_txt"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="12sp"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@id/surface_label"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/bedroom_label"
@@ -223,142 +235,125 @@
 
             />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/bathroom_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:text="4"
+            tools:text="4"
             android:textColor="@color/colorPrimary"
-            android:textSize="12sp"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@id/bathroom_icon"
+            app:layout_constraintEnd_toEndOf="@id/bathroom_label"
             app:layout_constraintStart_toEndOf="@id/bathroom_icon"
             app:layout_constraintTop_toTopOf="@id/bathroom_icon" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/description_txt"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:gravity="center"
-            android:text="C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description."
-            android:textColor="@color/colorPrimary"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="@id/bathroom_label"
-            app:layout_constraintStart_toStartOf="@id/surface_label"
-            app:layout_constraintTop_toBottomOf="@id/surface_icon" />
+            android:gravity="center_horizontal"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/surface_icon"
+            tools:text="C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description.C'est une Description." />
 
 
         <ImageView
+            android:contentDescription="@string/image_content_description"
             android:id="@+id/pinpoint_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
             android:src="@drawable/ic_pinpoint"
             android:tint="@color/colorPrimaryDark"
             app:layout_constraintEnd_toStartOf="@id/address_txt"
-            app:layout_constraintHorizontal_bias="1"
             app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="@id/surface_label"
-            app:layout_constraintTop_toTopOf="@+id/address_txt" />
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="@dimen/dp_16"
+            app:layout_constraintTop_toBottomOf="@id/description_txt" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/address_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="6 rue de l'artillerie\n17000 LsqdfmlkjmsqlkRochelle"
-            android:textColor="@color/colorPrimary"
-            android:textSize="12sp"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintBottom_toTopOf="@+id/poi_txt"
-            app:layout_constraintEnd_toStartOf="@id/center_space"
-            app:layout_constraintHorizontal_bias="0"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/pinpoint_icon"
-            app:layout_constraintVertical_chainStyle="packed"
-            android:layout_marginBottom="12dp"
-            app:layout_constraintTop_toTopOf="@id/center_space"/>
+            app:layout_constraintTop_toTopOf="@id/pinpoint_icon"
+            tools:text="6 rur de l'artillerie \n170000 La Rochelle" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/poi_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Near schools"
-            android:textColor="@color/colorPrimary"
-            android:textSize="12sp"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="14sp"
+            android:layout_marginEnd="48dp"
+            android:layout_marginTop="10dp"
             app:layout_constrainedWidth="true"
-            app:layout_constraintBottom_toBottomOf="@+id/map_img"
-            app:layout_constraintEnd_toStartOf="@id/center_space"
-            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/poi_icon"
-            app:layout_constraintTop_toBottomOf="@id/address_txt" />
+            app:layout_constraintTop_toBottomOf="@id/address_txt"
+            tools:text="Near schools mkjqs"/>
 
         <ImageView
+            android:contentDescription="@string/image_content_description"
             android:id="@+id/poi_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
+            android:layout_marginStart="48dp"
             android:src="@drawable/ic_location"
             android:tint="@color/colorPrimaryDark"
             app:layout_constraintEnd_toStartOf="@+id/poi_txt"
-            app:layout_constraintHorizontal_bias="1"
             app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="@id/surface_label"
-            app:layout_constraintTop_toTopOf="@id/poi_txt"
-            />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierDirection="end"
-            app:constraint_referenced_ids="pinpoint_icon,poi_icon" />
-
-
-        <Space
-            android:id="@+id/center_space"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/description_txt"
-            app:layout_constraintWidth_percent="0.15" />
+            app:layout_constraintTop_toTopOf="@id/poi_txt" />
 
 
         <ImageView
+            android:contentDescription="@string/image_content_description"
             android:id="@+id/map_img"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/poi_txt"
+            android:layout_marginTop="16dp"
+            app:layout_constraintWidth_max="350dp"
+            android:minWidth="200dp"
             app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintEnd_toEndOf="@id/bathroom_label"
-            app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintStart_toEndOf="@id/center_space"
-            app:layout_constraintTop_toTopOf="@id/center_space" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/added_by_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="added by"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/map_img"
             android:layout_marginTop="18dp"
+            tools:text="added by"
             android:textSize="14sp"
-            />
+            android:textColor="@color/colorPrimary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/map_img" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/modify_btn"
+            style="@style/Widget.MaterialComponents.Button.TextButton.Dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            app:layout_constraintTop_toBottomOf="@id/map_img"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:text="modify property"
             android:gravity="center"
-            android:textSize="12sp"
-            style="@style/Widget.MaterialComponents.Button.TextButton.Dialog"
-            />
+            android:text="@string/modify_property_btn_text"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/map_img" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

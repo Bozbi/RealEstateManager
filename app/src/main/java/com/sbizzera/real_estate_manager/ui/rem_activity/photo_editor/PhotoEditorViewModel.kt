@@ -13,15 +13,18 @@ class PhotoEditorViewModel(
 ) : ViewModel() {
 
     val photoEditorViewAction = SingleLiveEvent<PhotoEditorViewAction>()
-    val currentPhotoEdited = currentEditedPhotoRepository.currentPhotoLD.value!!
+    val currentPhotoEdited = currentEditedPhotoRepository.currentPhotoLD.value!!.first
 
 
     fun onDeletePhotoInEditor() {
         val currentPhotoList = propertyInModificationRepository.propertyInModificationLD.value!!.photoList
-        val currentPhotoEdited = currentEditedPhotoRepository.currentPhotoLD.value!!
+        val currentPhotoEdited = currentEditedPhotoRepository.currentPhotoLD.value!!.first
         currentPhotoList.remove(currentPhotoEdited)
         propertyInModificationRepository.propertyInModificationLD.value =
             propertyInModificationRepository.propertyInModificationLD.value!!.copy(photoList = currentPhotoList)
+        currentEditedPhotoRepository.currentPhotoLD.value!!.second?.let {
+            currentEditedPhotoRepository.currentPhotoLD.value ==null
+        }
         photoEditorViewAction.value = CloseFragment
     }
 
@@ -46,6 +49,12 @@ class PhotoEditorViewModel(
                 addPhotoVisibility = if (currentPhotoList.isEmpty()) View.VISIBLE else View.INVISIBLE
             )
         propertyInModificationRepository.propertyInModificationLD.value = propertyInModification
+        if(currentEditedPhotoRepository.currentPhotoLD.value!!.second == null){
+            currentEditedPhotoRepository.currentPhotoLD.value =
+                currentEditedPhotoRepository.currentPhotoLD.value!!.copy(
+                    second = currentPhotoList.size-1
+                )
+        }
         photoEditorViewAction.value = CloseFragment
     }
 

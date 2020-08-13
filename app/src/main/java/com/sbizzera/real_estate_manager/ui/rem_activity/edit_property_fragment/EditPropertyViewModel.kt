@@ -2,6 +2,7 @@ package com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.net.Uri
 import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
@@ -42,6 +43,7 @@ class EditPropertyViewModel(
     val editEvent = SingleLiveEvent<EditPropertyEvent>()
     val editUiStateLD: LiveData<EditUiState>
     private lateinit var initialProperty: Property
+    private lateinit var tempPhotoUri: Uri
 
 
     init {
@@ -60,15 +62,18 @@ class EditPropertyViewModel(
                     propertyInModificationRepository.propertyInModificationLD
                 }
             }
+
+        println("debug : init EditPropertyViewModel")
     }
 
 
     fun takePhotoFromCameraClicked() {
-        editViewAction.value = EditPropertyViewAction.TakePhotoFromCamera(fileHelper)
+        tempPhotoUri = Uri.parse(fileHelper.createEmptyTempPhotoFileAndGetUriBack())
+        editViewAction.value = EditPropertyViewAction.TakePhotoFromCamera(tempPhotoUri)
     }
 
     fun takePhotoFromGalleryClicked() {
-        editViewAction.value = EditPropertyViewAction.TakePhotoFromGallery(fileHelper)
+        editViewAction.value = EditPropertyViewAction.TakePhotoFromGallery
     }
 
     fun soldDatePickerClicked() {
@@ -79,7 +84,6 @@ class EditPropertyViewModel(
 
     fun savePropertyClicked() {
         if (!allInfoCorrect()) {
-            editViewAction.value = EditPropertyViewAction.FillInError
             return
         }
         if (propertyHasNotChanged()) {
@@ -96,6 +100,7 @@ class EditPropertyViewModel(
 
     private fun allInfoCorrect(): Boolean {
         var allInfoCorrect = true
+        var photoCountCorrect = true
         var state = propertyInModificationRepository.propertyInModificationLD.value!!
         state = state.copy(
             propertyTitleError = null,
@@ -104,15 +109,15 @@ class EditPropertyViewModel(
             propertyAddressError = null,
             propertyCityCodeError = null,
             propertyCityNameError = null,
-
             propertyPriceError = null,
             propertyTypeError = null,
             propertySurfaceError = null
         )
         with(state) {
             if (photoList.isEmpty()) {
-                allInfoCorrect = false
+                photoCountCorrect = false
                 state = state.copy(addPhotoVisibility = View.VISIBLE)
+                editViewAction.value = EditPropertyViewAction.NoPhotoError
             }
             if (propertyTitle.isNullOrEmpty()) {
                 allInfoCorrect = false
@@ -148,9 +153,17 @@ class EditPropertyViewModel(
                 state = state.copy(propertySurfaceError = app.resources.getString(R.string.property_surface_error))
             }
         }
-        propertyInModificationRepository.propertyInModificationLD.value = state
 
-        return allInfoCorrect
+        propertyInModificationRepository.propertyInModificationLD.value = state
+        if (!photoCountCorrect) {
+            editViewAction.value = EditPropertyViewAction.NoPhotoError
+        } else {
+            if (!allInfoCorrect) {
+                editViewAction.value = EditPropertyViewAction.FillInError
+            }
+        }
+
+        return allInfoCorrect && photoCountCorrect
     }
 
 
@@ -187,14 +200,12 @@ class EditPropertyViewModel(
     }
 
 
-    fun onPhotoSelected(uri: String) {
-        currentPhotoRepository.currentPhotoLD.value = PhotoOnEdit(photoUri = uri)
-        editViewAction.value = LaunchEditor
-    }
-
     fun editPhotoClicked(recyclerPosition: Int) {
         currentPhotoRepository.currentPhotoLD.value =
-            propertyInModificationRepository.propertyInModificationLD.value!!.photoList[recyclerPosition]
+            Pair(
+                propertyInModificationRepository.propertyInModificationLD.value!!.photoList[recyclerPosition],
+                recyclerPosition
+            )
         editViewAction.value = LaunchEditor
     }
 
@@ -398,18 +409,39 @@ class EditPropertyViewModel(
             propertyInModificationRepository.propertyInModificationLD.value?.copy(propertySoldDate = soldDate)
     }
 
-    override fun onCleared() {
-        propertyInModificationRepository.propertyInModificationLD.value = null
+    fun onClearSoldDate() {
+        propertyInModificationRepository.propertyInModificationLD.value =
+            propertyInModificationRepository.propertyInModificationLD.value?.copy(propertySoldDate = null)
+    }
+
+    fun onResultFromCamera() {
+        currentPhotoRepository.currentPhotoLD.value = Pair(PhotoOnEdit(photoUri = tempPhotoUri.toString()), null)
+        editViewAction.value = LaunchEditor
+    }
+
+    fun onResultFromGallery(tempPhotoUri: Uri) {
+        val currentTempPhotoUri = fileHelper.createTempPhotoFileFromUriAndGetPathBack(tempPhotoUri)
+        currentPhotoRepository.currentPhotoLD.value = Pair(PhotoOnEdit(photoUri = currentTempPhotoUri), null)
+        editViewAction.value = LaunchEditor
+    }
+
+    fun moveToPosition() {
+        currentPhotoRepository.currentPhotoLD.value?.second?.let {
+            editViewAction.value = EditPropertyViewAction.MoveRecyclerToPosition(it)
+        }
+        currentPhotoRepository.currentPhotoLD.value ==null
+
     }
 
     sealed class EditPropertyViewAction {
-        class TakePhotoFromCamera(val fileHelper: FileHelper) : EditPropertyViewAction()
-        class TakePhotoFromGallery(val fileHelper: FileHelper) : EditPropertyViewAction()
+        class TakePhotoFromCamera(val tempPhotoUri: Uri) : EditPropertyViewAction()
+        object TakePhotoFromGallery : EditPropertyViewAction()
         object LaunchEditor : EditPropertyViewAction()
         class MoveRecyclerToPosition(val position: Int) : EditPropertyViewAction()
         class DisplayDatePicker(val year: Int, val month: Int, val day: Int) : EditPropertyViewAction()
         object FillInError : EditPropertyViewAction()
         object CloseFragment : EditPropertyViewAction()
+        object NoPhotoError : EditPropertyViewAction()
     }
 
     sealed class EditPropertyEvent {
