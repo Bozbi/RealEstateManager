@@ -2,17 +2,18 @@ package com.sbizzera.real_estate_manager.ui.rem_activity.photo_editor
 
 import android.view.View
 import androidx.lifecycle.ViewModel
-import com.sbizzera.real_estate_manager.data.CurrentEditedPhotoRepository
-import com.sbizzera.real_estate_manager.data.PropertyInModificationRepository
+import com.sbizzera.real_estate_manager.data.repository.CurrentEditedPhotoRepository
+import com.sbizzera.real_estate_manager.data.repository.PropertyInModificationRepository
 import com.sbizzera.real_estate_manager.ui.rem_activity.photo_editor.PhotoEditorViewModel.PhotoEditorViewAction.CloseFragment
-import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
+import com.sbizzera.real_estate_manager.utils.architecture_components.SingleLiveEvent
 
 class PhotoEditorViewModel(
     private val currentEditedPhotoRepository: CurrentEditedPhotoRepository,
     private val propertyInModificationRepository: PropertyInModificationRepository
 ) : ViewModel() {
 
-    val photoEditorViewAction = SingleLiveEvent<PhotoEditorViewAction>()
+    val photoEditorViewAction =
+        SingleLiveEvent<PhotoEditorViewAction>()
     val currentPhotoEdited = currentEditedPhotoRepository.currentPhotoLD.value!!.first
 
 

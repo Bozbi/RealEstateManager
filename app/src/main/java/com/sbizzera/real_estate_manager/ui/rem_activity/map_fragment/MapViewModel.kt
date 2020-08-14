@@ -6,11 +6,11 @@ import android.location.Location
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sbizzera.real_estate_manager.data.CurrentPropertyIdRepository
-import com.sbizzera.real_estate_manager.data.CustomMapMarkers
-import com.sbizzera.real_estate_manager.data.UserLocationRepo
-import com.sbizzera.real_estate_manager.data.property.PropertyRepository
-import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
+import com.sbizzera.real_estate_manager.data.repository.CurrentPropertyIdRepository
+import com.sbizzera.real_estate_manager.data.model.CustomMapMarkers
+import com.sbizzera.real_estate_manager.data.repository.UserLocationRepo
+import com.sbizzera.real_estate_manager.data.repository.PropertyRepository
+import com.sbizzera.real_estate_manager.utils.architecture_components.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
@@ -24,7 +24,8 @@ class MapViewModel(
     propertyRepository: PropertyRepository
 ) : ViewModel() {
 
-    val mapViewAction = SingleLiveEvent<MapViewAction>()
+    val mapViewAction =
+        SingleLiveEvent<MapViewAction>()
     private lateinit var mapMarkers: List<CustomMapMarkers>
     private lateinit var locationToFocus: Location
     private var mapIsReady = false
@@ -109,7 +110,7 @@ class MapViewModel(
         object GetMap : MapViewAction()
         object RequestNormalPermission : MapViewAction()
         object RequestRationalePermission : MapViewAction()
-        class MapIsReady(val markers: List<CustomMapMarkers>,val locationToFocus : Location) : MapViewAction()
+        class MapIsReady(val markers: List<CustomMapMarkers>, val locationToFocus : Location) : MapViewAction()
         object MapIsReadyWithoutLocation : MapViewAction()
     }
 

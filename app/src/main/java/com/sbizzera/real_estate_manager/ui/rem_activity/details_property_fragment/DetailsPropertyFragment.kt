@@ -16,7 +16,7 @@ import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEvent
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEventListenable
 import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyViewModel.DetailsViewAction.ModifyPropertyClicked
-import com.sbizzera.real_estate_manager.utils.ViewModelFactory
+import com.sbizzera.real_estate_manager.utils.architecture_components.ViewModelFactory
 import kotlinx.android.synthetic.main.fragment_details_property.*
 
 class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,DetailsPropertyPhotoAdapter.OnPhotoClickForTransitionListener, DetailsPropertyPhotoAdapter.OnViewHolderBoundListener {
@@ -41,9 +41,12 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModelDetails = ViewModelProvider(this, ViewModelFactory).get(DetailsPropertyViewModel::class.java)
+        viewModelDetails = ViewModelProvider(this,
+            ViewModelFactory
+        ).get(DetailsPropertyViewModel::class.java)
         recyclerAdapter.setListener(this,this)
         recycler_view.adapter = recyclerAdapter
+        recycler_view.isNestedScrollingEnabled = false
 
         detailsLayoutManager = object : LinearLayoutManager(requireContext(), HORIZONTAL, false){
             override fun onLayoutCompleted(state: RecyclerView.State?) {
@@ -53,6 +56,10 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
                     detailsLayoutManager.findLastCompletelyVisibleItemPosition()
 
                 )
+            }
+
+            override fun canScrollVertically(): Boolean {
+                return false
             }
         }
         recycler_view.layoutManager = detailsLayoutManager
@@ -81,7 +88,7 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
                 sharedElements: MutableMap<String, View>
             ) {
                 recycler_view.findViewHolderForAdapterPosition(viewModelDetails.getCurrentPhotoPosition())?.let {
-                    sharedElements[names[0]] = it.itemView.findViewById(R.id.photo_img)
+                    sharedElements[names[0]] = it.itemView.findViewById(R.id.photo_in_details_img)
                 }
             }
         })

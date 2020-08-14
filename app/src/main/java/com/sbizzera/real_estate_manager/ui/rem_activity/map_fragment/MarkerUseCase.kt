@@ -1,8 +1,8 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.map_fragment
 
 
-import com.sbizzera.real_estate_manager.data.CustomMapMarkers
-import com.sbizzera.real_estate_manager.data.property.PropertyRepository
+import com.sbizzera.real_estate_manager.data.model.CustomMapMarkers
+import com.sbizzera.real_estate_manager.data.repository.PropertyRepository
 
 class MarkerUseCase(private val propertyRepository: PropertyRepository) {
 

@@ -16,8 +16,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEvent
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEventListenable
-import com.sbizzera.real_estate_manager.utils.ViewModelFactory
-import com.sbizzera.real_estate_manager.utils.intent_contracts.GoToSettingContract
+import com.sbizzera.real_estate_manager.utils.architecture_components.ViewModelFactory
+import com.sbizzera.real_estate_manager.utils.helper.GoToSettingContract
 
 class MapFragment : SupportMapFragment(), OnMapReadyCallback, OnUserAskTransactionEventListenable {
 
@@ -31,7 +31,9 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback, OnUserAskTransacti
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mapViewModel = ViewModelProvider(this, ViewModelFactory).get(MapViewModel::class.java)
+        mapViewModel = ViewModelProvider(this,
+            ViewModelFactory
+        ).get(MapViewModel::class.java)
 
 
         mapViewModel.mapViewAction.observe(viewLifecycleOwner) { action ->

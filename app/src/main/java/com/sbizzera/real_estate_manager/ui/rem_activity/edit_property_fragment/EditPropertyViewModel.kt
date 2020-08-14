@@ -9,15 +9,15 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sbizzera.real_estate_manager.R
-import com.sbizzera.real_estate_manager.data.CurrentEditedPhotoRepository
-import com.sbizzera.real_estate_manager.data.CurrentPropertyIdRepository
-import com.sbizzera.real_estate_manager.data.PropertyInModificationRepository
-import com.sbizzera.real_estate_manager.data.photo.Photo
-import com.sbizzera.real_estate_manager.data.property.PointOfInterest
-import com.sbizzera.real_estate_manager.data.property.Property
-import com.sbizzera.real_estate_manager.data.property.PropertyRepository
+import com.sbizzera.real_estate_manager.data.model.Photo
+import com.sbizzera.real_estate_manager.data.model.PointOfInterest
+import com.sbizzera.real_estate_manager.data.model.Property
+import com.sbizzera.real_estate_manager.data.repository.*
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyViewModel.EditPropertyViewAction.LaunchEditor
 import com.sbizzera.real_estate_manager.utils.*
+import com.sbizzera.real_estate_manager.utils.architecture_components.SingleLiveEvent
+import com.sbizzera.real_estate_manager.utils.helper.FileHelper
+import com.sbizzera.real_estate_manager.utils.helper.GeocodeResolver
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
@@ -39,8 +39,10 @@ class EditPropertyViewModel(
     private val sharedPreferencesRepo: SharedPreferencesRepo
 ) : ViewModel() {
 
-    val editViewAction = SingleLiveEvent<EditPropertyViewAction>()
-    val editEvent = SingleLiveEvent<EditPropertyEvent>()
+    val editViewAction =
+        SingleLiveEvent<EditPropertyViewAction>()
+    val editEvent =
+        SingleLiveEvent<EditPropertyEvent>()
     val editUiStateLD: LiveData<EditUiState>
     private lateinit var initialProperty: Property
     private lateinit var tempPhotoUri: Uri

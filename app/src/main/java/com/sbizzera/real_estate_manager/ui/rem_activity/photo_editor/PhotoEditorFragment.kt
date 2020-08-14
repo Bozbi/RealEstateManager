@@ -13,7 +13,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.PhotoOnEdit
-import com.sbizzera.real_estate_manager.utils.ViewModelFactory
+import com.sbizzera.real_estate_manager.utils.architecture_components.ViewModelFactory
 import kotlinx.android.synthetic.main.fragment_photo_editor.*
 import kotlinx.android.synthetic.main.fragment_photo_editor.view.*
 
@@ -31,7 +31,9 @@ class PhotoEditorFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel = ViewModelProvider(this, ViewModelFactory).get(PhotoEditorViewModel::class.java)
+        viewModel = ViewModelProvider(this,
+            ViewModelFactory
+        ).get(PhotoEditorViewModel::class.java)
 
         updateUi(viewModel.currentPhotoEdited)
 

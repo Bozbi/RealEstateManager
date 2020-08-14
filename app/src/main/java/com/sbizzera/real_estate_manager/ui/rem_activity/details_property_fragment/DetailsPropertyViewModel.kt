@@ -5,18 +5,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.sbizzera.real_estate_manager.BuildConfig
-import com.sbizzera.real_estate_manager.data.CurrentPhotoPositionRepo
-import com.sbizzera.real_estate_manager.data.CurrentPropertyIdRepository
-import com.sbizzera.real_estate_manager.data.photo.Photo
-import com.sbizzera.real_estate_manager.data.property.PointOfInterest
-import com.sbizzera.real_estate_manager.data.property.Property
-import com.sbizzera.real_estate_manager.data.property.PropertyRepository
+import com.sbizzera.real_estate_manager.data.repository.CurrentPhotoPositionRepo
+import com.sbizzera.real_estate_manager.data.repository.CurrentPropertyIdRepository
+import com.sbizzera.real_estate_manager.data.model.Photo
+import com.sbizzera.real_estate_manager.data.model.PointOfInterest
+import com.sbizzera.real_estate_manager.data.model.Property
+import com.sbizzera.real_estate_manager.data.repository.PropertyRepository
 import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyViewModel.DetailsViewAction.ModifyPropertyClicked
 import com.sbizzera.real_estate_manager.utils.CUSTOM_DATE_FORMATTER
-import com.sbizzera.real_estate_manager.utils.FileHelper
-import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
+import com.sbizzera.real_estate_manager.utils.helper.FileHelper
+import com.sbizzera.real_estate_manager.utils.architecture_components.SingleLiveEvent
 import org.threeten.bp.format.DateTimeFormatter
-import java.time.LocalDateTime
 
 
 class DetailsPropertyViewModel(
@@ -28,7 +27,8 @@ class DetailsPropertyViewModel(
 ) : ViewModel() {
 
     val detailsUiStateLD: LiveData<DetailsUiState>
-    val detailsViewAction = SingleLiveEvent<DetailsViewAction>()
+    val detailsViewAction =
+        SingleLiveEvent<DetailsViewAction>()
 
 
     init {

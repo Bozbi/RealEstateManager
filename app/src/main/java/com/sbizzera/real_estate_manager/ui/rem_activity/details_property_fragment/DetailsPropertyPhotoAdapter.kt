@@ -1,16 +1,10 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment
 
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyPhotoAdapter.DetailsPhotoViewHolder
 import com.squareup.picasso.Callback
@@ -51,7 +45,7 @@ class DetailsPropertyPhotoAdapter : RecyclerView.Adapter<DetailsPhotoViewHolder>
     inner class DetailsPhotoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(position: Int) {
             with(itemView) {
-                Picasso.get().load("file://${photoList[position].photoUri}").into(photo_img,object : Callback{
+                Picasso.get().load("file://${photoList[position].photoUri}").resize(500,500).centerCrop().into(photo_in_details_img,object : Callback{
                     override fun onSuccess() {
                         onViewHolderBoundListener.onViewHolderBound(position)
                     }
@@ -63,9 +57,9 @@ class DetailsPropertyPhotoAdapter : RecyclerView.Adapter<DetailsPhotoViewHolder>
                 })
                 photo_title_txt.text = photoList[position].photoTitle
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    photo_img.transitionName = "transition$position"
+                    photo_in_details_img.transitionName = "transition$position"
                 }
-                photo_img.setOnClickListener {
+                photo_in_details_img.setOnClickListener {
                     onPhotoClickForTransitionListener.onPhotoClickedForTransition(adapterPosition, it)
                 }
             }

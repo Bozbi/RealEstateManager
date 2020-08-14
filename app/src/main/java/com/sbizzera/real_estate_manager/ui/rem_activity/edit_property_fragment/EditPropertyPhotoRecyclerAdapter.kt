@@ -31,7 +31,7 @@ class EditPropertyPhotoRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewH
 
     inner class PropertyPhotoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(photo: PhotoOnEdit) {
-            Glide.with(itemView.photo_img).load(photo.photoUri).into(itemView.photo_img)
+            Glide.with(itemView.photo_in_details_img).load(photo.photoUri).into(itemView.photo_in_details_img)
             itemView.photo_title.text = photo.photoTitle
             itemView.edit_btn.setOnClickListener {
                 onPhotoActionListener.onPhotoClick(adapterPosition)

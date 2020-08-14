@@ -1,6 +1,7 @@
 package com.sbizzera.real_estate_manager.utils
 
-import com.sbizzera.real_estate_manager.data.property.Property
+import com.sbizzera.real_estate_manager.data.model.Property
+import com.sbizzera.real_estate_manager.utils.data_utils.PropertyComparator
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -17,7 +18,7 @@ class PropertyComparatorTest {
         val property1 = Property(creationDate = date1)
         val property2 = Property(creationDate = date2)
         val list = listOf(property1,property2)
-        Collections.sort(list,PropertyComparator())
+        Collections.sort(list, PropertyComparator())
         assertEquals(list[0],property2)
     }
 }

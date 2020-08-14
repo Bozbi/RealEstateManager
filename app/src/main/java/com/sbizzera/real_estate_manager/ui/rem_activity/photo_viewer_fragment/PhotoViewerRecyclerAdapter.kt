@@ -39,7 +39,7 @@ class PhotoViewerRecyclerAdapter : RecyclerView.Adapter<PhotoViewerRecyclerAdapt
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(position: Int){
             with(itemView){
-                Glide.with(photo_img).load(photoList[position].uri).listener(object :RequestListener<Drawable>{
+                Glide.with(photo_in_details_img).load(photoList[position].uri).listener(object :RequestListener<Drawable>{
                     override fun onLoadFailed(
                         e: GlideException?,
                         model: Any?,
@@ -60,9 +60,9 @@ class PhotoViewerRecyclerAdapter : RecyclerView.Adapter<PhotoViewerRecyclerAdapt
                         onViewHolderBoundListener.onViewHolderBound(position)
                         return false
                     }
-                }).into(photo_img)
+                }).into(photo_in_details_img)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    photo_img.transitionName = "transition$position"
+                    photo_in_details_img.transitionName = "transition$position"
                 }
             }
         }

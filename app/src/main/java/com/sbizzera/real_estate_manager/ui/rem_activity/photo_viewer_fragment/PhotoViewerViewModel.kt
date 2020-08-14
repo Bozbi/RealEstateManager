@@ -3,13 +3,13 @@ package com.sbizzera.real_estate_manager.ui.rem_activity.photo_viewer_fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sbizzera.real_estate_manager.data.CurrentPhotoPositionRepo
-import com.sbizzera.real_estate_manager.data.CurrentPropertyIdRepository
-import com.sbizzera.real_estate_manager.data.photo.Photo
-import com.sbizzera.real_estate_manager.data.property.Property
-import com.sbizzera.real_estate_manager.data.property.PropertyRepository
-import com.sbizzera.real_estate_manager.utils.FileHelper
-import com.sbizzera.real_estate_manager.utils.SingleLiveEvent
+import com.sbizzera.real_estate_manager.data.repository.CurrentPhotoPositionRepo
+import com.sbizzera.real_estate_manager.data.repository.CurrentPropertyIdRepository
+import com.sbizzera.real_estate_manager.data.model.Photo
+import com.sbizzera.real_estate_manager.data.model.Property
+import com.sbizzera.real_estate_manager.data.repository.PropertyRepository
+import com.sbizzera.real_estate_manager.utils.helper.FileHelper
+import com.sbizzera.real_estate_manager.utils.architecture_components.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
@@ -23,7 +23,8 @@ class PhotoViewerViewModel(
 ) : ViewModel() {
 
     var photoList = MutableLiveData<List<PhotoInViewer>>()
-    val photoViewerViewAction = SingleLiveEvent<PhotoViewerViewAction>()
+    val photoViewerViewAction =
+        SingleLiveEvent<PhotoViewerViewAction>()
 
     init {
         val id = currentPropertyIdRepository.currentPropertyIdLiveData.value

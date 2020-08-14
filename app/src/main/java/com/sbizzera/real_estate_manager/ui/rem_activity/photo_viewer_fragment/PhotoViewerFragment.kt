@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.sbizzera.real_estate_manager.R
-import com.sbizzera.real_estate_manager.utils.ViewModelFactory
+import com.sbizzera.real_estate_manager.utils.architecture_components.ViewModelFactory
 import kotlinx.android.synthetic.main.fragment_photo_viewer.*
 
 class PhotoViewerFragment : Fragment(), PhotoViewerRecyclerAdapter.OnViewHolderBound {
@@ -55,7 +55,9 @@ class PhotoViewerFragment : Fragment(), PhotoViewerRecyclerAdapter.OnViewHolderB
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel = ViewModelProvider(this, ViewModelFactory).get(PhotoViewerViewModel::class.java)
+        viewModel = ViewModelProvider(this,
+            ViewModelFactory
+        ).get(PhotoViewerViewModel::class.java)
         viewModel.photoViewerViewAction.observe(viewLifecycleOwner) { action ->
             when (action) {
                 PhotoViewerViewModel.PhotoViewerViewAction.ViewHolderReady -> startPostponedEnterTransition()
@@ -98,7 +100,7 @@ class PhotoViewerFragment : Fragment(), PhotoViewerRecyclerAdapter.OnViewHolderB
                 sharedElements: MutableMap<String, View>
             ) {
                 recycler_view.findViewHolderForAdapterPosition(viewModel.getCurrentPhotoPosition())?.let {
-                    sharedElements[names[0]] = it.itemView.findViewById(R.id.photo_img)
+                    sharedElements[names[0]] = it.itemView.findViewById(R.id.photo_in_details_img)
                 }
             }
         })

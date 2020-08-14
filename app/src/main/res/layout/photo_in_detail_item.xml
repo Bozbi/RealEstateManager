@@ -11,7 +11,7 @@
     >
 
     <ImageView
-        android:id="@+id/photo_img"
+        android:id="@+id/photo_in_details_img"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         app:layout_constraintDimensionRatio="1:1"

@@ -17,9 +17,10 @@ import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.events.OnPropertyClickEvent
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEvent
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEventListenable
+import com.sbizzera.real_estate_manager.ui.rem_activity.dialog.FilterDialog
 import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel.ListPropertyViewAction.AddPropertyClicked
 import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel.ListPropertyViewAction.DetailsPropertyClicked
-import com.sbizzera.real_estate_manager.utils.ViewModelFactory
+import com.sbizzera.real_estate_manager.utils.architecture_components.ViewModelFactory
 import kotlinx.android.synthetic.main.fragment_list_property.*
 
 
@@ -55,7 +56,9 @@ class ListPropertyFragment : Fragment(), OnPropertyClickEvent, OnUserAskTransact
         }
 
 
-        viewModel = ViewModelProvider(requireActivity(), ViewModelFactory)
+        viewModel = ViewModelProvider(requireActivity(),
+            ViewModelFactory
+        )
             .get(ListPropertyViewModel::class.java)
 
         viewModel.listUiStateLD.observe(viewLifecycleOwner) { model ->

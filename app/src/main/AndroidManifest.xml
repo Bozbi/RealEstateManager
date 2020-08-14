@@ -11,7 +11,7 @@
         android:required="true" />
 
     <application
-        android:name="com.sbizzera.real_estate_manager.App"
+        android:name="com.sbizzera.real_estate_manager.application.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -20,7 +20,7 @@
         android:theme="@style/AppTheme"
         >
         <activity
-            android:name="com.sbizzera.real_estate_manager.ui.rem_activity.REMActivity"
+            android:name="com.sbizzera.real_estate_manager.ui.rem_activity.main.REMActivity"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
