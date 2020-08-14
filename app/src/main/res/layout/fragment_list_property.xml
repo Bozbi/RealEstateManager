@@ -36,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:text="Filter Results"
+        android:text="@string/filter_results"
         android:textAllCaps="true"
         android:padding="15dp"
         android:textSize="16sp"

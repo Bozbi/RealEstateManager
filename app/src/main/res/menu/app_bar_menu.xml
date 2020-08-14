@@ -12,13 +12,13 @@
             <item
                 android:id="@+id/synchronise"
                 android:icon="@drawable/ic_sync"
-                android:title="Synchronise"
+                android:title="@string/synchronise"
                  />
 
             <item
                 android:id="@+id/disconnect"
                 android:icon="@drawable/ic_exit"
-                android:title="Log out"
+                android:title="@string/log_out"
                 />
         </menu>
     </item>

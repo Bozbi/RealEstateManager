@@ -1,18 +1,15 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.photo_viewer_fragment
 
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.sbizzera.real_estate_manager.R
+import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.photo_in_viewer_item.view.*
+import java.lang.Exception
 
 class PhotoViewerRecyclerAdapter : RecyclerView.Adapter<PhotoViewerRecyclerAdapter.ViewHolder>() {
 
@@ -39,28 +36,15 @@ class PhotoViewerRecyclerAdapter : RecyclerView.Adapter<PhotoViewerRecyclerAdapt
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(position: Int){
             with(itemView){
-                Glide.with(photo_in_details_img).load(photoList[position].uri).listener(object :RequestListener<Drawable>{
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
+                Picasso.get().load("file://${photoList[position].uri}").resize(1000,1000).centerCrop().into(photo_in_details_img,object : Callback{
+                    override fun onSuccess() {
                         onViewHolderBoundListener.onViewHolderBound(position)
-                        return false
                     }
 
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
+                    override fun onError(e: Exception?) {
                         onViewHolderBoundListener.onViewHolderBound(position)
-                        return false
                     }
-                }).into(photo_in_details_img)
+                })
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     photo_in_details_img.transitionName = "transition$position"
                 }

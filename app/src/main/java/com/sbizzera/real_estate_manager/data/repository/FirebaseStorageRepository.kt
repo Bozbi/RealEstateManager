@@ -24,8 +24,6 @@ class FirebaseStorageRepository private constructor() {
     }
 
     fun downloadImage(name: String,file:File) {
-        storageRef.child("$name.jpg").getFile(file).addOnCompleteListener {
-            println("debug : img download completed")
-        }
+        storageRef.child("$name.jpg").getFile(file)
     }
 }

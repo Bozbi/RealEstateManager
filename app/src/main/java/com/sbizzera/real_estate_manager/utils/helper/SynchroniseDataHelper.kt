@@ -24,7 +24,6 @@ class SynchroniseDataHelper(
         updateRemoteProperties(remoteProperties, localProperties)
     }
 
-    //TODO why can't i make this a suspend function
     private fun updateLocalProperties(remoteProperties: List<Property>, localProperties: List<Property>) {
         remoteProperties.forEach { remoteProperty ->
             val localPropertyToWorkOn = localProperties.filter { localProperty ->
@@ -77,7 +76,6 @@ class SynchroniseDataHelper(
         }
     }
 
-    //TODO idem up (why not a suspend function)
     private fun updateRemoteProperties(remoteProperties: List<Property>, localProperties: List<Property>) {
         localProperties.forEach { localProperty ->
             val remotePropertyToWorkOn = remoteProperties.filter { remoteProperty ->

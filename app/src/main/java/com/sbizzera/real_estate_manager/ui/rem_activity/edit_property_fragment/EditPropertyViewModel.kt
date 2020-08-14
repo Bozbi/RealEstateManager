@@ -431,8 +431,7 @@ class EditPropertyViewModel(
         currentPhotoRepository.currentPhotoLD.value?.second?.let {
             editViewAction.value = EditPropertyViewAction.MoveRecyclerToPosition(it)
         }
-        currentPhotoRepository.currentPhotoLD.value ==null
-
+        currentPhotoRepository.currentPhotoLD.value = null
     }
 
     sealed class EditPropertyViewAction {

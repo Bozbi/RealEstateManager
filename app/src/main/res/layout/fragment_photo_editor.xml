@@ -21,7 +21,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@id/title_input_layout"
         app:layout_constraintEnd_toStartOf="@id/save_photo_btn"
-        android:text="Delete"
+        android:text="@string/delete"
         app:strokeColor="@android:color/holo_red_dark"
         android:textColor="@android:color/holo_red_dark"
         app:iconTint="@android:color/holo_red_dark"
@@ -40,7 +40,7 @@
         app:layout_constraintBottom_toBottomOf="@id/delete_photo_btn"
         app:layout_constraintStart_toEndOf="@id/delete_photo_btn"
         app:layout_constraintEnd_toEndOf="@id/title_input_layout"
-        android:text="Save"
+        android:text="@string/save"
         app:strokeColor="@android:color/holo_green_dark"
         android:textColor="@android:color/holo_green_dark"
         app:iconTint="@android:color/holo_green_dark"
@@ -48,6 +48,7 @@
         />
 
     <ImageView
+        android:contentDescription="@string/image_content_description"
         android:id="@+id/current_photo_img"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -66,7 +67,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginBottom="8dp"
-        android:hint="Title"
+        android:hint="@string/title"
         app:counterMaxLength="25"
         app:counterEnabled="true"
         app:layout_constraintTop_toBottomOf="@id/current_photo_img"

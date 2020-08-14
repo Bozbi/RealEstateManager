@@ -16,5 +16,8 @@ class UtilsAndroidTest{
         Assert.assertEquals(true,Utils().isNetworkAvailable(InstrumentationRegistry.getInstrumentation().context))
     }
 
-    //TODO getTodayDateHere
+    @Test
+    fun getTodayDate() {
+        Assert.assertEquals("29/11/1983", getTodayDate())
+    }
 }

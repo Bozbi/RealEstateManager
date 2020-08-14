@@ -36,6 +36,7 @@ class ListPropertyFragmentAdapter : RecyclerView.Adapter<ListPropertyFragmentAda
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
         fun bind(position: Int) {
             with(itemView) {
                 val propertyModel = list[position]
@@ -44,7 +45,7 @@ class ListPropertyFragmentAdapter : RecyclerView.Adapter<ListPropertyFragmentAda
                 property_price.text = propertyModel.price
                 Picasso.get().load(
                     "file://${propertyModel.photoUri}"
-                ).into(this.property_img, object : Callback {
+                ).resize(300,300).centerCrop().into(this.property_img, object : Callback {
                     override fun onSuccess() {}
                     override fun onError(e: Exception?) {
                         if (e is FileNotFoundException) {
@@ -60,7 +61,8 @@ class ListPropertyFragmentAdapter : RecyclerView.Adapter<ListPropertyFragmentAda
                 setOnClickListener {
                     onPropertyClickListener.onPropertyItemClick(propertyModel.id)
                 }
-                list_item_container.setBackgroundColor(propertyModel.backGroundColor as Int)
+                @Suppress("ResourceAsColor")
+                list_item_container.setBackgroundColor(propertyModel.backGroundColor)
             }
         }
     }

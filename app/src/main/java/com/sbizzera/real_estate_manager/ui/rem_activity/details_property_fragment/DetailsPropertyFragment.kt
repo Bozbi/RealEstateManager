@@ -11,12 +11,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEvent
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEventListenable
 import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyViewModel.DetailsViewAction.ModifyPropertyClicked
 import com.sbizzera.real_estate_manager.utils.architecture_components.ViewModelFactory
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_details_property.*
 
 class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,DetailsPropertyPhotoAdapter.OnPhotoClickForTransitionListener, DetailsPropertyPhotoAdapter.OnViewHolderBoundListener {
@@ -113,7 +113,7 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
         description_txt.text = model.description
         address_txt.text = model.addressText
         poi_txt.text = model.poiText
-        Glide.with(map_img).load(model.staticMapUri).into(map_img)
+        Picasso.get().load(model.staticMapUri).into(map_img)
         added_by_txt.text = model.agentText
     }
 

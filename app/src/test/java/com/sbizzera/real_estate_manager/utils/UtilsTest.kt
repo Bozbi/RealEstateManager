@@ -30,6 +30,7 @@ class UtilsTest {
 
     @Test
     fun getTodayDate() {
-        assertEquals("29/11/1983", utils.getTodayDate())
+        val date = LocalDate.now().format(CUSTOM_DATE_FORMATTER)
+        assertEquals(date, utils.getTodayDate())
     }
 }

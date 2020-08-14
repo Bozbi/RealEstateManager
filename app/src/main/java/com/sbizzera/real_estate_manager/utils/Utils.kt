@@ -10,6 +10,7 @@ class Utils {
 
     fun getTodayDate(): String = org.threeten.bp.LocalDate.now().format(CUSTOM_DATE_FORMATTER)
 
+    @Suppress("DEPRECATION")
     fun isNetworkAvailable(context: Context):Boolean{
         val activeNetworkInfo = (context.getSystemService((Context.CONNECTIVITY_SERVICE)) as ConnectivityManager).activeNetworkInfo
         return activeNetworkInfo!=null && activeNetworkInfo.isConnectedOrConnecting

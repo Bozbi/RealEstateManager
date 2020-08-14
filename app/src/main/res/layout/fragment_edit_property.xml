@@ -34,7 +34,7 @@
             android:visibility="visible"
             android:src="@drawable/ic_add_a_photo"
             android:tint="@color/colorPrimaryDark"
-            />
+            android:contentDescription="@string/image_content_description" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/add_photo_from_gallery_btn"
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="4dp"
-            android:text="from gallery"
+            android:text="@string/from_gallery"
             android:textAllCaps="false"
             app:icon="@drawable/ic_add_photo_from_gallery"
             app:layout_constraintEnd_toStartOf="@id/add_photo_from_camera_btn"
@@ -58,7 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="8dp"
-            android:text="from camera"
+            android:text="@string/from_camera"
             android:textAllCaps="false"
             app:icon="@drawable/ic_add_a_photo"
             app:layout_constraintBottom_toBottomOf="@id/add_photo_from_gallery_btn"
@@ -81,7 +81,7 @@
                 android:id="@+id/property_title_edt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Title"
+                android:hint="@string/title"
                 android:inputType="text"
                 />
 
@@ -103,7 +103,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="top"
-                android:hint="Description"
+                android:hint="@string/description"
                 android:lines="4"
                 android:singleLine="false" />
 
@@ -124,7 +124,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="top"
-                android:hint="Address" />
+                android:hint="@string/address" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -143,7 +143,7 @@
                 android:id="@+id/property_city_code_edt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="City Code"
+                android:hint="@string/city_code"
                 android:inputType="number" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -163,7 +163,7 @@
                 android:id="@+id/property_city_name_edt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="CityName" />
+                android:hint="@string/cityName" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -172,7 +172,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
-            android:hint="Price"
+            android:hint="@string/price_field_hint"
             app:layout_constraintTop_toBottomOf="@id/property_city_name_layout">
 
             <com.sbizzera.real_estate_manager.custom_views.MyCustomEditText
@@ -189,7 +189,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
-            android:hint="Type"
+            android:hint="@string/type"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/property_price_layout">
 
@@ -215,7 +215,7 @@
                 android:id="@+id/property_surface_edt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Surface"
+                android:hint="@string/surface_hint"
                 android:inputType="number" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -232,7 +232,7 @@
                 android:id="@+id/property_room_count_edt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Rooms"
+                android:hint="@string/rooms_hint"
                 android:inputType="number" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -250,7 +250,7 @@
                 android:id="@+id/property_bedroom_count_edt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Bedrooms"
+                android:hint="@string/bedrooms"
                 android:inputType="number" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -267,7 +267,7 @@
                 android:id="@+id/property_bathroom_count_edt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Bathrooms"
+                android:hint="@string/bathrooms"
                 android:inputType="number" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -280,7 +280,7 @@
             android:layout_marginTop="8dp"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
-            android:text="Points of interest"
+            android:text="@string/points_of_interest"
             android:textSize="16sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/property_bathroom_count_layout" />
@@ -304,7 +304,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Sold on"
+            android:hint="@string/sold_on"
             android:layout_marginHorizontal="8dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:startIconDrawable="@drawable/ic_calendar"
@@ -333,7 +333,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="8dp"
-            android:text="Save property"
+            android:text="@string/save_property"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/property_sold_date_layout" />

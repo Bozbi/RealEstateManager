@@ -1,7 +1,6 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.main
 
 import android.view.View
-import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sbizzera.real_estate_manager.data.repository.CurrentPropertyIdRepository
@@ -23,7 +22,6 @@ class REMActivityViewModel(
 
     val viewAction =
         SingleLiveEvent<ViewAction>()
-    private lateinit var activityResultLauncher: ActivityResultLauncher<String>
 
     init {
         checkUserIsLogged()

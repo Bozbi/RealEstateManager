@@ -67,7 +67,7 @@ class FileHelper private constructor() {
         }
 
         val bmpOptions = BitmapFactory.Options()
-        var bitmap = BitmapFactory.decodeFile(fileToCopy.absolutePath, bmpOptions)
+        val bitmap = BitmapFactory.decodeFile(fileToCopy.absolutePath, bmpOptions)
 
         val fileDir = File("${appContext.filesDir}/$propertyId")
         fileDir.mkdir()

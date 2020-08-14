@@ -11,7 +11,6 @@ import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -21,12 +20,12 @@ import com.google.android.material.snackbar.Snackbar
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEvent
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEventListenable
-import com.sbizzera.real_estate_manager.ui.rem_activity.main.REMActivityViewModel.ViewAction.*
 import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyFragment
 import com.sbizzera.real_estate_manager.ui.rem_activity.dialog.ChooseUserMaterialDialog
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyFragment
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.OnPropertySavedListener
 import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyFragment
+import com.sbizzera.real_estate_manager.ui.rem_activity.main.REMActivityViewModel.ViewAction.*
 import com.sbizzera.real_estate_manager.ui.rem_activity.map_fragment.MapFragment
 import com.sbizzera.real_estate_manager.ui.rem_activity.photo_editor.PhotoEditorFragment
 import com.sbizzera.real_estate_manager.ui.rem_activity.photo_viewer_fragment.PhotoViewerFragment
@@ -42,13 +41,12 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
     private lateinit var viewModel: REMActivityViewModel
     private lateinit var mMenu: Menu
 
-    var mContract: ActivityResultContract<Uri, Boolean>? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_r_e_m)
 
-        viewModel = ViewModelProvider(this,
+        viewModel = ViewModelProvider(
+            this,
             ViewModelFactory
         ).get(REMActivityViewModel::class.java)
         viewModel.viewAction.observe(this) { action ->
@@ -217,7 +215,7 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
         val contextView = findViewById<View>(R.id.details_container)
         Snackbar.make(
             contextView,
-            "Property has been saved in your hardware. Synchronise to push it to other agents",
+            getString(R.string.insertion_completed_message),
             Snackbar.LENGTH_LONG
         ).show()
     }
@@ -243,15 +241,19 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
             takePictureIntent2.clipData = ClipData.newRawUri("", tempPhotoUri)
             takePictureIntent2.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        //TODO RegisterForActivityResult issue. no other way to get result
+        @Suppress("DEPRECATION")
         startActivityForResult(takePictureIntent2, CAMERA_INTENT_REQUEST_CODE)
-
     }
 
     override fun onGalleryAsked() {
-        startActivityForResult(Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI),GALLERY_INTENT_REQUEST_CODE)
+        @Suppress("DEPRECATION")
+        startActivityForResult(
+            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI),
+            GALLERY_INTENT_REQUEST_CODE
+        )
     }
 
+    @Suppress("DEPRECATION")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
         if (requestCode == CAMERA_INTENT_REQUEST_CODE) {
@@ -261,7 +263,9 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
         }
         if (requestCode == GALLERY_INTENT_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                (supportFragmentManager.fragments.filter { it.tag == EditPropertyFragment::class.java.simpleName }[0] as EditPropertyFragment).onResultFromGallery(intent?.data)
+                (supportFragmentManager.fragments.filter { it.tag == EditPropertyFragment::class.java.simpleName }[0] as EditPropertyFragment).onResultFromGallery(
+                    intent?.data
+                )
             }
         }
     }
