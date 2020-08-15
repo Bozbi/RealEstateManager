@@ -21,7 +21,7 @@ class REMActivityViewModel(
 ) : ViewModel() {
 
     val viewAction =
-        SingleLiveEvent<ViewAction>()
+        SingleLiveEvent<ViewAction?>()
 
     init {
         checkUserIsLogged()
@@ -107,8 +107,6 @@ class REMActivityViewModel(
                 ViewAction.HideBackButton
         }
     }
-
-
 
     sealed class ViewAction {
         object LaunchPhotoEditor : ViewAction()

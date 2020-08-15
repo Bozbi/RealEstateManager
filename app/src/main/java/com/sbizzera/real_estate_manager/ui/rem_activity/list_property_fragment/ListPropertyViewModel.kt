@@ -1,16 +1,14 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment
 
 import androidx.annotation.ColorRes
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.sbizzera.real_estate_manager.application.App
 import com.sbizzera.real_estate_manager.R
-import com.sbizzera.real_estate_manager.data.repository.CurrentPropertyIdRepository
 import com.sbizzera.real_estate_manager.data.model.PointOfInterest
 import com.sbizzera.real_estate_manager.data.model.Property
+import com.sbizzera.real_estate_manager.data.repository.CurrentPropertyIdRepository
 import com.sbizzera.real_estate_manager.data.repository.FilterRepository
 import com.sbizzera.real_estate_manager.data.repository.PropertyFilter
 import com.sbizzera.real_estate_manager.data.repository.PropertyRepository
@@ -19,9 +17,9 @@ import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.L
 import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel.ListPropertyViewAction.AddPropertyClicked
 import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel.ListPropertyViewAction.DetailsPropertyClicked
 import com.sbizzera.real_estate_manager.utils.CUSTOM_DATE_FORMATTER
-import com.sbizzera.real_estate_manager.utils.helper.FileHelper
-import com.sbizzera.real_estate_manager.utils.data_utils.PropertyComparator
 import com.sbizzera.real_estate_manager.utils.architecture_components.SingleLiveEvent
+import com.sbizzera.real_estate_manager.utils.data_utils.PropertyComparator
+import com.sbizzera.real_estate_manager.utils.helper.FileHelper
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
@@ -35,8 +33,7 @@ class ListPropertyViewModel(
     private val currentPropertyRepository: CurrentPropertyIdRepository,
     propertyRepository: PropertyRepository,
     private val fileHelper: FileHelper,
-    private val filterRepository: FilterRepository,
-    private val appContext : App
+    private val filterRepository: FilterRepository
 ) : ViewModel() {
 
     val listUiStateLD = MediatorLiveData<ListUiState>()
@@ -50,15 +47,17 @@ class ListPropertyViewModel(
         val allPropertiesLD = propertyRepository.getAllLocalProperties()
         val propertyFilterLD = filterRepository.filterLiveData
         val currentPropertyIdLD = currentPropertyRepository.currentPropertyIdLiveData
-        listUiStateLD.addSource(allPropertiesLD) { allProperties ->
-            combineSources(allProperties, propertyFilterLD.value,currentPropertyIdLD.value)
-        }
 
         listUiStateLD.addSource(filterRepository.filterLiveData) { propertyFilter ->
-            combineSources(allPropertiesLD.value, propertyFilter,currentPropertyIdLD.value)
+            combineSources(allPropertiesLD.value, propertyFilter, currentPropertyIdLD.value)
         }
+
         listUiStateLD.addSource(currentPropertyIdLD){currentPropertyRepositoryId->
             combineSources(allPropertiesLD.value,propertyFilterLD.value,currentPropertyRepositoryId)
+        }
+
+        listUiStateLD.addSource(allPropertiesLD) { allProperties ->
+            combineSources(allProperties, propertyFilterLD.value,currentPropertyIdLD.value)
         }
 
         filterUiState = Transformations.map(filterRepository.filterLiveData) { filters ->
@@ -77,7 +76,7 @@ class ListPropertyViewModel(
         )
 
         allProperties.forEach { property ->
-            val doesPropertyMatchFilters = doesPropertyMatchFilers(property, propertyFilter)
+            val doesPropertyMatchFilters = doesPropertyMatchFilters(property, propertyFilter)
 
             if (doesPropertyMatchFilters) {
                 listOfFilteredProperties.add(property)
@@ -91,7 +90,7 @@ class ListPropertyViewModel(
         listUiStateLD.value = listUiStateToReturn
     }
 
-    private fun doesPropertyMatchFilers(property: Property, propertyFilter: PropertyFilter): Boolean {
+    private fun doesPropertyMatchFilters(property: Property, propertyFilter: PropertyFilter): Boolean {
         if (
             !availabilityDateMatchesFilter(property.creationDate, propertyFilter.createDateRange) ||
             !soldDateMatchesFilters(property.soldDate, propertyFilter.soldDateRange) ||
@@ -136,7 +135,9 @@ class ListPropertyViewModel(
         if (soldDate.isEmpty()) {
             return false
         }
-        val soldDateLocalDate = LocalDate.parse(soldDate, DateTimeFormatter.ISO_DATE_TIME)
+
+
+        val soldDateLocalDate = LocalDate.parse(soldDate, CUSTOM_DATE_FORMATTER)
         val rangeBeginLocalDate =
             LocalDateTime.ofInstant(Instant.ofEpochMilli(soldDateRange.first), ZoneOffset.UTC).toLocalDate()
         val rangeEndLocalDate =
@@ -153,9 +154,6 @@ class ListPropertyViewModel(
     private fun availabilityDateMatchesFilter(creationDate: String, creationDateRange: LongRange?): Boolean {
         if (creationDateRange == null) {
             return true
-        }
-        if (creationDate.isEmpty()) {
-            return false
         }
         val creationDateLocalDate = LocalDate.parse(creationDate, DateTimeFormatter.ISO_DATE_TIME)
         val rangeBeginLocalDate =
@@ -218,7 +216,7 @@ class ListPropertyViewModel(
     }
 
     fun addPropertyClicked() {
-        currentPropertyRepository.currentPropertyIdLiveData.value = null
+        currentPropertyRepository.currentPropertyIdLiveData.value = ""
         listViewAction.value = AddPropertyClicked
     }
 
@@ -247,9 +245,9 @@ class ListPropertyViewModel(
 
     private fun getBackgroundColor(propertyId: String,currentPropertyId: String?): Int {
         return if(currentPropertyId==null || propertyId != currentPropertyId){
-            ContextCompat.getColor(appContext,android.R.color.white)
+            android.R.color.white
         }else{
-            ContextCompat.getColor(appContext,R.color.colorAccent)
+            R.color.colorAccent
         }
     }
 

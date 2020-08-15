@@ -42,8 +42,7 @@ object ViewModelFactory : ViewModelProvider.Factory {
                 CurrentPropertyIdRepository.instance,
                 PropertyRepository.instance,
                 FileHelper.instance,
-                FilterRepository.instance,
-                App.instance
+                FilterRepository.instance
             ) as T
         }
         if (modelClass.isAssignableFrom(EditPropertyViewModel::class.java)) {

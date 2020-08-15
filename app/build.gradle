@@ -16,13 +16,14 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
-        buildConfigField("String","MAPS_STATIC_API_KEY",MAPS_STATIC_API_KEY)
+        buildConfigField("String", "MAPS_STATIC_API_KEY", MAPS_STATIC_API_KEY)
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -33,22 +34,26 @@ android {
         jvmTarget = "1.8"
     }
 
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.core:core-ktx:1.3.1'
-    implementation 'androidx.fragment:fragment-ktx:1.3.0-alpha06'
-    implementation 'androidx.activity:activity-ktx:1.2.0-alpha06'
+    implementation 'androidx.fragment:fragment-ktx:1.3.0-alpha07'
+    implementation 'androidx.activity:activity-ktx:1.2.0-alpha07'
 
 
     //UI
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta7'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-rc1'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
-    implementation 'com.google.android.material:material:1.2.0-rc01'
+    implementation 'com.google.android.material:material:1.3.0-alpha02'
 
     //Room
     def room_version = "2.2.5"
@@ -61,7 +66,7 @@ dependencies {
     testImplementation "androidx.room:room-testing:$room_version"
 
     //Firestore
-    implementation 'com.google.firebase:firebase-firestore-ktx:21.4.0'
+    implementation 'com.google.firebase:firebase-firestore-ktx:21.5.0'
 
     //FirebaseStorage
     implementation 'com.google.firebase:firebase-storage:19.1.1'
@@ -78,10 +83,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinx_version"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1'
 
-    //Test
-    testImplementation 'junit:junit:4.13'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
 
     //ABP
     implementation 'com.jakewharton.threetenabp:threetenabp:1.2.4'
@@ -104,17 +106,16 @@ dependencies {
 
 
     //Mockito
-    testImplementation "org.mockito:mockito-core:2.28.2"
-    testImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.5.0"
-    androidTestImplementation("com.nhaarman:mockito-kotlin-kt1.1:1.5.0", {
-        exclude group: 'org.mockito', module: 'mockito-core'
-    })
-    androidTestImplementation 'org.mockito:mockito-android:2.11.0'
-
+    //Test
+    testImplementation 'junit:junit:4.13'
+    testImplementation 'org.mockito:mockito-core:3.0.0'
     testImplementation "org.powermock:powermock-api-mockito2:2.0.4"
-    testImplementation "org.powermock:powermock-module-junit4-rule-agent:2.0.0-beta.5"
     testImplementation "org.powermock:powermock-module-junit4:2.0.0-beta.5"
+    testImplementation "android.arch.core:core-testing:1.1.1"
 
-    implementation "androidx.concurrent:concurrent-futures-ktx:1.1.0-rc01"
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
 
 }

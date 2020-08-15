@@ -4,7 +4,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.powermock.api.mockito.PowerMockito
 import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
 import org.threeten.bp.LocalDate
@@ -17,8 +16,6 @@ class UtilsTest {
 
     @Before
     fun setUp() {
-        val mockedDate = LocalDate.of(1983, 11, 29)
-        PowerMockito.stub<LocalDate>(PowerMockito.method(LocalDate::class.java, "now")).toReturn(mockedDate)
         utils = Utils()
     }
 
@@ -28,9 +25,4 @@ class UtilsTest {
         assertEquals(utils.convertDollarToEuro(dollars), 81)
     }
 
-    @Test
-    fun getTodayDate() {
-        val date = LocalDate.now().format(CUSTOM_DATE_FORMATTER)
-        assertEquals(date, utils.getTodayDate())
-    }
 }

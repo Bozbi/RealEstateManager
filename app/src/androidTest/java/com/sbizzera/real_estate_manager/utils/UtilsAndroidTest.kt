@@ -6,6 +6,7 @@ import org.junit.Assert
 import org.junit.Test
 
 import org.junit.runner.RunWith
+import org.threeten.bp.LocalDate
 
 
 @RunWith(AndroidJUnit4::class)
@@ -18,6 +19,7 @@ class UtilsAndroidTest{
 
     @Test
     fun getTodayDate() {
-        Assert.assertEquals("29/11/1983", getTodayDate())
+        val date = LocalDate.now().format(CUSTOM_DATE_FORMATTER)
+        Assert.assertEquals(date, Utils().getTodayDate())
     }
 }
