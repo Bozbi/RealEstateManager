@@ -10,6 +10,6 @@ interface OnUserAskTransactionEvent {
     fun onPhotoEditorAsked()
     fun onPhotoViewerAsked(transitionView: View)
     fun onMapAsked()
-    fun onCameraAsked(tempPhotoUri : Uri)
+    fun onCameraAsked(tempPhotoUri : String)
     fun onGalleryAsked()
 }

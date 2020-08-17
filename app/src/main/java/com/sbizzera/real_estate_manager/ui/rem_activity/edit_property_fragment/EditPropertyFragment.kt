@@ -31,6 +31,8 @@ import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.E
 import com.sbizzera.real_estate_manager.utils.architecture_components.ViewModelFactory
 import com.sbizzera.real_estate_manager.custom_views.MyCustomChip
 import kotlinx.android.synthetic.main.fragment_edit_property.*
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 
 class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransactionEventListenable,
     DatePickerDialog.OnDateSetListener {
@@ -140,7 +142,8 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
         }
 
         property_sold_date_edt.setOnClickListener {
-            viewModel.soldDatePickerClicked()
+            val today = LocalDate.now()
+            viewModel.soldDatePickerClicked(today.year,today.monthValue,today.dayOfMonth)
         }
 
         property_title_edt.doOnTextChanged { text, _, _, _ ->
@@ -201,7 +204,8 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
         }
 
         save_property_btn.setOnClickListener {
-            viewModel.savePropertyClicked()
+            val dateTimeNow = LocalDateTime.now()
+            viewModel.savePropertyClicked(dateTimeNow)
         }
 
         property_sold_date_layout.setEndIconOnClickListener {

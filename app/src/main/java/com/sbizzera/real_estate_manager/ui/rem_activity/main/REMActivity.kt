@@ -233,12 +233,13 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
         viewModel.shouldDisplayBackIconAndClearCurrentPropertyRepo(backStackList)
     }
 
-    override fun onCameraAsked(tempPhotoUri: Uri) {
+    override fun onCameraAsked(tempPhotoUri: String) {
         val takePictureIntent2 = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         takePictureIntent2.resolveActivity(packageManager)
         takePictureIntent2.putExtra(MediaStore.EXTRA_OUTPUT, tempPhotoUri)
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
-            takePictureIntent2.clipData = ClipData.newRawUri("", tempPhotoUri)
+            val tempPhotoUriInUri = Uri.parse(tempPhotoUri)
+            takePictureIntent2.clipData = ClipData.newRawUri("", tempPhotoUriInUri)
             takePictureIntent2.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         @Suppress("DEPRECATION")

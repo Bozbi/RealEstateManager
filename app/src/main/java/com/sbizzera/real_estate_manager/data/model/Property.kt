@@ -25,12 +25,13 @@ data class Property(
     val propertyBathRooms: Int = 0,
     val propertyPoiList: List<PointOfInterest> = emptyList(),
     val soldDate: String = "",
-    val creationDate: String = "",
+    val creationDate: String = "2000-01-01T00:00:00.000",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
     val estateAgent: String? = null
 ) {
     fun hasNotChanged(property: Property): Boolean {
+        println()
             return propertyId == property.propertyId &&
                     propertyType ==property.propertyType &&
                     photoList == property.photoList &&

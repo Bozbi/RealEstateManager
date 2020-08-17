@@ -1,7 +1,7 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment
 
 import android.annotation.SuppressLint
-import android.app.Application
+import android.content.Context
 import android.net.Uri
 import android.view.View
 import androidx.lifecycle.LiveData
@@ -34,18 +34,18 @@ class EditPropertyViewModel(
     private val propertyRepository: PropertyRepository,
     private val fileHelper: FileHelper,
     private val currentPhotoRepository: CurrentEditedPhotoRepository,
-    private val app: Application,
+    private val context: Context,
     private val geocodeResolver: GeocodeResolver,
     private val sharedPreferencesRepo: SharedPreferencesRepo
 ) : ViewModel() {
 
     val editViewAction =
-        SingleLiveEvent<EditPropertyViewAction>()
+        SingleLiveEvent<EditPropertyViewAction?>()
     val editEvent =
         SingleLiveEvent<EditPropertyEvent>()
     val editUiStateLD: LiveData<EditUiState>
     private lateinit var initialProperty: Property
-    private lateinit var tempPhotoUri: Uri
+    private lateinit var tempPhotoUri: String
 
 
     init {
@@ -64,13 +64,11 @@ class EditPropertyViewModel(
                     propertyInModificationRepository.propertyInModificationLD
                 }
             }
-
-        println("debug : init EditPropertyViewModel")
     }
 
 
     fun takePhotoFromCameraClicked() {
-        tempPhotoUri = Uri.parse(fileHelper.createEmptyTempPhotoFileAndGetUriBack())
+        tempPhotoUri = fileHelper.createEmptyTempPhotoFileAndGetUriBack()
         editViewAction.value = EditPropertyViewAction.TakePhotoFromCamera(tempPhotoUri)
     }
 
@@ -78,25 +76,24 @@ class EditPropertyViewModel(
         editViewAction.value = EditPropertyViewAction.TakePhotoFromGallery
     }
 
-    fun soldDatePickerClicked() {
-        val date = LocalDate.now()
+    fun soldDatePickerClicked(year: Int,month: Int,dayOfMonth: Int) {
         editViewAction.value =
-            EditPropertyViewAction.DisplayDatePicker(date.year, date.monthValue, date.dayOfMonth)
+            EditPropertyViewAction.DisplayDatePicker(year, month, dayOfMonth)
     }
 
-    fun savePropertyClicked() {
+    fun savePropertyClicked(dateTimeNow: LocalDateTime) {
         if (!allInfoCorrect()) {
             return
         }
-        if (propertyHasNotChanged()) {
+        if (propertyHasNotChanged(dateTimeNow)) {
             editViewAction.value = EditPropertyViewAction.CloseFragment
             return
         }
-        saveProperty()
+        saveProperty(dateTimeNow)
     }
 
-    private fun propertyHasNotChanged(): Boolean {
-        val propertyModified = fromEditUiStateToProperty()
+    private fun propertyHasNotChanged(dateTimeNow: LocalDateTime): Boolean {
+        val propertyModified = fromEditUiStateToProperty(dateTimeNow)
         return propertyModified.hasNotChanged(initialProperty)
     }
 
@@ -104,6 +101,7 @@ class EditPropertyViewModel(
         var allInfoCorrect = true
         var photoCountCorrect = true
         var state = propertyInModificationRepository.propertyInModificationLD.value!!
+
         state = state.copy(
             propertyTitleError = null,
             addPhotoVisibility = View.INVISIBLE,
@@ -123,36 +121,36 @@ class EditPropertyViewModel(
             }
             if (propertyTitle.isNullOrEmpty()) {
                 allInfoCorrect = false
-                state = state.copy(propertyTitleError = app.resources.getString(R.string.property_title_error))
+                state = state.copy(propertyTitleError = context.getString(R.string.property_title_error))
             }
             if (propertyDescription.isNullOrEmpty()) {
                 allInfoCorrect = false
-                state = state.copy(propertyDescriptionError = app.resources.getString(R.string.property_description_error))
+                state = state.copy(propertyDescriptionError = context.getString(R.string.property_description_error))
             }
 
             if (this.propertyAddress.isNullOrEmpty()) {
                 allInfoCorrect = false
-                state = state.copy(propertyAddressError = app.resources.getString(R.string.property_address_error))
+                state = state.copy(propertyAddressError = context.getString(R.string.property_address_error))
             }
             if (this.propertyCityCode.isNullOrEmpty()) {
                 allInfoCorrect = false
-                state = state.copy(propertyCityCodeError = app.resources.getString(R.string.property_city_code_error))
+                state = state.copy(propertyCityCodeError = context.getString(R.string.property_city_code_error))
             }
             if (propertyCityName.isNullOrEmpty()) {
                 allInfoCorrect = false
-                state = state.copy(propertyCityNameError = app.resources.getString(R.string.property_city_name_error))
+                state = state.copy(propertyCityNameError = context.getString(R.string.property_city_name_error))
             }
             if (propertyPrice.isNullOrEmpty()) {
                 allInfoCorrect = false
-                state = state.copy(propertyPriceError = app.resources.getString(R.string.property_price_error))
+                state = state.copy(propertyPriceError = context.getString(R.string.property_price_error))
             }
             if (propertyType.isNullOrEmpty()) {
                 allInfoCorrect = false
-                state = state.copy(propertyTypeError = app.resources.getString(R.string.property_type_error))
+                state = state.copy(propertyTypeError = context.getString(R.string.property_type_error))
             }
             if (propertySurface.isNullOrEmpty()) {
                 allInfoCorrect = false
-                state = state.copy(propertySurfaceError = app.resources.getString(R.string.property_surface_error))
+                state = state.copy(propertySurfaceError = context.getString(R.string.property_surface_error))
             }
         }
 
@@ -169,10 +167,10 @@ class EditPropertyViewModel(
     }
 
 
-    private fun saveProperty() {
+    private fun saveProperty(dateTimeNow: LocalDateTime) {
         val currentEditUiState = propertyInModificationRepository.propertyInModificationLD.value!!
         checkInsertOrDeletePhoto(currentEditUiState)
-        val propertyToInsert = fromEditUiStateToProperty()
+        val propertyToInsert = fromEditUiStateToProperty(dateTimeNow)
         viewModelScope.launch(IO) {
             val inserted = propertyRepository.insertLocalProperty(propertyToInsert)
             withContext(Main) {
@@ -180,7 +178,6 @@ class EditPropertyViewModel(
                 if (inserted.toInt() != -1) {
                     editEvent.value = EditPropertyEvent.PropertySaved
                 }
-                editEvent.value
             }
         }
     }
@@ -212,7 +209,7 @@ class EditPropertyViewModel(
     }
 
     @SuppressLint("DefaultLocale")
-    private fun fromEditUiStateToProperty(): Property {
+    private fun fromEditUiStateToProperty(dateTimeNow :LocalDateTime): Property {
         val currentPropertyToInsert = propertyInModificationRepository.propertyInModificationLD.value!!
         val photoList = createPhotoList(currentPropertyToInsert.photoList)
         with(currentPropertyToInsert) {
@@ -222,7 +219,7 @@ class EditPropertyViewModel(
                 propertyType.toString(),
                 propertyPrice.toString().toIntOrNull() ?: 0,
                 photoList,
-                LocalDateTime.now().toString(),
+                dateTimeNow.toString(),
                 propertyDescription.toString(),
                 propertyAddress.toString(),
                 propertyCityCode.toString(),
@@ -233,7 +230,7 @@ class EditPropertyViewModel(
                 propertyBathroomCount?.toString()?.toIntOrNull() ?: 0,
                 this@EditPropertyViewModel.createPoiList(propertyPoiMap),
                 propertySoldDate?.toString() ?: "",
-                propertyCreationDate ?: LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
+                propertyCreationDate ?: dateTimeNow.format(DateTimeFormatter.ISO_DATE_TIME),
                 propertyLat,
                 propertyLng,
                 sharedPreferencesRepo.getUserName()
@@ -416,8 +413,10 @@ class EditPropertyViewModel(
             propertyInModificationRepository.propertyInModificationLD.value?.copy(propertySoldDate = null)
     }
 
+
+
     fun onResultFromCamera() {
-        currentPhotoRepository.currentPhotoLD.value = Pair(PhotoOnEdit(photoUri = tempPhotoUri.toString()), null)
+        currentPhotoRepository.currentPhotoLD.value = Pair(PhotoOnEdit(photoUri = tempPhotoUri), null)
         editViewAction.value = LaunchEditor
     }
 
@@ -435,7 +434,7 @@ class EditPropertyViewModel(
     }
 
     sealed class EditPropertyViewAction {
-        class TakePhotoFromCamera(val tempPhotoUri: Uri) : EditPropertyViewAction()
+        class TakePhotoFromCamera(val tempPhotoUri: String) : EditPropertyViewAction()
         object TakePhotoFromGallery : EditPropertyViewAction()
         object LaunchEditor : EditPropertyViewAction()
         class MoveRecyclerToPosition(val position: Int) : EditPropertyViewAction()

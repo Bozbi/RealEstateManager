@@ -26,23 +26,20 @@ class DetailsPropertyViewModel(
 
 ) : ViewModel() {
 
-    val detailsUiStateLD: LiveData<DetailsUiState>
+    var detailsUiStateLD: LiveData<DetailsUiState>
     val detailsViewAction =
         SingleLiveEvent<DetailsViewAction>()
 
 
     init {
         val currentPropertyId = currentPropertyIdRepository.currentPropertyIdLiveData.value
-        detailsUiStateLD = if (currentPropertyId != null) {
+        detailsUiStateLD = MutableLiveData(null)
+         if (currentPropertyId != null) {
             val propertyLiveData: LiveData<Property> = propertyRepository.getPropertyByIdLD(currentPropertyId)
-            Transformations.map(propertyLiveData) { property ->
+            detailsUiStateLD = Transformations.map(propertyLiveData) { property ->
                 fromPropertyToDetailUiState(property)
             }
-        } else {
-            MutableLiveData(fromPropertyToDetailUiState(Property()))
         }
-
-
     }
 
 
@@ -76,9 +73,6 @@ class DetailsPropertyViewModel(
     }
 
     private fun createAgentText(estateAgent: String?): String {
-        if (estateAgent == null) {
-            return ""
-        }
         return "added by $estateAgent"
     }
 
