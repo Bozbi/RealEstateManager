@@ -11,12 +11,12 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.slider.RangeSlider
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.data.model.PointOfInterest
-import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel.FilterDialogViewAction.CreationDateRangeClicked
-import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel.FilterDialogViewAction.SoldDateRangeClicked
+import com.sbizzera.real_estate_manager.ui.rem_activity.list_property.ListPropertyViewModel.FilterDialogViewAction.CreationDateRangeClicked
+import com.sbizzera.real_estate_manager.ui.rem_activity.list_property.ListPropertyViewModel.FilterDialogViewAction.SoldDateRangeClicked
 import com.sbizzera.real_estate_manager.utils.architecture_components.ViewModelFactory
 import com.sbizzera.real_estate_manager.custom_views.MyCustomChip
-import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.FilterUiState
-import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel
+import com.sbizzera.real_estate_manager.ui.rem_activity.list_property.FilterUiState
+import com.sbizzera.real_estate_manager.ui.rem_activity.list_property.ListPropertyViewModel
 import kotlinx.android.synthetic.main.dialog_filter.*
 
 

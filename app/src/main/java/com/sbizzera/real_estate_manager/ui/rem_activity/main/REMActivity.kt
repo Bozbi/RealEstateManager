@@ -20,15 +20,15 @@ import com.google.android.material.snackbar.Snackbar
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEvent
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEventListenable
-import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyFragment
+import com.sbizzera.real_estate_manager.ui.rem_activity.details_property.DetailsPropertyFragment
 import com.sbizzera.real_estate_manager.ui.rem_activity.dialog.ChooseUserMaterialDialog
-import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyFragment
-import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.OnPropertySavedListener
-import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyFragment
+import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property.EditPropertyFragment
+import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property.OnPropertySavedListener
+import com.sbizzera.real_estate_manager.ui.rem_activity.list_property.ListPropertyFragment
 import com.sbizzera.real_estate_manager.ui.rem_activity.main.REMActivityViewModel.ViewAction.*
-import com.sbizzera.real_estate_manager.ui.rem_activity.map_fragment.MapFragment
+import com.sbizzera.real_estate_manager.ui.rem_activity.map.MapFragment
 import com.sbizzera.real_estate_manager.ui.rem_activity.photo_editor.PhotoEditorFragment
-import com.sbizzera.real_estate_manager.ui.rem_activity.photo_viewer_fragment.PhotoViewerFragment
+import com.sbizzera.real_estate_manager.ui.rem_activity.photo_viewer.PhotoViewerFragment
 import com.sbizzera.real_estate_manager.utils.architecture_components.ViewModelFactory
 import kotlinx.android.synthetic.main.activity_r_e_m.*
 

@@ -8,7 +8,7 @@
     android:background="@android:color/white"
     android:clickable="true"
     android:focusable="true"
-    tools:context=".ui.rem_activity.details_property_fragment.DetailsPropertyFragment">
+    tools:context=".ui.rem_activity.details_property.DetailsPropertyFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

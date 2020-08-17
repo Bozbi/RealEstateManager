@@ -1,4 +1,4 @@
-package com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment
+package com.sbizzera.real_estate_manager.ui.rem_activity.list_property
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,8 +15,8 @@ import com.sbizzera.real_estate_manager.events.OnPropertyClickEvent
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEvent
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEventListenable
 import com.sbizzera.real_estate_manager.ui.rem_activity.dialog.FilterDialog
-import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel.ListPropertyViewAction.AddPropertyClicked
-import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel.ListPropertyViewAction.DetailsPropertyClicked
+import com.sbizzera.real_estate_manager.ui.rem_activity.list_property.ListPropertyViewModel.ListPropertyViewAction.AddPropertyClicked
+import com.sbizzera.real_estate_manager.ui.rem_activity.list_property.ListPropertyViewModel.ListPropertyViewAction.DetailsPropertyClicked
 import com.sbizzera.real_estate_manager.utils.architecture_components.ViewModelFactory
 import kotlinx.android.synthetic.main.fragment_list_property.*
 

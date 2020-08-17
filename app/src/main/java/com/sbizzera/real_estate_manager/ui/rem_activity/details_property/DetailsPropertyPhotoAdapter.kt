@@ -1,18 +1,22 @@
-package com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment
+package com.sbizzera.real_estate_manager.ui.rem_activity.details_property
 
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.sbizzera.real_estate_manager.R
-import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyPhotoAdapter.DetailsPhotoViewHolder
+import com.sbizzera.real_estate_manager.ui.rem_activity.details_property.DetailsPropertyPhotoAdapter.DetailsPhotoViewHolder
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.photo_in_detail_item.view.*
 import java.lang.Exception
 
-class DetailsPropertyPhotoAdapter : RecyclerView.Adapter<DetailsPhotoViewHolder>() {
+class DetailsPropertyPhotoAdapter : ListAdapter<DetailsPhotoUiState,DetailsPhotoViewHolder>(
+    DiffUtilCallback
+) {
 
     private lateinit var onPhotoClickForTransitionListener: OnPhotoClickForTransitionListener
     private lateinit var onViewHolderBoundListener: OnViewHolderBoundListener
@@ -73,5 +77,15 @@ class DetailsPropertyPhotoAdapter : RecyclerView.Adapter<DetailsPhotoViewHolder>
 
     interface OnViewHolderBoundListener {
         fun onViewHolderBound(position: Int)
+    }
+
+    private object DiffUtilCallback : DiffUtil.ItemCallback<DetailsPhotoUiState>(){
+        override fun areItemsTheSame(oldItem: DetailsPhotoUiState, newItem: DetailsPhotoUiState) =
+            oldItem.photoTitle ==newItem.photoTitle
+
+
+        override fun areContentsTheSame(oldItem: DetailsPhotoUiState, newItem: DetailsPhotoUiState)=
+            oldItem ==newItem
+
     }
 }

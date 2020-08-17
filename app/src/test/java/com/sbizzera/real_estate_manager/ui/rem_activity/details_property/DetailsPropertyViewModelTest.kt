@@ -1,4 +1,4 @@
-package com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment
+package com.sbizzera.real_estate_manager.ui.rem_activity.details_property
 
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule

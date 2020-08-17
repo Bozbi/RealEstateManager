@@ -1,4 +1,4 @@
-package com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment
+package com.sbizzera.real_estate_manager.ui.rem_activity.details_property
 
 import android.os.Bundle
 import android.transition.TransitionInflater
@@ -14,12 +14,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEvent
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEventListenable
-import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyViewModel.DetailsViewAction.ModifyPropertyClicked
+import com.sbizzera.real_estate_manager.ui.rem_activity.details_property.DetailsPropertyViewModel.DetailsViewAction.ModifyPropertyClicked
 import com.sbizzera.real_estate_manager.utils.architecture_components.ViewModelFactory
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_details_property.*
 
-class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,DetailsPropertyPhotoAdapter.OnPhotoClickForTransitionListener, DetailsPropertyPhotoAdapter.OnViewHolderBoundListener {
+class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
+    DetailsPropertyPhotoAdapter.OnPhotoClickForTransitionListener, DetailsPropertyPhotoAdapter.OnViewHolderBoundListener {
 
     companion object {
         fun newInstance() = DetailsPropertyFragment()
@@ -41,14 +42,15 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModelDetails = ViewModelProvider(this,
+        viewModelDetails = ViewModelProvider(
+            this,
             ViewModelFactory
         ).get(DetailsPropertyViewModel::class.java)
-        recyclerAdapter.setListener(this,this)
+        recyclerAdapter.setListener(this, this)
         recycler_view.adapter = recyclerAdapter
         recycler_view.isNestedScrollingEnabled = false
 
-        detailsLayoutManager = object : LinearLayoutManager(requireContext(), HORIZONTAL, false){
+        detailsLayoutManager = object : LinearLayoutManager(requireContext(), HORIZONTAL, false) {
             override fun onLayoutCompleted(state: RecyclerView.State?) {
                 super.onLayoutCompleted(state)
                 viewModelDetails.checkScrollNecessity(
@@ -62,8 +64,11 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
                 return false
             }
         }
-        recycler_view.layoutManager = detailsLayoutManager
-        recycler_view.isNestedScrollingEnabled = false
+        recycler_view.apply {
+            layoutManager = detailsLayoutManager
+            isNestedScrollingEnabled = false
+            setHasFixedSize(true)
+        }
 
         viewModelDetails.detailsUiStateLD.observe(viewLifecycleOwner) { model ->
             updateUi(model)
@@ -74,7 +79,9 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
                     onUserAskTransactionEvent.onModifyPropertyAsked()
                 }
                 DetailsPropertyViewModel.DetailsViewAction.ViewHolderReady -> startPostponedEnterTransition()
-                is DetailsPropertyViewModel.DetailsViewAction.ScrollToPosition -> detailsLayoutManager.scrollToPosition(action.position)
+                is DetailsPropertyViewModel.DetailsViewAction.ScrollToPosition -> detailsLayoutManager.scrollToPosition(
+                    action.position
+                )
             }
         }
         modify_btn.setOnClickListener {
@@ -82,7 +89,7 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
         }
         postponeEnterTransition()
 
-        setExitSharedElementCallback(object :SharedElementCallback(){
+        setExitSharedElementCallback(object : SharedElementCallback() {
             override fun onMapSharedElements(
                 names: MutableList<String>,
                 sharedElements: MutableMap<String, View>

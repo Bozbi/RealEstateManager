@@ -1,4 +1,4 @@
-package com.sbizzera.real_estate_manager.ui.rem_activity.photo_viewer_fragment
+package com.sbizzera.real_estate_manager.ui.rem_activity.photo_viewer
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

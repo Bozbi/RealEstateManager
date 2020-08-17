@@ -4,7 +4,7 @@ import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sbizzera.real_estate_manager.data.repository.CurrentPropertyIdRepository
-import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyFragment
+import com.sbizzera.real_estate_manager.ui.rem_activity.details_property.DetailsPropertyFragment
 import com.sbizzera.real_estate_manager.data.repository.SharedPreferencesRepo
 import com.sbizzera.real_estate_manager.utils.architecture_components.SingleLiveEvent
 import com.sbizzera.real_estate_manager.utils.helper.SynchroniseDataHelper

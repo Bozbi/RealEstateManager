@@ -1,4 +1,4 @@
-package com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment
+package com.sbizzera.real_estate_manager.ui.rem_activity.details_property
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,7 +11,7 @@ import com.sbizzera.real_estate_manager.data.model.Photo
 import com.sbizzera.real_estate_manager.data.model.PointOfInterest
 import com.sbizzera.real_estate_manager.data.model.Property
 import com.sbizzera.real_estate_manager.data.repository.PropertyRepository
-import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyViewModel.DetailsViewAction.ModifyPropertyClicked
+import com.sbizzera.real_estate_manager.ui.rem_activity.details_property.DetailsPropertyViewModel.DetailsViewAction.ModifyPropertyClicked
 import com.sbizzera.real_estate_manager.utils.CUSTOM_DATE_FORMATTER
 import com.sbizzera.real_estate_manager.utils.helper.FileHelper
 import com.sbizzera.real_estate_manager.utils.architecture_components.SingleLiveEvent

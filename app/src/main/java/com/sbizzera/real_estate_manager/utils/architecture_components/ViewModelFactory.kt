@@ -4,18 +4,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.sbizzera.real_estate_manager.application.App
 import com.sbizzera.real_estate_manager.data.repository.*
-import com.sbizzera.real_estate_manager.ui.rem_activity.details_property_fragment.DetailsPropertyViewModel
+import com.sbizzera.real_estate_manager.ui.rem_activity.details_property.DetailsPropertyViewModel
 import com.sbizzera.real_estate_manager.ui.rem_activity.main.REMActivityViewModel
-import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyViewModel
+import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property.EditPropertyViewModel
 import com.sbizzera.real_estate_manager.data.repository.FilterRepository
-import com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment.ListPropertyViewModel
-import com.sbizzera.real_estate_manager.ui.rem_activity.map_fragment.MapViewModel
-import com.sbizzera.real_estate_manager.ui.rem_activity.map_fragment.MarkerUseCase
+import com.sbizzera.real_estate_manager.ui.rem_activity.list_property.ListPropertyViewModel
+import com.sbizzera.real_estate_manager.ui.rem_activity.map.MapViewModel
+import com.sbizzera.real_estate_manager.ui.rem_activity.map.MarkerUseCase
 import com.sbizzera.real_estate_manager.ui.rem_activity.photo_editor.PhotoEditorViewModel
-import com.sbizzera.real_estate_manager.ui.rem_activity.photo_viewer_fragment.PhotoViewerViewModel
+import com.sbizzera.real_estate_manager.ui.rem_activity.photo_viewer.PhotoViewerViewModel
+import com.sbizzera.real_estate_manager.utils.CoroutineContextProvider
 import com.sbizzera.real_estate_manager.utils.helper.FileHelper
 import com.sbizzera.real_estate_manager.utils.helper.GeocodeResolver
 import com.sbizzera.real_estate_manager.utils.helper.SynchroniseDataHelper
+import org.threeten.bp.Clock
 
 object ViewModelFactory : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
@@ -54,7 +56,10 @@ object ViewModelFactory : ViewModelProvider.Factory {
                 CurrentEditedPhotoRepository.instance,
                 App.instance,
                 GeocodeResolver(),
-                SharedPreferencesRepo.instance) as T
+                SharedPreferencesRepo.instance,
+                Clock.systemDefaultZone(),
+                CoroutineContextProvider()
+            ) as T
         }
         if (modelClass.isAssignableFrom(PhotoEditorViewModel::class.java)) {
             return PhotoEditorViewModel(

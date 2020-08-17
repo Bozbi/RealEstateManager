@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import com.google.android.material.snackbar.Snackbar
 import com.sbizzera.real_estate_manager.R
-import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.PhotoOnEdit
+import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property.PhotoOnEdit
 import com.sbizzera.real_estate_manager.utils.architecture_components.ViewModelFactory
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_photo_editor.*

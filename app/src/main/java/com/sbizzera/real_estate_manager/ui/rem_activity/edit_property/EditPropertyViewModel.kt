@@ -1,4 +1,4 @@
-package com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment
+package com.sbizzera.real_estate_manager.ui.rem_activity.edit_property
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -13,15 +13,14 @@ import com.sbizzera.real_estate_manager.data.model.Photo
 import com.sbizzera.real_estate_manager.data.model.PointOfInterest
 import com.sbizzera.real_estate_manager.data.model.Property
 import com.sbizzera.real_estate_manager.data.repository.*
-import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyViewModel.EditPropertyViewAction.LaunchEditor
+import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property.EditPropertyViewModel.EditPropertyViewAction.LaunchEditor
 import com.sbizzera.real_estate_manager.utils.*
 import com.sbizzera.real_estate_manager.utils.architecture_components.SingleLiveEvent
 import com.sbizzera.real_estate_manager.utils.helper.FileHelper
 import com.sbizzera.real_estate_manager.utils.helper.GeocodeResolver
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.threeten.bp.Clock
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -36,7 +35,9 @@ class EditPropertyViewModel(
     private val currentPhotoRepository: CurrentEditedPhotoRepository,
     private val context: Context,
     private val geocodeResolver: GeocodeResolver,
-    private val sharedPreferencesRepo: SharedPreferencesRepo
+    private val sharedPreferencesRepo: SharedPreferencesRepo,
+    private val clock : Clock,
+    private val coroutineProvider: CoroutineContextProvider
 ) : ViewModel() {
 
     val editViewAction =
@@ -81,15 +82,15 @@ class EditPropertyViewModel(
             EditPropertyViewAction.DisplayDatePicker(year, month, dayOfMonth)
     }
 
-    fun savePropertyClicked(dateTimeNow: LocalDateTime) {
+    fun savePropertyClicked() {
         if (!allInfoCorrect()) {
             return
         }
-        if (propertyHasNotChanged(dateTimeNow)) {
+        if (propertyHasNotChanged(LocalDateTime.now(clock))) {
             editViewAction.value = EditPropertyViewAction.CloseFragment
             return
         }
-        saveProperty(dateTimeNow)
+        saveProperty(LocalDateTime.now(clock))
     }
 
     private fun propertyHasNotChanged(dateTimeNow: LocalDateTime): Boolean {
@@ -171,9 +172,9 @@ class EditPropertyViewModel(
         val currentEditUiState = propertyInModificationRepository.propertyInModificationLD.value!!
         checkInsertOrDeletePhoto(currentEditUiState)
         val propertyToInsert = fromEditUiStateToProperty(dateTimeNow)
-        viewModelScope.launch(IO) {
+        viewModelScope.launch(coroutineProvider.io) {
             val inserted = propertyRepository.insertLocalProperty(propertyToInsert)
-            withContext(Main) {
+            withContext(coroutineProvider.main) {
                 editViewAction.value = EditPropertyViewAction.CloseFragment
                 if (inserted.toInt() != -1) {
                     editEvent.value = EditPropertyEvent.PropertySaved
@@ -350,10 +351,10 @@ class EditPropertyViewModel(
 
     private fun fetchNewLatLng() {
         val currentPropertyToInsert = propertyInModificationRepository.propertyInModificationLD.value!!
-        viewModelScope.launch(IO) {
+        viewModelScope.launch(coroutineProvider.io) {
             val newLat = getLatitudeOrLongitude(currentPropertyToInsert, GeocodeResolver.LatOrLng.LATITUDE)
             val newLng = getLatitudeOrLongitude(currentPropertyToInsert, GeocodeResolver.LatOrLng.LONGITUDE)
-            withContext(Main) {
+            withContext(coroutineProvider.main) {
                 propertyInModificationRepository.propertyInModificationLD.value =
                     propertyInModificationRepository.propertyInModificationLD.value
                         ?.copy(
@@ -412,8 +413,6 @@ class EditPropertyViewModel(
         propertyInModificationRepository.propertyInModificationLD.value =
             propertyInModificationRepository.propertyInModificationLD.value?.copy(propertySoldDate = null)
     }
-
-
 
     fun onResultFromCamera() {
         currentPhotoRepository.currentPhotoLD.value = Pair(PhotoOnEdit(photoUri = tempPhotoUri), null)

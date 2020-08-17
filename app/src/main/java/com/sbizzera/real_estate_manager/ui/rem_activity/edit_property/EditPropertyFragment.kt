@@ -1,4 +1,4 @@
-package com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment
+package com.sbizzera.real_estate_manager.ui.rem_activity.edit_property
 
 import android.app.DatePickerDialog
 import android.content.Context
@@ -27,12 +27,11 @@ import com.sbizzera.real_estate_manager.data.model.getTypeNameList
 import com.sbizzera.real_estate_manager.events.OnPhotoActionListener
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEvent
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEventListenable
-import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment.EditPropertyViewModel.EditPropertyViewAction.*
+import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property.EditPropertyViewModel.EditPropertyViewAction.*
 import com.sbizzera.real_estate_manager.utils.architecture_components.ViewModelFactory
 import com.sbizzera.real_estate_manager.custom_views.MyCustomChip
 import kotlinx.android.synthetic.main.fragment_edit_property.*
 import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalDateTime
 
 class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransactionEventListenable,
     DatePickerDialog.OnDateSetListener {
@@ -204,8 +203,7 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
         }
 
         save_property_btn.setOnClickListener {
-            val dateTimeNow = LocalDateTime.now()
-            viewModel.savePropertyClicked(dateTimeNow)
+            viewModel.savePropertyClicked()
         }
 
         property_sold_date_layout.setEndIconOnClickListener {

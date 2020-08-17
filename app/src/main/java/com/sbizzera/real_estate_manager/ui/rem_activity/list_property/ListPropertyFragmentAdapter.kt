@@ -1,4 +1,4 @@
-package com.sbizzera.real_estate_manager.ui.rem_activity.list_property_fragment
+package com.sbizzera.real_estate_manager.ui.rem_activity.list_property
 
 import android.view.LayoutInflater
 import android.view.View

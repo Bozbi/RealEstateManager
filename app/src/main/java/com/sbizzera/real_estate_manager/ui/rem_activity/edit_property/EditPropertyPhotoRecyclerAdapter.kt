@@ -1,4 +1,4 @@
-package com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment
+package com.sbizzera.real_estate_manager.ui.rem_activity.edit_property
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,10 +8,7 @@ import com.bumptech.glide.Glide
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.events.OnPhotoActionListenable
 import com.sbizzera.real_estate_manager.events.OnPhotoActionListener
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.property_photo_item_view.view.*
-import java.lang.Exception
 
 class EditPropertyPhotoRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() , OnPhotoActionListenable{
 

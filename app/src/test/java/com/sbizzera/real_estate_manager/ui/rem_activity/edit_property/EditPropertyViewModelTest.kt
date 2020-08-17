@@ -1,29 +1,41 @@
-package com.sbizzera.real_estate_manager.ui.rem_activity.edit_property_fragment
+package com.sbizzera.real_estate_manager.ui.rem_activity.edit_property
 
-import android.app.Application
 import android.content.Context
 import android.view.View
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import com.sbizzera.real_estate_manager.R
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.mock
 import com.sbizzera.real_estate_manager.application.App
 import com.sbizzera.real_estate_manager.data.model.Photo
 import com.sbizzera.real_estate_manager.data.model.PointOfInterest
 import com.sbizzera.real_estate_manager.data.model.Property
 import com.sbizzera.real_estate_manager.data.repository.*
 import com.sbizzera.real_estate_manager.test_utils.getOrAwaitValue
+import com.sbizzera.real_estate_manager.utils.CoroutineContextProvider
 import com.sbizzera.real_estate_manager.utils.helper.FileHelper
 import com.sbizzera.real_estate_manager.utils.helper.GeocodeResolver
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
+import org.mockito.ArgumentMatchers.*
+import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
-import java.time.LocalDateTime
+import org.threeten.bp.Clock
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.ZonedDateTime
 
 
+@ExperimentalCoroutinesApi
 class EditPropertyViewModelTest {
     private val currentPropertyIdRepository = CurrentPropertyIdRepository.instance
     private val propertyInModificationRepository = PropertyInModificationRepository.instance
@@ -33,18 +45,33 @@ class EditPropertyViewModelTest {
     private lateinit var context: Context
     private lateinit var geocodeResolver: GeocodeResolver
     private lateinit var sharedPreferencesRepo: SharedPreferencesRepo
+    private lateinit var clock: Clock
 
     private lateinit var viewModel: EditPropertyViewModel
 
     private val mockedProperty = MutableLiveData(Property())
+    private var mockedInsertReturn = 10L
 
     @Rule
     @JvmField
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
+    private val testCoroutineDispatcher = TestCoroutineDispatcher()
+
+    private val coroutineContextProvider = CoroutineContextProvider(
+        testCoroutineDispatcher,
+        testCoroutineDispatcher
+    )
+
     @Before
     fun setUp() {
-        propertyRepo = mock(PropertyRepository::class.java)
+        Dispatchers.setMain(
+            testCoroutineDispatcher
+        )
+
+        propertyRepo = mock {
+            onBlocking { insertLocalProperty(anyObject()) } doReturn  (mockedInsertReturn)
+        }
         `when`(propertyRepo.getPropertyByIdLD(anyString())).thenReturn(mockedProperty)
 
         fileHelper = mock(FileHelper::class.java)
@@ -57,12 +84,12 @@ class EditPropertyViewModelTest {
         )
 
         context = mock(App::class.java)
-//        `when`(context.getString(R.string.property_description_error)).thenReturn("mocked_description_error")
-//        `when`(context.getString(R.string.property_title_error)).thenReturn("mocked_title_error")
 
         geocodeResolver = mock(GeocodeResolver::class.java)
 
         sharedPreferencesRepo = mock(SharedPreferencesRepo::class.java)
+
+        clock = Clock.fixed(ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC).toInstant(), ZoneOffset.UTC)
 
 
         currentPropertyIdRepository.currentPropertyIdLiveData.value = "id1"
@@ -76,10 +103,17 @@ class EditPropertyViewModelTest {
             currentEditedPhotoRepository,
             context,
             geocodeResolver,
-            sharedPreferencesRepo
+            sharedPreferencesRepo,
+            clock,
+            coroutineContextProvider
         )
     }
 
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+        testCoroutineDispatcher.cleanupTestCoroutines()
+    }
 
     @Test
     fun shouldReturnProperEditUiState() {
@@ -101,47 +135,48 @@ class EditPropertyViewModelTest {
     }
 
     @Test
-    fun shouldLaunchDatePickerOnSoldDateClicked(){
-        viewModel.soldDatePickerClicked(2020,1,1)
+    fun shouldLaunchDatePickerOnSoldDateClicked() {
+        viewModel.soldDatePickerClicked(2020, 1, 1)
         val model = viewModel.editViewAction.getOrAwaitValue()
         assertEquals(
             2020
-            ,(model as EditPropertyViewModel.EditPropertyViewAction.DisplayDatePicker).year
+            , (model as EditPropertyViewModel.EditPropertyViewAction.DisplayDatePicker).year
         )
         assertEquals(
             1
-            ,model.month
+            , model.month
         )
         assertEquals(
             1
-            ,model.day
+            , model.day
         )
     }
 
     @Test
-    fun shouldLaunchCameraGalleryOnGalleryClick(){
+    fun shouldLaunchCameraGalleryOnGalleryClick() {
         viewModel.takePhotoFromGalleryClicked()
-         val model = viewModel.editViewAction.getOrAwaitValue()
+        val model = viewModel.editViewAction.getOrAwaitValue()
         assertEquals(
-            EditPropertyViewModel.EditPropertyViewAction.TakePhotoFromGallery,model
+            EditPropertyViewModel.EditPropertyViewAction.TakePhotoFromGallery, model
         )
     }
 
     @Test
-    fun shouldTriggerNoPhotoErrorIfPropertyHasNoPhotoOnSave(){
+    fun shouldTriggerNoPhotoErrorIfPropertyHasNoPhotoOnSave() {
         viewModel.editUiStateLD.getOrAwaitValue()
         propertyInModificationRepository.propertyInModificationLD.value =
             propertyInModificationRepository.propertyInModificationLD.value!!.copy(
                 propertyPrice = "",
                 propertySurface = ""
             )
-        val dateTimeNowMocked = org.threeten.bp.LocalDateTime.of(2020,1,1,1,1,0,0)
-        viewModel.savePropertyClicked(dateTimeNowMocked)
+        val dateTimeNowMocked = org.threeten.bp.LocalDateTime.of(2020, 1, 1, 1, 1, 0, 0)
+        viewModel.savePropertyClicked()
         val model = viewModel.editViewAction.getOrAwaitValue()
-        assertEquals(EditPropertyViewModel.EditPropertyViewAction.NoPhotoError,model)
+        assertEquals(EditPropertyViewModel.EditPropertyViewAction.NoPhotoError, model)
     }
+
     @Test
-    fun shouldTriggerFillErrorIfPropertyHasPhotoButInfoNotCorrectOnSave(){
+    fun shouldTriggerFillErrorIfPropertyHasPhotoButInfoNotCorrectOnSave() {
         viewModel.editUiStateLD.getOrAwaitValue()
         propertyInModificationRepository.propertyInModificationLD.value =
             propertyInModificationRepository.propertyInModificationLD.value!!.copy(
@@ -156,37 +191,108 @@ class EditPropertyViewModelTest {
                 )
 
             )
-        val dateTimeNowMocked = org.threeten.bp.LocalDateTime.of(2020,1,1,1,1,0,0)
-        viewModel.savePropertyClicked(dateTimeNowMocked)
+        viewModel.savePropertyClicked()
         val model = viewModel.editViewAction.getOrAwaitValue()
-        assertEquals(EditPropertyViewModel.EditPropertyViewAction.FillInError,model)
+        assertEquals(EditPropertyViewModel.EditPropertyViewAction.FillInError, model)
     }
 
     @Test
-    fun onSavePropertyShouldNotSaveIfPropertyNotModified(){
+    fun onSavePropertyShouldNotSaveIfPropertyNotModified() {
         mockedProperty.value = property1
         viewModel.editUiStateLD.getOrAwaitValue()
-        val dateTimeNowMocked = org.threeten.bp.LocalDateTime.of(2020,1,1,1,1,0,0)
-        viewModel.savePropertyClicked(dateTimeNowMocked)
+        viewModel.savePropertyClicked()
         val viewActionModel = viewModel.editViewAction.getOrAwaitValue()
-        assertEquals(EditPropertyViewModel.EditPropertyViewAction.CloseFragment,viewActionModel)
+        assertEquals(EditPropertyViewModel.EditPropertyViewAction.CloseFragment, viewActionModel)
 
     }
 
     @Test
-    fun shouldSavePropertyIfAllInfoCorrectAndPropertyHasChanged(){
+    fun shouldSavePropertyIfAllInfoCorrectAndPropertyHasChanged() = runBlockingTest {
         mockedProperty.value = property1
         viewModel.editUiStateLD.getOrAwaitValue()
-        val dateTimeNowMocked = org.threeten.bp.LocalDateTime.of(2020,1,1,1,1,0,0)
         propertyInModificationRepository.propertyInModificationLD.value =
             propertyInModificationRepository.propertyInModificationLD.value!!.copy(
                 propertyTitle = "NewTitle"
             )
-        viewModel.savePropertyClicked(dateTimeNowMocked)
+        viewModel.savePropertyClicked()
         val viewActionModel = viewModel.editViewAction.getOrAwaitValue()
-        assertNotEquals(EditPropertyViewModel.EditPropertyViewAction.FillInError,viewActionModel)
-        assertNotEquals(EditPropertyViewModel.EditPropertyViewAction.NoPhotoError,viewActionModel)
+        val viewEventModel = viewModel.editEvent.getOrAwaitValue()
+        assertEquals(EditPropertyViewModel.EditPropertyViewAction.CloseFragment, viewActionModel)
+        assertEquals(EditPropertyViewModel.EditPropertyEvent.PropertySaved, viewEventModel)
     }
+
+    @Test
+    fun editPhotoClickShouldChangeRepoPositionAndTriggerPhotoEditor() {
+        mockedProperty.value = property1
+        viewModel.editUiStateLD.getOrAwaitValue()
+        viewModel.editPhotoClicked(1)
+        val model = viewModel.editViewAction.getOrAwaitValue()
+        assertEquals(EditPropertyViewModel.EditPropertyViewAction.LaunchEditor,model)
+        assertEquals(1,currentEditedPhotoRepository.currentPhotoLD.value?.second)
+    }
+
+    @Test
+    fun onTitleChangeShouldChangeState(){
+        mockedProperty.value = property1
+        viewModel.editUiStateLD.getOrAwaitValue()
+        viewModel.onTitleChange("Test")
+        var model = viewModel.editUiStateLD.getOrAwaitValue()
+        assertEquals("Test",model.propertyTitle)
+
+        viewModel.onDescriptionChange("Test")
+        model = viewModel.editUiStateLD.getOrAwaitValue()
+        assertEquals("Test",model.propertyDescription)
+
+        viewModel.onAddressChange("TestAddress")
+        model = viewModel.editUiStateLD.getOrAwaitValue()
+        assertEquals("TestAddress",model.propertyAddress)
+
+        viewModel.onCityCodeChange("TestCityCode")
+        model = viewModel.editUiStateLD.getOrAwaitValue()
+        assertEquals("TestCityCode",model.propertyCityCode)
+
+        viewModel.onCityNameChange("TestCityName")
+        model = viewModel.editUiStateLD.getOrAwaitValue()
+        assertEquals("TestCityName",model.propertyCityName)
+
+        viewModel.onPriceChange("123")
+        model = viewModel.editUiStateLD.getOrAwaitValue()
+        assertEquals("123",model.propertyPrice)
+
+        viewModel.onTypeChange("Mansion")
+        model = viewModel.editUiStateLD.getOrAwaitValue()
+        assertEquals("Mansion",model.propertyType)
+
+        viewModel.onSurfaceChange("124")
+        model = viewModel.editUiStateLD.getOrAwaitValue()
+        assertEquals("124",model.propertySurface)
+
+        viewModel.onRoomCountChange("127")
+        model = viewModel.editUiStateLD.getOrAwaitValue()
+        assertEquals("127",model.propertyRoomCount)
+
+        viewModel.onBedroomCountChange("128")
+        model = viewModel.editUiStateLD.getOrAwaitValue()
+        assertEquals("128",model.propertyBedroomCount)
+
+        viewModel.onBathroomCountChange("129")
+        model = viewModel.editUiStateLD.getOrAwaitValue()
+        assertEquals("129",model.propertyBathroomCount)
+
+        viewModel.onChipChange("COUNTRYSIDE",true)
+        model = viewModel.editUiStateLD.getOrAwaitValue()
+        assertEquals(true,model.propertyPoiMap[PointOfInterest.COUNTRYSIDE])
+
+        viewModel.onSoldDateChange(2019,12,12)
+        model = viewModel.editUiStateLD.getOrAwaitValue()
+        assertEquals("12/12/2019",model.propertySoldDate)
+
+        viewModel.onClearSoldDate()
+        model = viewModel.editUiStateLD.getOrAwaitValue()
+        assertEquals(null,model.propertySoldDate)
+    }
+
+
 
     private var property1 = Property(
         "id1",
@@ -262,3 +368,10 @@ class EditPropertyViewModelTest {
         propertyLng = 2.0
     )
 }
+
+private fun <T> anyObject(): T {
+    Mockito.anyObject<T>()
+    return uninitialized()
+}
+
+private fun <T> uninitialized(): T = null as T

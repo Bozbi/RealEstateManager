@@ -1,4 +1,4 @@
-package com.sbizzera.real_estate_manager.ui.rem_activity.map_fragment
+package com.sbizzera.real_estate_manager.ui.rem_activity.map
 
 
 import com.sbizzera.real_estate_manager.data.model.CustomMapMarkers
