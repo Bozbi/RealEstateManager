@@ -52,7 +52,7 @@ class EditPropertyViewModel(
     init {
         editUiStateLD =
             Transformations.switchMap(currentPropertyIdRepository.currentPropertyIdLiveData) { propertyId ->
-                if (propertyId != null) {
+                if (propertyId.isNotEmpty()) {
                     Transformations.switchMap(propertyRepository.getPropertyByIdLD(propertyId)) { property ->
                         initialProperty = property
                         propertyInModificationRepository.propertyInModificationLD.value =
