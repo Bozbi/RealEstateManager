@@ -39,29 +39,12 @@ class FilterDialog : DialogFragment() {
             ViewModelFactory
         ).get(ListPropertyViewModel::class.java)
 
-        price_range_slider.addOnSliderTouchListener(object : RangeSlider.OnSliderTouchListener {
-            override fun onStartTrackingTouch(slider: RangeSlider) {}
-            override fun onStopTrackingTouch(slider: RangeSlider) {
-                dialogViewModel.onPriceRangeFilterChange(slider.values[0], slider.values[1])
-            }
-        })
-
-        surface_range_slider.addOnSliderTouchListener(object : RangeSlider.OnSliderTouchListener {
-            override fun onStartTrackingTouch(slider: RangeSlider) {}
-            override fun onStopTrackingTouch(slider: RangeSlider) {
-                dialogViewModel.onSurfaceRangeFilterChange(slider.values[0], slider.values[1])
-            }
-        })
-
-        room_range_slider.addOnSliderTouchListener(object : RangeSlider.OnSliderTouchListener {
-            override fun onStartTrackingTouch(slider: RangeSlider) {}
-            override fun onStopTrackingTouch(slider: RangeSlider) {
-                dialogViewModel.onRoomRangeFilterChange(slider.values[0], slider.values[1])
-            }
-        })
-
         addChips()
+        initObservers()
+        initListeners()
+    }
 
+    private fun initObservers() {
         dialogViewModel.filterUiState.observe(viewLifecycleOwner) {
             updateUiState(it)
         }
@@ -86,6 +69,31 @@ class FilterDialog : DialogFragment() {
                 }
             }
         }
+    }
+
+    private fun initListeners() {
+
+        price_range_slider.addOnSliderTouchListener(object : RangeSlider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: RangeSlider) {}
+            override fun onStopTrackingTouch(slider: RangeSlider) {
+                dialogViewModel.onPriceRangeFilterChange(slider.values[0], slider.values[1])
+            }
+        })
+
+        surface_range_slider.addOnSliderTouchListener(object : RangeSlider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: RangeSlider) {}
+            override fun onStopTrackingTouch(slider: RangeSlider) {
+                dialogViewModel.onSurfaceRangeFilterChange(slider.values[0], slider.values[1])
+            }
+        })
+
+        room_range_slider.addOnSliderTouchListener(object : RangeSlider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: RangeSlider) {}
+            override fun onStopTrackingTouch(slider: RangeSlider) {
+                dialogViewModel.onRoomRangeFilterChange(slider.values[0], slider.values[1])
+            }
+        })
+
         available_since_txt.setOnClickListener {
             dialogViewModel.onAvailableSinceDateClick()
         }
@@ -101,7 +109,6 @@ class FilterDialog : DialogFragment() {
         reset_btn.setOnClickListener {
             dialogViewModel.resetFilters()
         }
-
     }
 
     private fun updateUiState(filterUiState: FilterUiState) {

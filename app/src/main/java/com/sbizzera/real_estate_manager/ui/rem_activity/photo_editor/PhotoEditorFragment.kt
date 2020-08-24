@@ -39,6 +39,12 @@ class PhotoEditorFragment : Fragment() {
 
         updateUi(viewModel.currentPhotoEdited)
 
+        initViewActions(view)
+
+        initListeners()
+    }
+
+    private fun initViewActions(view: View) {
         viewModel.photoEditorViewAction.observe(viewLifecycleOwner) { viewAction ->
             when (viewAction) {
                 PhotoEditorViewModel.PhotoEditorViewAction.TitleEmptyError -> {
@@ -54,7 +60,9 @@ class PhotoEditorFragment : Fragment() {
                 }
             }
         }
+    }
 
+    private fun initListeners() {
         delete_photo_btn.setOnClickListener {
             viewModel.onDeletePhotoInEditor()
         }

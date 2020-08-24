@@ -46,34 +46,24 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
             this,
             ViewModelFactory
         ).get(DetailsPropertyViewModel::class.java)
-        recyclerAdapter.setListener(this, this)
-        recycler_view.adapter = recyclerAdapter
-        recycler_view.isNestedScrollingEnabled = false
+        initLayoutManager()
+        initRecyclerView()
+        initClickListeners()
+        prepareAnimation()
+        initObservers()
+    }
 
-        detailsLayoutManager = object : LinearLayoutManager(requireContext(), HORIZONTAL, false) {
-            override fun onLayoutCompleted(state: RecyclerView.State?) {
-                super.onLayoutCompleted(state)
-                viewModelDetails.checkScrollNecessity(
-                    detailsLayoutManager.findFirstCompletelyVisibleItemPosition(),
-                    detailsLayoutManager.findLastCompletelyVisibleItemPosition()
-
-                )
-            }
-
-            override fun canScrollVertically(): Boolean {
-                return false
-            }
-        }
-        recycler_view.apply {
-            layoutManager = detailsLayoutManager
-            isNestedScrollingEnabled = false
-            setHasFixedSize(true)
-        }
-
-
+    private fun initClickListeners() {
         modify_btn.setOnClickListener {
             viewModelDetails.modifyPropertyClicked()
         }
+
+        map_img.setOnClickListener {
+            onUserAskTransactionEvent.onMapAsked()
+        }
+    }
+
+    private fun prepareAnimation() {
         postponeEnterTransition()
 
         setExitSharedElementCallback(object : SharedElementCallback() {
@@ -86,10 +76,9 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
                 }
             }
         })
+    }
 
-        map_img.setOnClickListener {
-            onUserAskTransactionEvent.onMapAsked()
-        }
+    private fun initObservers() {
         viewModelDetails.detailsUiStateLD.observe(viewLifecycleOwner) { model ->
             updateUi(model)
             detailsLayoutManager.scrollToPosition(viewModelDetails.getCurrentPhotoPosition())
@@ -103,6 +92,35 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
                 is DetailsPropertyViewModel.DetailsViewAction.ScrollToPosition -> detailsLayoutManager.scrollToPosition(
                     action.position
                 )
+            }
+        }
+    }
+
+    private fun initRecyclerView() {
+        recyclerAdapter.setListener(this, this)
+        recycler_view.adapter = recyclerAdapter
+        recycler_view.isNestedScrollingEnabled = false
+
+        recycler_view.apply {
+            layoutManager = detailsLayoutManager
+            isNestedScrollingEnabled = false
+            setHasFixedSize(true)
+        }
+    }
+
+    private fun initLayoutManager() {
+        detailsLayoutManager = object : LinearLayoutManager(requireContext(), HORIZONTAL, false) {
+            override fun onLayoutCompleted(state: RecyclerView.State?) {
+                super.onLayoutCompleted(state)
+                viewModelDetails.checkScrollNecessity(
+                    detailsLayoutManager.findFirstCompletelyVisibleItemPosition(),
+                    detailsLayoutManager.findLastCompletelyVisibleItemPosition()
+
+                )
+            }
+
+            override fun canScrollVertically(): Boolean {
+                return false
             }
         }
     }

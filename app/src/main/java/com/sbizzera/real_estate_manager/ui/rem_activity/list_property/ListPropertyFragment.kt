@@ -25,6 +25,7 @@ class ListPropertyFragment : Fragment(), OnPropertyClickEvent, OnUserAskTransact
 
     private lateinit var viewModel: ListPropertyViewModel
     private lateinit var onUserAskTransactionEvent: OnUserAskTransactionEvent
+    private lateinit var recyclerViewAdapter: ListPropertyFragmentAdapter
 
     companion object {
         fun newInstance(): ListPropertyFragment {
@@ -41,23 +42,25 @@ class ListPropertyFragment : Fragment(), OnPropertyClickEvent, OnUserAskTransact
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val recyclerViewAdapter = ListPropertyFragmentAdapter()
-        recyclerViewAdapter.onPropertyClickListener = this
-
-        list_property_recycler.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = recyclerViewAdapter
-            val itemDecoration = DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL)
-            getDrawable(this.context, R.drawable.divider)?.let { itemDecoration.setDrawable(it) }
-            addItemDecoration(itemDecoration)
-        }
-
+        initRecyclerView()
 
         viewModel = ViewModelProvider(requireActivity(),
             ViewModelFactory
         )
             .get(ListPropertyViewModel::class.java)
 
+        initObservers()
+
+        add_property_fab.setOnClickListener {
+            viewModel.addPropertyClicked()
+        }
+
+        filter_txt.setOnClickListener {
+            FilterDialog.newInstance().show(activity?.supportFragmentManager!!,null)
+        }
+    }
+
+    private fun initObservers() {
         viewModel.listUiStateLD.observe(viewLifecycleOwner) { model ->
             with(recyclerViewAdapter) {
                 list = model.listPropertyItems
@@ -74,13 +77,19 @@ class ListPropertyFragment : Fragment(), OnPropertyClickEvent, OnUserAskTransact
                 }
             }
         }
+    }
 
-        add_property_fab.setOnClickListener {
-            viewModel.addPropertyClicked()
-        }
+    fun initRecyclerView(){
 
-        filter_txt.setOnClickListener {
-            FilterDialog.newInstance().show(activity?.supportFragmentManager!!,null)
+        recyclerViewAdapter = ListPropertyFragmentAdapter()
+        recyclerViewAdapter.onPropertyClickListener = this
+
+        list_property_recycler.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = recyclerViewAdapter
+            val itemDecoration = DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL)
+            getDrawable(this.context, R.drawable.divider)?.let { itemDecoration.setDrawable(it) }
+            addItemDecoration(itemDecoration)
         }
     }
 

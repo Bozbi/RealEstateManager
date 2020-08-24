@@ -59,8 +59,43 @@ class PhotoViewerFragment : Fragment(), PhotoViewerRecyclerAdapter.OnViewHolderB
             ViewModelFactory
         ).get(PhotoViewerViewModel::class.java)
 
+        val photoViewerLayoutManager = initRecycler()
 
+        prepareTransitionAnimation()
 
+        initObservers(photoViewerLayoutManager)
+
+    }
+
+    private fun initObservers(photoViewerLayoutManager: LinearLayoutManager) {
+        viewModel.photoList.observe(viewLifecycleOwner) { photoList ->
+            updateUi(photoList)
+            photoViewerLayoutManager.scrollToPosition(viewModel.getCurrentPhotoPosition())
+        }
+
+        viewModel.photoViewerViewAction.observe(viewLifecycleOwner) { action ->
+            when (action) {
+                PhotoViewerViewModel.PhotoViewerViewAction.ViewHolderReady -> startPostponedEnterTransition()
+            }
+        }
+    }
+
+    private fun prepareTransitionAnimation() {
+        postponeEnterTransition()
+
+        setEnterSharedElementCallback(object : SharedElementCallback() {
+            override fun onMapSharedElements(
+                names: MutableList<String>,
+                sharedElements: MutableMap<String, View>
+            ) {
+                recycler_view.findViewHolderForAdapterPosition(viewModel.getCurrentPhotoPosition())?.let {
+                    sharedElements[names[0]] = it.itemView.findViewById(R.id.photo_in_details_img)
+                }
+            }
+        })
+    }
+
+    private fun initRecycler(): LinearLayoutManager {
         photoViewerAdapter = PhotoViewerRecyclerAdapter()
         photoViewerAdapter.setListener(this)
         recycler_view.adapter = photoViewerAdapter
@@ -75,9 +110,9 @@ class PhotoViewerFragment : Fragment(), PhotoViewerRecyclerAdapter.OnViewHolderB
         )
         recycler_view.layoutManager = photoViewerLayoutManager
 
-        recycler_view.addOnScrollListener(object :RecyclerView.OnScrollListener(){
+        recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if(newState == RecyclerView.SCROLL_STATE_IDLE){
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     val currentPhotoPosition = snapHelper.findTargetSnapPosition(
                         photoViewerLayoutManager,
                         0,
@@ -87,31 +122,7 @@ class PhotoViewerFragment : Fragment(), PhotoViewerRecyclerAdapter.OnViewHolderB
                 }
             }
         })
-
-        postponeEnterTransition()
-
-        setEnterSharedElementCallback(object : SharedElementCallback() {
-            override fun onMapSharedElements(
-                names: MutableList<String>,
-                sharedElements: MutableMap<String, View>
-            ) {
-                recycler_view.findViewHolderForAdapterPosition(viewModel.getCurrentPhotoPosition())?.let {
-                    sharedElements[names[0]] = it.itemView.findViewById(R.id.photo_in_details_img)
-                }
-            }
-        })
-
-        viewModel.photoList.observe(viewLifecycleOwner){photoList->
-            updateUi(photoList)
-            photoViewerLayoutManager.scrollToPosition(viewModel.getCurrentPhotoPosition())
-        }
-
-        viewModel.photoViewerViewAction.observe(viewLifecycleOwner) { action ->
-            when (action) {
-                PhotoViewerViewModel.PhotoViewerViewAction.ViewHolderReady -> startPostponedEnterTransition()
-            }
-        }
-
+        return photoViewerLayoutManager
     }
 
     private fun updateUi(photoList: List<PhotoInViewer>) {

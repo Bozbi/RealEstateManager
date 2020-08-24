@@ -1,6 +1,7 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.map
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
@@ -35,63 +36,88 @@ class MapFragment : SupportMapFragment(), OnMapReadyCallback, OnUserAskTransacti
             ViewModelFactory
         ).get(MapViewModel::class.java)
 
+        initViewActions()
+    }
 
+    private fun initViewActions() {
         mapViewModel.mapViewAction.observe(viewLifecycleOwner) { action ->
             when (action) {
                 MapViewModel.MapViewAction.LocationPermissionToBeAsked -> {
-                    mapViewModel.chooseAppropriateRequestPermission(
-                        ActivityCompat.shouldShowRequestPermissionRationale(
-                            requireActivity(),
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                        )
-                    )
+                    launchLocationPermission()
                 }
 
                 MapViewModel.MapViewAction.RequestNormalPermission -> {
-                    registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-                        mapViewModel.checkLocationPermission()
-                    }.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    requestNormalPermission()
                 }
                 MapViewModel.MapViewAction.RequestRationalePermission -> {
-                    AlertDialog.Builder(requireContext()).apply {
-                        setPositiveButton("SETTINGS") { _, _ ->
-                            registerForActivityResult(GoToSettingContract()) {}.launch(null)
-                        }
-                        setNegativeButton("BACK") { _, _ ->
-                            activity?.supportFragmentManager?.popBackStack()
-                        }
-                        setMessage("Location permission is needed to access this feature")
-                        setTitle("LOCATION PERMISSION")
-                        setCancelable(false)
-                    }.show()
+                    requestRationalPermission()
                 }
                 MapViewModel.MapViewAction.GetMap -> getMapAsync(this)
                 MapViewModel.MapViewAction.MapIsReadyWithoutLocation -> {
-                    googleMap.isMyLocationEnabled = true
-                    googleMap.uiSettings.isMyLocationButtonEnabled = true
+                    mapIsReadyWithoutLocation()
                 }
                 is MapViewModel.MapViewAction.MapIsReady -> {
-                    googleMap.isMyLocationEnabled = true
-                    googleMap.uiSettings.isMyLocationButtonEnabled = true
-                    googleMap.moveCamera(
-                        CameraUpdateFactory.newLatLngZoom(
-                            LatLng(
-                                action.locationToFocus.latitude,
-                                action.locationToFocus.longitude
-                            ),
-                            17f
-                        )
-                    )
-                    action.markers.forEach {
-                        val marker = googleMap.addMarker(
-                            MarkerOptions()
-                                .position(LatLng(it.latitude, it.longitude))
-                        )
-                        marker.tag = it.propertyId
-                    }
+                    mapIsReady(action)
                 }
             }
         }
+    }
+
+    private fun launchLocationPermission() {
+        mapViewModel.chooseAppropriateRequestPermission(
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        )
+    }
+
+    private fun requestNormalPermission() {
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            mapViewModel.checkLocationPermission()
+        }.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    }
+
+    private fun requestRationalPermission() {
+        AlertDialog.Builder(requireContext()).apply {
+            setPositiveButton("SETTINGS") { _, _ ->
+                registerForActivityResult(GoToSettingContract()) {}.launch(null)
+            }
+            setNegativeButton("BACK") { _, _ ->
+                activity?.supportFragmentManager?.popBackStack()
+            }
+            setMessage("Location permission is needed to access this feature")
+            setTitle("LOCATION PERMISSION")
+            setCancelable(false)
+        }.show()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun mapIsReady(action: MapViewModel.MapViewAction.MapIsReady) {
+        this.googleMap.isMyLocationEnabled = true
+        googleMap.uiSettings.isMyLocationButtonEnabled = true
+        googleMap.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(
+                    action.locationToFocus.latitude,
+                    action.locationToFocus.longitude
+                ),
+                17f
+            )
+        )
+        action.markers.forEach {
+            val marker = googleMap.addMarker(
+                MarkerOptions()
+                    .position(LatLng(it.latitude, it.longitude))
+            )
+            marker.tag = it.propertyId
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun mapIsReadyWithoutLocation() {
+        googleMap.isMyLocationEnabled = true
+        googleMap.uiSettings.isMyLocationButtonEnabled = true
     }
 
 

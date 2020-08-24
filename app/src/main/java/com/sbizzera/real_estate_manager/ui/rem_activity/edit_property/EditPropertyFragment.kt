@@ -1,5 +1,6 @@
 package com.sbizzera.real_estate_manager.ui.rem_activity.edit_property
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.Context
 import android.net.Uri
@@ -54,10 +55,127 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelFactory
-        ).get(EditPropertyViewModel::class.java)
+        viewModel = ViewModelProvider(this, ViewModelFactory).get(EditPropertyViewModel::class.java)
+        initViewState()
+        initViewAction()
+        addChips()
+        initRecycler()
+        initAfterTextChangeListeners()
+        initTextChangeListener()
+        setScrollViewListener()
+        initClickListeners()
+    }
+
+    private fun initAfterTextChangeListeners() {
+        property_address_edt.afterTextChangedDelayed { address ->
+            viewModel.onAddressChange(address)
+        }
+
+        property_city_code_edt.afterTextChangedDelayed { cityCode ->
+            viewModel.onCityCodeChange(cityCode)
+
+        }
+
+        property_city_name_edt.afterTextChangedDelayed { cityName ->
+            viewModel.onCityNameChange(cityName)
+        }
+    }
+
+    private fun initClickListeners() {
+        save_property_btn.setOnClickListener {
+            viewModel.savePropertyClicked()
+        }
+
+        property_sold_date_layout.setEndIconOnClickListener {
+            viewModel.onClearSoldDate()
+        }
+
+        add_photo_from_camera_btn.setOnClickListener {
+            viewModel.takePhotoFromCameraClicked()
+        }
+
+        add_photo_from_gallery_btn.setOnClickListener {
+            viewModel.takePhotoFromGalleryClicked()
+        }
+
+        property_sold_date_edt.setOnClickListener {
+            val today = LocalDate.now()
+            viewModel.soldDatePickerClicked(today.year, today.monthValue, today.dayOfMonth)
+        }
+    }
+
+    private fun initTextChangeListener() {
+        property_title_edt.doOnTextChanged { text, _, _, _ ->
+            viewModel.onTitleChange(text.toString())
+        }
+
+        property_description_edt.doOnTextChanged { text, _, _, _ ->
+            viewModel.onDescriptionChange(text.toString())
+        }
+
+        property_price_edt.doOnTextChanged { text, _, _, _ ->
+            viewModel.onPriceChange(text.toString())
+        }
+
+        property_type_autocomplete.doOnTextChanged { text, _, _, _ ->
+            viewModel.onTypeChange(text.toString())
+        }
+
+        property_surface_edt.doOnTextChanged { text, _, _, _ ->
+            viewModel.onSurfaceChange(text)
+        }
+
+        property_room_count_edt.doOnTextChanged { text, _, _, _ ->
+            viewModel.onRoomCountChange(text.toString())
+        }
+
+        property_bedroom_count_edt.doOnTextChanged { text, _, _, _ ->
+            viewModel.onBedroomCountChange(text.toString())
+        }
+
+        property_bathroom_count_edt.doOnTextChanged { text, _, _, _ ->
+            viewModel.onBathroomCountChange(text.toString())
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setScrollViewListener() {
+        scroll_view.setOnTouchListener { v, _ ->
+            (activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
+                scroll_view.windowToken,
+                0
+            )
+            (v as ScrollView).children.forEach {
+                it.clearFocus()
+            }
+            false
+        }
+    }
+
+    private fun initRecycler() {
+        val propertyTypeAdapter = ArrayAdapter(
+            requireContext(), R.layout.list_item,
+            getTypeNameList()
+        )
+        val autoCompleteTextView = property_type_layout.editText as AutoCompleteTextView
+        autoCompleteTextView.setAdapter(propertyTypeAdapter)
+
+        recyclerViewAdapter = EditPropertyPhotoRecyclerAdapter()
+        mLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        val snapHelper = PagerSnapHelper()
+
+        recyclerView = property_photos_recycler_view.apply {
+            layoutManager = mLayoutManager
+            adapter = recyclerViewAdapter
+            isNestedScrollingEnabled = false
+        }
+
+        recyclerViewAdapter.setListener(this)
+
+        snapHelper.attachToRecyclerView(property_photos_recycler_view)
+    }
+
+    private fun initViewState() {
         viewModel.editUiStateLD.observe(viewLifecycleOwner) { model ->
 
             updateUi(model)
@@ -69,6 +187,9 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
                 }
             }
         }
+    }
+
+    private fun initViewAction() {
         viewModel.editViewAction.observe(viewLifecycleOwner) { viewAction ->
             when (viewAction) {
 
@@ -108,107 +229,6 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
                     Snackbar.LENGTH_LONG
                 ).show()
             }
-        }
-
-        addChips()
-
-        val propertyTypeAdapter = ArrayAdapter(
-            requireContext(), R.layout.list_item,
-            getTypeNameList()
-        )
-        val autoCompleteTextView = property_type_layout.editText as AutoCompleteTextView
-        autoCompleteTextView.setAdapter(propertyTypeAdapter)
-
-        recyclerViewAdapter = EditPropertyPhotoRecyclerAdapter()
-        mLayoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        val snapHelper = PagerSnapHelper()
-
-        recyclerView = property_photos_recycler_view.apply {
-            layoutManager = mLayoutManager
-            adapter = recyclerViewAdapter
-            isNestedScrollingEnabled = false
-        }
-
-        recyclerViewAdapter.setListener(this)
-
-        snapHelper.attachToRecyclerView(property_photos_recycler_view)
-
-        add_photo_from_camera_btn.setOnClickListener {
-            viewModel.takePhotoFromCameraClicked()
-        }
-
-        add_photo_from_gallery_btn.setOnClickListener {
-            viewModel.takePhotoFromGalleryClicked()
-        }
-
-        property_sold_date_edt.setOnClickListener {
-            val today = LocalDate.now()
-            viewModel.soldDatePickerClicked(today.year, today.monthValue, today.dayOfMonth)
-        }
-
-        property_title_edt.doOnTextChanged { text, _, _, _ ->
-            viewModel.onTitleChange(text.toString())
-        }
-
-        property_description_edt.doOnTextChanged { text, _, _, _ ->
-            viewModel.onDescriptionChange(text.toString())
-        }
-
-
-        property_address_edt.afterTextChangedDelayed { address ->
-            viewModel.onAddressChange(address)
-        }
-
-        property_city_code_edt.afterTextChangedDelayed { cityCode ->
-            viewModel.onCityCodeChange(cityCode)
-
-        }
-
-        property_city_name_edt.afterTextChangedDelayed { cityName ->
-            viewModel.onCityNameChange(cityName)
-        }
-
-        property_price_edt.doOnTextChanged { text, _, _, _ ->
-            viewModel.onPriceChange(text.toString())
-        }
-
-        property_type_autocomplete.doOnTextChanged { text, _, _, _ ->
-            viewModel.onTypeChange(text.toString())
-        }
-
-        property_surface_edt.doOnTextChanged { text, _, _, _ ->
-            viewModel.onSurfaceChange(text)
-        }
-
-        property_room_count_edt.doOnTextChanged { text, _, _, _ ->
-            viewModel.onRoomCountChange(text.toString())
-        }
-
-        property_bedroom_count_edt.doOnTextChanged { text, _, _, _ ->
-            viewModel.onBedroomCountChange(text.toString())
-        }
-
-        property_bathroom_count_edt.doOnTextChanged { text, _, _, _ ->
-            viewModel.onBathroomCountChange(text.toString())
-        }
-
-        scroll_view.setOnTouchListener { v, _ ->
-            (activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
-                scroll_view.windowToken,
-                0
-            )
-            (v as ScrollView).children.forEach {
-                it.clearFocus()
-            }
-            false
-        }
-
-        save_property_btn.setOnClickListener {
-            viewModel.savePropertyClicked()
-        }
-
-        property_sold_date_layout.setEndIconOnClickListener {
-            viewModel.onClearSoldDate()
         }
     }
 

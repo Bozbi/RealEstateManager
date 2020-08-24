@@ -1,7 +1,6 @@
 package com.sbizzera.real_estate_manager.provider
 
 import android.content.ContentProvider
-import android.content.ContentUris
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
@@ -50,7 +49,7 @@ class PropertyContentProvider : ContentProvider() {
                 }
             }
         }
-        throw IllegalArgumentException ("Failed to insert row into " + uri)
+        throw IllegalArgumentException ("Failed to insert row into $uri")
     }
 
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int {

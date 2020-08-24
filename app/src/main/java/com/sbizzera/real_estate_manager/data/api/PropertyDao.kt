@@ -35,7 +35,7 @@ interface PropertyDao {
     @Query("SELECT * FROM properties WHERE propertyId LIKE :propertyId LIMIT 1")
     suspend fun getPropertyByIdAsync(propertyId: String): Property
 
-    @Query("DELETE FROM properties")
-    fun deleteTables()
+    @Query("DELETE FROM properties WHERE propertyId LIKE :propertyId")
+    fun deleteTables(propertyId: String)
 
 }

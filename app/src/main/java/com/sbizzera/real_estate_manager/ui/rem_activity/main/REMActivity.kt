@@ -32,6 +32,7 @@ import com.sbizzera.real_estate_manager.utils.architecture_components.ViewModelF
 import kotlinx.android.synthetic.main.activity_r_e_m.*
 
 
+@Suppress("PrivatePropertyName")
 class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySavedListener {
 
     private val CAMERA_INTENT_REQUEST_CODE = 123
@@ -48,99 +49,21 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
             this,
             ViewModelFactory
         ).get(REMActivityViewModel::class.java)
-        viewModel.viewAction.observe(this) { action ->
-            when (action) {
 
-                LaunchPhotoEditor -> {
-                    supportFragmentManager.popBackStackImmediate(
-                        PhotoEditorFragment::class.java.simpleName,
-                        FragmentManager.POP_BACK_STACK_INCLUSIVE
-                    )
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.details_container, PhotoEditorFragment.newInstance())
-                        .addToBackStack(PhotoEditorFragment::class.java.simpleName).commit()
-                }
-                LaunchDetails -> {
-                    supportActionBar?.let {
-                        it.setDisplayHomeAsUpEnabled(true)
-                        it.setDisplayShowHomeEnabled(true)
-                    }
-                    supportFragmentManager.popBackStackImmediate(
-                        DetailsPropertyFragment::class.java.simpleName,
-                        FragmentManager.POP_BACK_STACK_INCLUSIVE
-                    )
-                    supportFragmentManager.beginTransaction().replace(
-                        R.id.details_container,
-                        DetailsPropertyFragment.newInstance(),
-                        DetailsPropertyFragment::class.java.simpleName
-                    ).addToBackStack(DetailsPropertyFragment::class.java.simpleName).commit()
-                }
-                is LaunchEditProperty -> {
-                    supportFragmentManager.popBackStackImmediate(
-                        EditPropertyFragment::class.java.simpleName,
-                        FragmentManager.POP_BACK_STACK_INCLUSIVE
-                    )
+        initViewActions()
+        checkInstantState(savedInstanceState)
+        initToolBar()
 
-                    supportFragmentManager.beginTransaction().replace(
-                        R.id.details_container,
-                        EditPropertyFragment.newInstance(),
-                        EditPropertyFragment::class.java.simpleName
-                    ).addToBackStack(EditPropertyFragment::class.java.simpleName).commit()
-                }
-                LaunchMap -> {
-                    supportFragmentManager.popBackStackImmediate(
-                        MapFragment::class.java.simpleName,
-                        FragmentManager.POP_BACK_STACK_INCLUSIVE
-                    )
-                    supportFragmentManager
-                        .beginTransaction().replace(
-                            R.id.details_container,
-                            MapFragment.newInstance()
-                        ).addToBackStack(MapFragment::class.java.simpleName).commit()
-                }
-                is LaunchPhotoViewer -> {
+    }
 
-                    supportFragmentManager.popBackStackImmediate(
-                        PhotoViewerFragment::class.java.simpleName,
-                        FragmentManager.POP_BACK_STACK_INCLUSIVE
-                    )
-
-                    supportFragmentManager
-                        .beginTransaction()
-                        .setReorderingAllowed(true).apply {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                addSharedElement(action.transitionView, action.transitionView.transitionName)
-                            }
-                        }
-                        .replace(
-                            R.id.details_container,
-                            PhotoViewerFragment.newInstance()
-                        )
-                        .addToBackStack(PhotoViewerFragment::class.java.simpleName)
-                        .commit()
-                }
-                ShowChooseUserDialog -> {
-                    val dialog =
-                        ChooseUserMaterialDialog()
-                    dialog.show(supportFragmentManager, null)
-                }
-                HideBackButton -> {
-                    supportActionBar?.let {
-                        it.setDisplayShowHomeEnabled(false)
-                        it.setDisplayHomeAsUpEnabled(false)
-                    }
-                }
-                LaunchSync -> {
-                    sync_background.visibility = View.VISIBLE
-                    sync_progress.visibility = View.VISIBLE
-                }
-                SyncEnd -> {
-                    sync_background.visibility = View.GONE
-                    sync_progress.visibility = View.GONE
-                }
-            }
+    private fun initToolBar() {
+        setSupportActionBar(toolbar)
+        toolbar.setNavigationOnClickListener {
+            onBackPressed()
         }
+    }
 
+    private fun checkInstantState(savedInstanceState: Bundle?) {
         if (savedInstanceState == null) {
             supportFragmentManager.popBackStackImmediate(
                 ListPropertyFragment::class.java.simpleName,
@@ -149,13 +72,136 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
             supportFragmentManager.beginTransaction()
                 .replace(R.id.list_container, ListPropertyFragment.newInstance())
                 .commit()
-
         }
-        setSupportActionBar(toolbar)
-        toolbar.setNavigationOnClickListener {
-            onBackPressed()
-        }
+    }
 
+    private fun initViewActions() {
+        viewModel.viewAction.observe(this) { action ->
+            when (action) {
+                LaunchPhotoEditor -> {
+                    launchPhotoEditor()
+                }
+                LaunchDetails -> {
+                    launchDetails()
+                }
+                is LaunchEditProperty -> {
+                    LaunchEditProperty()
+                }
+                LaunchMap -> {
+                    launchMap()
+                }
+                is LaunchPhotoViewer -> {
+                    launchPhotoViewer(action)
+                }
+                ShowChooseUserDialog -> {
+                    launchChooseUserDialog()
+                }
+                HideBackButton -> {
+                    launchHideBackButton()
+                }
+                LaunchSync -> {
+                    launchSync()
+                }
+                SyncEnd -> {
+                    endSync()
+                }
+            }
+        }
+    }
+
+    private fun endSync() {
+        sync_background.visibility = View.GONE
+        sync_progress.visibility = View.GONE
+    }
+
+    private fun launchSync() {
+        sync_background.visibility = View.VISIBLE
+        sync_progress.visibility = View.VISIBLE
+    }
+
+    private fun launchHideBackButton() {
+        supportActionBar?.let {
+            it.setDisplayShowHomeEnabled(false)
+            it.setDisplayHomeAsUpEnabled(false)
+        }
+    }
+
+    private fun launchChooseUserDialog() {
+        val dialog =
+            ChooseUserMaterialDialog()
+        dialog.show(supportFragmentManager, null)
+    }
+
+    private fun launchPhotoViewer(action: LaunchPhotoViewer) {
+        supportFragmentManager.popBackStackImmediate(
+            PhotoViewerFragment::class.java.simpleName,
+            FragmentManager.POP_BACK_STACK_INCLUSIVE
+        )
+
+        supportFragmentManager
+            .beginTransaction()
+            .setReorderingAllowed(true).apply {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    addSharedElement(action.transitionView, action.transitionView.transitionName)
+                }
+            }
+            .replace(
+                R.id.details_container,
+                PhotoViewerFragment.newInstance()
+            )
+            .addToBackStack(PhotoViewerFragment::class.java.simpleName)
+            .commit()
+    }
+
+    private fun launchMap() {
+        supportFragmentManager.popBackStackImmediate(
+            MapFragment::class.java.simpleName,
+            FragmentManager.POP_BACK_STACK_INCLUSIVE
+        )
+        supportFragmentManager
+            .beginTransaction().replace(
+                R.id.details_container,
+                MapFragment.newInstance()
+            ).addToBackStack(MapFragment::class.java.simpleName).commit()
+    }
+
+    private fun LaunchEditProperty() {
+        supportFragmentManager.popBackStackImmediate(
+            EditPropertyFragment::class.java.simpleName,
+            FragmentManager.POP_BACK_STACK_INCLUSIVE
+        )
+
+        supportFragmentManager.beginTransaction().replace(
+            R.id.details_container,
+            EditPropertyFragment.newInstance(),
+            EditPropertyFragment::class.java.simpleName
+        ).addToBackStack(EditPropertyFragment::class.java.simpleName).commit()
+    }
+
+    private fun launchDetails() {
+        supportActionBar?.let {
+            it.setDisplayHomeAsUpEnabled(true)
+            it.setDisplayShowHomeEnabled(true)
+        }
+        supportFragmentManager.popBackStackImmediate(
+            DetailsPropertyFragment::class.java.simpleName,
+            FragmentManager.POP_BACK_STACK_INCLUSIVE
+        )
+        supportFragmentManager.beginTransaction().replace(
+            R.id.details_container,
+            DetailsPropertyFragment.newInstance(),
+            DetailsPropertyFragment::class.java.simpleName
+        ).addToBackStack(DetailsPropertyFragment::class.java.simpleName).commit()
+    }
+
+    private fun launchPhotoEditor() {
+        supportFragmentManager.popBackStackImmediate(
+            PhotoEditorFragment::class.java.simpleName,
+            FragmentManager.POP_BACK_STACK_INCLUSIVE
+        )
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.details_container, PhotoEditorFragment.newInstance())
+            .addToBackStack(PhotoEditorFragment::class.java.simpleName).commit()
     }
 
 
