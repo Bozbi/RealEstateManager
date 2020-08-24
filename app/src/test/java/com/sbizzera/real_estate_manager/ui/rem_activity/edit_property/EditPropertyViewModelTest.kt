@@ -169,7 +169,6 @@ class EditPropertyViewModelTest {
                 propertyPrice = "",
                 propertySurface = ""
             )
-        val dateTimeNowMocked = org.threeten.bp.LocalDateTime.of(2020, 1, 1, 1, 1, 0, 0)
         viewModel.savePropertyClicked()
         val model = viewModel.editViewAction.getOrAwaitValue()
         assertEquals(EditPropertyViewModel.EditPropertyViewAction.NoPhotoError, model)
@@ -368,10 +367,10 @@ class EditPropertyViewModelTest {
         propertyLng = 2.0
     )
 }
-
+@Suppress("DEPRECATION")
 private fun <T> anyObject(): T {
     Mockito.anyObject<T>()
     return uninitialized()
 }
-
+@Suppress("UNCHECKED_CAST")
 private fun <T> uninitialized(): T = null as T

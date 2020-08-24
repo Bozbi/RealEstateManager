@@ -70,20 +70,7 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
             setHasFixedSize(true)
         }
 
-        viewModelDetails.detailsUiStateLD.observe(viewLifecycleOwner) { model ->
-            updateUi(model)
-        }
-        viewModelDetails.detailsViewAction.observe(viewLifecycleOwner) { action ->
-            when (action) {
-                ModifyPropertyClicked -> {
-                    onUserAskTransactionEvent.onModifyPropertyAsked()
-                }
-                DetailsPropertyViewModel.DetailsViewAction.ViewHolderReady -> startPostponedEnterTransition()
-                is DetailsPropertyViewModel.DetailsViewAction.ScrollToPosition -> detailsLayoutManager.scrollToPosition(
-                    action.position
-                )
-            }
-        }
+
         modify_btn.setOnClickListener {
             viewModelDetails.modifyPropertyClicked()
         }
@@ -102,6 +89,21 @@ class DetailsPropertyFragment : Fragment(), OnUserAskTransactionEventListenable,
 
         map_img.setOnClickListener {
             onUserAskTransactionEvent.onMapAsked()
+        }
+        viewModelDetails.detailsUiStateLD.observe(viewLifecycleOwner) { model ->
+            updateUi(model)
+            detailsLayoutManager.scrollToPosition(viewModelDetails.getCurrentPhotoPosition())
+        }
+        viewModelDetails.detailsViewAction.observe(viewLifecycleOwner) { action ->
+            when (action) {
+                ModifyPropertyClicked -> {
+                    onUserAskTransactionEvent.onModifyPropertyAsked()
+                }
+                DetailsPropertyViewModel.DetailsViewAction.ViewHolderReady -> startPostponedEnterTransition()
+                is DetailsPropertyViewModel.DetailsViewAction.ScrollToPosition -> detailsLayoutManager.scrollToPosition(
+                    action.position
+                )
+            }
         }
     }
 

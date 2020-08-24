@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.sbizzera.real_estate_manager.R
+import com.sbizzera.real_estate_manager.custom_views.MyCustomChip
 import com.sbizzera.real_estate_manager.data.model.PointOfInterest
 import com.sbizzera.real_estate_manager.data.model.getTypeNameList
 import com.sbizzera.real_estate_manager.events.OnPhotoActionListener
@@ -29,7 +30,6 @@ import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEvent
 import com.sbizzera.real_estate_manager.events.OnUserAskTransactionEventListenable
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property.EditPropertyViewModel.EditPropertyViewAction.*
 import com.sbizzera.real_estate_manager.utils.architecture_components.ViewModelFactory
-import com.sbizzera.real_estate_manager.custom_views.MyCustomChip
 import kotlinx.android.synthetic.main.fragment_edit_property.*
 import org.threeten.bp.LocalDate
 
@@ -54,7 +54,8 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel = ViewModelProvider(this,
+        viewModel = ViewModelProvider(
+            this,
             ViewModelFactory
         ).get(EditPropertyViewModel::class.java)
         viewModel.editUiStateLD.observe(viewLifecycleOwner) { model ->
@@ -142,7 +143,7 @@ class EditPropertyFragment : Fragment(), OnPhotoActionListener, OnUserAskTransac
 
         property_sold_date_edt.setOnClickListener {
             val today = LocalDate.now()
-            viewModel.soldDatePickerClicked(today.year,today.monthValue,today.dayOfMonth)
+            viewModel.soldDatePickerClicked(today.year, today.monthValue, today.dayOfMonth)
         }
 
         property_title_edt.doOnTextChanged { text, _, _, _ ->

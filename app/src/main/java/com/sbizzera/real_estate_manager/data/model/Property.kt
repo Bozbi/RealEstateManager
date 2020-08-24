@@ -31,7 +31,6 @@ data class Property(
     val estateAgent: String? = null
 ) {
     fun hasNotChanged(property: Property): Boolean {
-        println()
             return propertyId == property.propertyId &&
                     propertyType ==property.propertyType &&
                     photoList == property.photoList &&

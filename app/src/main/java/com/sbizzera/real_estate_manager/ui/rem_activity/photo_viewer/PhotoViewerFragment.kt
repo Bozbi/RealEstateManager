@@ -58,11 +58,7 @@ class PhotoViewerFragment : Fragment(), PhotoViewerRecyclerAdapter.OnViewHolderB
         viewModel = ViewModelProvider(this,
             ViewModelFactory
         ).get(PhotoViewerViewModel::class.java)
-        viewModel.photoViewerViewAction.observe(viewLifecycleOwner) { action ->
-            when (action) {
-                PhotoViewerViewModel.PhotoViewerViewAction.ViewHolderReady -> startPostponedEnterTransition()
-            }
-        }
+
 
 
         photoViewerAdapter = PhotoViewerRecyclerAdapter()
@@ -108,6 +104,12 @@ class PhotoViewerFragment : Fragment(), PhotoViewerRecyclerAdapter.OnViewHolderB
         viewModel.photoList.observe(viewLifecycleOwner){photoList->
             updateUi(photoList)
             photoViewerLayoutManager.scrollToPosition(viewModel.getCurrentPhotoPosition())
+        }
+
+        viewModel.photoViewerViewAction.observe(viewLifecycleOwner) { action ->
+            when (action) {
+                PhotoViewerViewModel.PhotoViewerViewAction.ViewHolderReady -> startPostponedEnterTransition()
+            }
         }
 
     }

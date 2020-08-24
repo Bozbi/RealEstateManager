@@ -153,6 +153,10 @@ class DetailsPropertyViewModel(
         }
     }
 
+    override fun onCleared() {
+        currentPhotoPositionRepo.currentPhotoPosition = -1
+    }
+
 
     sealed class DetailsViewAction {
         object ModifyPropertyClicked : DetailsViewAction()

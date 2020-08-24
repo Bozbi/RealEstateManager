@@ -14,10 +14,12 @@ import com.sbizzera.real_estate_manager.data.model.PointOfInterest
 import com.sbizzera.real_estate_manager.data.model.Property
 import com.sbizzera.real_estate_manager.data.repository.*
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property.EditPropertyViewModel.EditPropertyViewAction.LaunchEditor
-import com.sbizzera.real_estate_manager.utils.*
+import com.sbizzera.real_estate_manager.utils.CUSTOM_DATE_FORMATTER
+import com.sbizzera.real_estate_manager.utils.CoroutineContextProvider
 import com.sbizzera.real_estate_manager.utils.architecture_components.SingleLiveEvent
 import com.sbizzera.real_estate_manager.utils.helper.FileHelper
 import com.sbizzera.real_estate_manager.utils.helper.GeocodeResolver
+import com.sbizzera.real_estate_manager.utils.toPhotoInEditUiState
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.threeten.bp.Clock

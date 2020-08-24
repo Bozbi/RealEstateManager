@@ -9,11 +9,12 @@ import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.snackbar.Snackbar
 import com.sbizzera.real_estate_manager.R
 import com.sbizzera.real_estate_manager.ui.rem_activity.edit_property.PhotoOnEdit
 import com.sbizzera.real_estate_manager.utils.architecture_components.ViewModelFactory
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_photo_editor.*
 import kotlinx.android.synthetic.main.fragment_photo_editor.view.*
 
@@ -31,7 +32,8 @@ class PhotoEditorFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel = ViewModelProvider(this,
+        viewModel = ViewModelProvider(
+            this,
             ViewModelFactory
         ).get(PhotoEditorViewModel::class.java)
 
@@ -64,7 +66,7 @@ class PhotoEditorFragment : Fragment() {
 
 
     private fun updateUi(photo: PhotoOnEdit) {
-        Picasso.get().load(photo.photoUri).resize(600,600).into(current_photo_img)
+        Glide.with(this).load(photo.photoUri).apply(RequestOptions().override(600, 600)).into(current_photo_img)
         photo_title_edit_text.setText(photo.photoTitle)
     }
 

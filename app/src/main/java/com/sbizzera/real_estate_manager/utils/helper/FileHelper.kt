@@ -6,8 +6,8 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.core.content.FileProvider
-import com.sbizzera.real_estate_manager.application.App
 import com.sbizzera.real_estate_manager.R
+import com.sbizzera.real_estate_manager.application.App
 import com.sbizzera.real_estate_manager.data.model.Photo
 import java.io.File
 import java.io.FileInputStream
@@ -119,7 +119,6 @@ class FileHelper private constructor() {
         }
         return File("${appContext.filesDir}/$propertyId/$fileName.jpg")
     }
-
 }
 
 fun ContentResolver.getFileName(fileUri: Uri): String {

@@ -2,7 +2,6 @@ package com.sbizzera.real_estate_manager.ui.rem_activity.main
 
 
 import android.app.Activity
-import android.content.ClipData
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -234,19 +233,19 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
     }
 
     override fun onCameraAsked(tempPhotoUri: String) {
-        val takePictureIntent2 = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        takePictureIntent2.resolveActivity(packageManager)
-        takePictureIntent2.putExtra(MediaStore.EXTRA_OUTPUT, tempPhotoUri)
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
-            val tempPhotoUriInUri = Uri.parse(tempPhotoUri)
-            takePictureIntent2.clipData = ClipData.newRawUri("", tempPhotoUriInUri)
-            takePictureIntent2.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            takePictureIntent.resolveActivity(packageManager)
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.parse(tempPhotoUri))
+
         }
         @Suppress("DEPRECATION")
-        startActivityForResult(takePictureIntent2, CAMERA_INTENT_REQUEST_CODE)
+        startActivityForResult(takePictureIntent, CAMERA_INTENT_REQUEST_CODE)
+
     }
 
+
     override fun onGalleryAsked() {
+
         @Suppress("DEPRECATION")
         startActivityForResult(
             Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI),
@@ -264,9 +263,9 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
         }
         if (requestCode == GALLERY_INTENT_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                (supportFragmentManager.fragments.filter { it.tag == EditPropertyFragment::class.java.simpleName }[0] as EditPropertyFragment).onResultFromGallery(
-                    intent?.data
-                )
+                (supportFragmentManager.fragments.filter {
+                    it.tag == EditPropertyFragment::class.java.simpleName
+                }[0] as EditPropertyFragment).onResultFromGallery(intent?.data)
             }
         }
     }
