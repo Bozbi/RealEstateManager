@@ -1,5 +1,6 @@
 package com.sbizzera.real_estate_manager.data.model
 
+import android.content.ContentValues
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
@@ -49,6 +50,16 @@ data class Property(
                     longitude == property.longitude &&
                     propertyBathRooms == property.propertyBathRooms
 
+    }
+    companion object{
+        fun fromContentValues(values : ContentValues):Property{
+            return Property(
+                propertyId = values.getAsString("propertyId"),
+                propertyTitle = values.getAsString("propertyTitle"),
+                propertyType = values.getAsString("propertyType"),
+                price = values.getAsInteger("price")
+            )
+        }
     }
 }
 

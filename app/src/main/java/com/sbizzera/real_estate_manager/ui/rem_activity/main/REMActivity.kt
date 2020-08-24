@@ -240,7 +240,6 @@ class REMActivity : AppCompatActivity(), OnUserAskTransactionEvent, OnPropertySa
         }
         @Suppress("DEPRECATION")
         startActivityForResult(takePictureIntent, CAMERA_INTENT_REQUEST_CODE)
-
     }
 
 

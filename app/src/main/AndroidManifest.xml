@@ -38,6 +38,12 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"/>
         </provider>
+
+        <provider
+            android:authorities="com.sbizzera.real_estate_manager.provider"
+            android:name=".provider.PropertyContentProvider"
+            android:exported="true"
+            />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBf-BkuCJ9RTvvZfgIj3juupvB0eD-NFaI"
